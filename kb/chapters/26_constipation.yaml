@@ -1,0 +1,157 @@
+# Chapter 26 — Constipation (ท้องผูก)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 289–298. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 26
+title: {th: ท้องผูก, en: Constipation}
+chief_complaint: constipation
+also_entry: [narrow_stool]                 # a change in stool calibre is asked in this history; p.290
+status: draft
+
+definitions:  # p.290
+  constipation: "รู้สึกขับถ่ายยาก อุจจาระแข็งเป็นก้อน ถ่ายไม่ออก หรือเบ่งถ่ายลำบาก"
+  chronic_constipation: "ท้องผูกนานกว่า 3 เดือน"
+
+hpi:
+  constipation:
+    duration:  # p.290
+      ask: "ท้องผูกมานานกี่เดือนแล้ว"
+      unit: months
+      categories:
+        recent: {below: 3}
+        chronic: {from: 3}
+      grey_zones:
+        - {from: 2, to: 4, both: [recent, chronic]}
+      allow_unknown: true
+    frequency:  # p.292
+      ask: "ถ่ายอุจจาระสัปดาห์ละกี่ครั้ง"
+      unit: per_week
+      categories:
+        infrequent: {below: 3}
+        normal: {from: 3}
+      allow_unknown: true
+    course:  # p.293
+      ask: "เป็นตลอด หรือเป็นๆ หายๆ"
+      options: [continuous, intermittent]
+
+steps:
+  - {id: secondary_or_functional}  # p.292
+  - {id: alarm_features}  # p.290, 292
+  - {id: drugs_and_systemic_disease}  # p.292, 293
+  - {id: functional_type}  # p.293, 294
+
+gates:
+  obstruction:  # mechanical obstruction, p.292; urgency: reviewer
+    when: always
+    ask: [no_stool_no_flatus]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # alarm features; p.290, 292
+    ask: [weight_loss, melena, hematochezia, narrow_stool, pallor, family_history_gi_cancer]
+    red_flag_when: {age_above: 50}
+    rules_out: [colon_cancer]
+  - when: always  # drugs that cause constipation; p.293
+    ask: [constipating_drug]
+    rules_out: [medication_induced_constipation]
+
+tree_selection:
+  - {when: always, use: [secondary, functional]}  # ภาพ 26-1
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {constipation.duration: chronic}, boost: functional}  # p.290
+  - {when: {constipation.duration: recent}, boost: secondary.mechanical_obstruction}  # p.290
+  - {when: {age_above: 50}, boost: secondary.mechanical_obstruction.malignant}  # p.292
+  - {when: {present: [pain_related_to_defecation]}, boost: functional.abdominal_pain}  # p.293
+  - {when: {absent: [abdominal_pain]}, boost: functional.no_abdominal_pain}  # p.293
+
+trees:  # ภาพ 26-1
+  secondary:
+    mechanical_obstruction:  # p.292
+      malignant: [colon_cancer, external_compression]
+      benign: [anal_stenosis, rectocele]
+    disease_associated:  # p.292
+      connective_tissue: [systemic_sclerosis]
+      metabolic: [hypercalcemia, diabetic_dysmotility]
+      endocrine: [hypothyroidism]
+      neurologic: [parkinsons_disease, multiple_sclerosis, spinal_cord_lesion]
+    drug_associated: [medication_induced_constipation]
+  functional:
+    abdominal_pain: [ibs]
+    no_abdominal_pain: [functional_constipation]
+    defecatory: [defecatory_disorder]
+
+scores:
+  rome_iv:  # p.292
+    applies_to: functional_constipation
+    when: always
+    items:
+      - {symptom: straining}
+      - {symptom: hard_stools}
+      - {symptom: tenesmus}
+      - {symptom: anorectal_blockage}
+      - {symptom: digital_evacuation}
+      - {symptom: infrequent_stools}
+    threshold: {at_least: 2}
+
+confirm: {}
+
+findings:
+  colon_cancer:  # p.290, 292
+    symptoms: [weight_loss, melena, hematochezia, narrow_stool, pallor]
+  hypothyroidism:  # from ch.18 p.195
+    symptoms: [fatigue, weight_gain, dry_skin]
+  parkinsons_disease:  # from ch.21 p.234
+    symptoms: [resting_tremor, slow_movement]
+  ibs:  # p.293, 294
+    symptoms: [pain_related_to_defecation, abdominal_pain, bowel_habit_change]
+  functional_constipation:  # p.293
+    symptoms: [hard_stools, infrequent_stools, straining]
+  defecatory_disorder:  # p.294
+    symptoms: [straining, tenesmus, digital_evacuation, anorectal_blockage]
+
+branch_findings: {}
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [family_history_gi_cancer], suggests: [colon_cancer]}  # p.290
+  - {findings: [connective_tissue_disease], suggests: [systemic_sclerosis]}  # p.291, 292
+  - {findings: [diabetes], suggests: [diabetic_dysmotility]}  # p.292
+  - {findings: [constipating_drug], suggests: [medication_induced_constipation]}  # p.293
+  - {findings: [bedridden], suggests: [functional_constipation]}  # less movement in older people; p.290
+
+exam_clues:
+  - {sign: rectal_mass_or_impacted_stool, suggests: [mechanical obstruction or fecal impaction]}  # p.291
+  - {sign: paradoxical_anal_contraction_on_straining, suggests: [defecatory disorder]}  # p.291

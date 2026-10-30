@@ -1,0 +1,211 @@
+# Eye symptoms: red eye, eye pain, eye irritation, blurred vision
+# Source: 402 Eye Summary (student summary notes, Ramathibodi RA58). `# eye.N` = PDF page of the notes.
+# Notes, not a textbook: needs closer physician review than the book chapters.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: g2
+title: {th: "ตาแดง ปวดตา เคืองตา ตามัว", en: "Red eye, eye pain, blurred vision"}
+chief_complaint: red_eye
+also_entry: [eye_pain, eye_irritation, blurred_vision, eye_discharge, eyelid_lump]
+status: draft
+
+definitions: {}
+
+hpi:
+  red_eye:
+    pain:  # eye.2 high vs low risk table
+      ask: "ปวดตาไหม หรือแค่เคืองๆ ระคายๆ"
+      options: [painful, irritation_only]
+    vision:  # eye.2
+      ask: "มองเห็นลดลงไหม"
+      options: [decreased, normal]
+  eye_discharge:
+    character:  # eye.2
+      ask: "ขี้ตาลักษณะแบบไหน"
+      allow_unknown: true
+      options: [watery, mucoid, mucopurulent, severe_purulent]
+  blurred_vision:
+    onset:  # eye.1
+      ask: "ตามัวลงทันที หรือค่อยๆ มัว"
+      options: [sudden, subacute, gradual]
+    laterality:  # eye.1
+      ask: "มัวข้างเดียวหรือทั้งสองข้าง"
+      options: [one_eye, both_eyes]
+    pain:  # eye.1
+      ask: "ปวดตาร่วมด้วยไหม"
+      options: [painful, painless]
+
+steps:
+  - {id: gate}  # eye.1 emergencies
+  - {id: high_vs_low_risk}  # eye.2
+  - {id: anatomy}  # eye.2: lid, lacrimal, conjunctiva, cornea, uvea, sclera
+  - {id: painful_vs_painless_visual_loss}  # eye.1
+
+gates:
+  vision_threatening:  # eye.1 emergencies, eye.2
+    when: always
+    ask: [sudden_vision_loss, halos, severe_purulent_eye_discharge, eye_trauma]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {present: [red_eye]}  # eye.2 high-risk features
+    ask: [eye_pain, photophobia, blurred_vision]
+    rules_out: [angle_closure_glaucoma, keratitis, uveitis, scleritis]
+  - when: {present: [blurred_vision], age_above: 50}  # eye.1
+    ask: [headache, jaw_claudication, scalp_tenderness]
+    rules_out: [temporal_arteritis]
+
+tree_selection:
+  - {when: always, use: [red_eye]}  # eye.2
+  - {when: {red_eye.vision: decreased}, use: [acute_visual_loss]}  # eye.1
+  - {when: {present: [blurred_vision]}, use: [acute_visual_loss]}  # eye.1
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {red_eye.pain: painful}, boost: red_eye.high_risk}  # eye.2
+  - {when: {red_eye.vision: decreased}, boost: red_eye.high_risk}  # eye.2
+  - {when: {red_eye.pain: irritation_only, red_eye.vision: normal}, boost: red_eye.low_risk}  # eye.2
+  - {when: {blurred_vision.pain: painful}, boost: acute_visual_loss.painful}  # eye.1
+  - {when: {blurred_vision.pain: painless}, boost: acute_visual_loss.painless}  # eye.1
+
+trees:
+  red_eye:  # eye.2
+    high_risk:
+      glaucoma: [angle_closure_glaucoma]
+      cornea: [corneal_abrasion, corneal_foreign_body, keratitis]
+      uvea: [uveitis]
+      sclera: [scleritis, episcleritis]
+    low_risk:
+      lid: [blepharitis, hordeolum, chalazion]
+      lacrimal: [dacryocystitis]
+      conjunctiva: [pterygium_pinguecula, subconjunctival_hemorrhage, allergic_conjunctivitis, viral_conjunctivitis,
+                    bacterial_conjunctivitis, hyperacute_bacterial_conjunctivitis]
+  acute_visual_loss:  # eye.1
+    painful:
+      red_eye: [angle_closure_glaucoma]
+      no_red_eye: [optic_neuritis]
+    painless:
+      one_eye: [crao, crvo, retinal_detachment, vitreous_hemorrhage, retinitis, naion, temporal_arteritis,
+                traumatic_optic_neuropathy]
+      both_eyes: [visual_pathway_lesion]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  angle_closure_glaucoma:  # eye.1
+    symptoms: [eye_pain, halos, blurred_vision, headache, nausea, vomiting, sudden_vision_loss]
+    signs: [fixed_dilated_pupil, ground_glass_cornea, ciliary_injection, iop_over_21]
+  corneal_abrasion:  # eye.2
+    symptoms: [eye_pain, eye_trauma]
+  corneal_foreign_body:  # eye.2
+    symptoms: [eye_pain, eye_trauma]
+  keratitis:  # eye.2
+    symptoms: [eye_pain, photophobia, blurred_vision]
+  uveitis:  # eye.2
+    symptoms: [eye_pain, photophobia, floaters, blurred_vision]
+    signs: [hypopyon, ciliary_injection, keratic_precipitate]
+  scleritis:  # eye.2
+    symptoms: [severe_eye_pain]
+  episcleritis:  # eye.2
+    symptoms: [eye_irritation]
+  blepharitis:  # eye.2
+    symptoms: [eyelid_inflammation]
+  hordeolum:  # eye.2
+    symptoms: [eyelid_lump]
+  chalazion:  # eye.2
+    symptoms: [eyelid_lump]
+  dacryocystitis:  # eye.2
+    symptoms: [painful_lump_inner_corner, tearing]
+  pterygium_pinguecula:  # eye.2
+    symptoms: [eye_irritation, tearing, sun_exposure]
+  subconjunctival_hemorrhage:  # eye.2
+    symptoms: [red_eye]
+  allergic_conjunctivitis:  # eye.2
+    symptoms: [itchy_eyes, mucoid_eye_discharge]
+  viral_conjunctivitis:  # eye.2
+    symptoms: [watery_eye_discharge, preauricular_lymph_node, recent_respiratory_infection]
+  bacterial_conjunctivitis:  # eye.2
+    symptoms: [mucopurulent_eye_discharge]
+  hyperacute_bacterial_conjunctivitis:  # eye.2
+    symptoms: [severe_purulent_eye_discharge, eyelid_swelling, preauricular_lymph_node]
+  optic_neuritis:  # eye.1
+    symptoms: [eye_pain_on_movement, blurred_vision, color_vision_loss]
+  crao:  # eye.1
+    symptoms: [sudden_vision_loss]
+  crvo:  # eye.1
+    symptoms: [blurred_vision]
+  retinal_detachment:  # eye.1
+    symptoms: [sudden_vision_loss, floaters]
+  vitreous_hemorrhage:  # eye.1
+    symptoms: [sudden_vision_loss, floaters]
+  naion:  # eye.1
+    symptoms: [sudden_vision_loss]
+  temporal_arteritis:  # eye.1
+    symptoms: [headache, jaw_claudication, weight_loss, sudden_vision_loss]
+  visual_pathway_lesion:  # eye.1
+    symptoms: [hemiparesis]
+
+branch_findings:
+  red_eye.high_risk:  # eye.2
+    symptoms: [eye_pain, photophobia, blurred_vision]
+    signs: [ciliary_injection, cloudy_cornea, abnormal_pupil, abnormal_iop]
+  red_eye.low_risk:  # eye.2
+    symptoms: [eye_irritation, watery_eye_discharge, mucoid_eye_discharge]
+    signs: [conjunctival_injection]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [eye_trauma], suggests: [corneal_abrasion, corneal_foreign_body, traumatic_optic_neuropathy]}  # eye.1, eye.2
+  - {findings: [contact_lens_use, eye_trauma], suggests: [keratitis]}  # eye.2
+  - {findings: [hyperopia], suggests: [angle_closure_glaucoma]}  # eye.1
+  - {findings: [sun_exposure], suggests: [pterygium_pinguecula]}  # eye.2
+  - {findings: [eye_rubbing_or_straining, antithrombotic_use, history_hypertension], suggests: [subconjunctival_hemorrhage]}  # eye.2
+  - {findings: [history_allergy, history_asthma], suggests: [allergic_conjunctivitis]}  # eye.2
+  - {findings: [recent_respiratory_infection, daycare_attendance], suggests: [viral_conjunctivitis]}  # eye.2
+  - {findings: [connective_tissue_disease], suggests: [scleritis]}  # eye.2
+  - {findings: [hiv_infection], suggests: [retinitis]}  # eye.1
+  - {findings: [history_hypertension, diabetes, dyslipidemia, smoking], suggests: [naion, crao]}  # eye.1
+  - {findings: [diabetes], suggests: [vitreous_hemorrhage]}  # eye.1
+  - {findings: [head_trauma], suggests: [traumatic_optic_neuropathy]}  # eye.1
+
+exam_clues:
+  - {sign: ciliary_injection, suggests: [acute glaucoma, keratitis, uveitis]}  # eye.2
+  - {sign: rapd, suggests: [optic neuritis, traumatic optic neuropathy]}  # eye.1
+  - {sign: cherry_red_spot, suggests: [CRAO]}  # eye.1
+  - {sign: flame_shaped_hemorrhage_four_quadrants, suggests: [CRVO]}  # eye.1
+  - {sign: chalky_white_disc_swelling, suggests: [arteritic AION (giant cell arteritis)]}  # eye.1
+  - {sign: homonymous_hemianopia_macular_sparing, suggests: [PCA occlusion]}  # eye.1
+  - {sign: hypopyon, suggests: [anterior uveitis]}  # eye.2

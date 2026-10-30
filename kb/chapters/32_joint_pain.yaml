@@ -1,0 +1,206 @@
+# Chapter 32 — Joint pain (ปวดข้อ)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 353–362. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 32
+title: {th: ปวดข้อ, en: Joint pain}
+chief_complaint: joint_pain
+also_entry: []
+status: draft
+
+definitions:  # p.354, 357
+  arthritis: "ปวดข้อร่วมกับข้อบวม กดเจ็บ อุ่น และขยับได้จำกัด"
+  arthralgia: "ปวดข้อโดยไม่มีลักษณะของการอักเสบ"
+  monoarthritis: "อักเสบข้อเดียว"
+  oligoarthritis: "อักเสบ 2–4 ข้อ มักเป็นข้อใหญ่"
+  polyarthritis: "อักเสบตั้งแต่ 5 ข้อขึ้นไป มักเป็นข้อเล็ก"
+  duration:
+    acute: "น้อยกว่า 2 สัปดาห์"
+    subacute: "2–6 สัปดาห์"
+    chronic: "มากกว่า 6 สัปดาห์"
+    intermittent: "เป็นๆ หายๆ ช่วงที่หายอาจไม่หายสนิท"
+
+hpi:
+  joint_pain:
+    swelling_redness:  # p.355
+      ask: "ข้อที่ปวดบวม แดง หรืออุ่นร้อนไหม"
+      allow_unknown: true
+      options: [present, absent]
+    duration:  # p.357
+      ask: "ปวดข้อมานานเท่าไหร่แล้ว"
+      unit: weeks
+      allow_unknown: true
+      categories:
+        acute: {below: 2}
+        subacute: {from: 2, to: 6}
+        chronic: {above: 6}
+      grey_zones:
+        - {from: 1, to: 3, both: [acute, subacute]}
+        - {from: 5, to: 8, both: [subacute, chronic]}
+    joint_count:  # p.354
+      ask: "ปวดกี่ข้อ"
+      unit: joints
+      allow_unknown: true
+      categories:
+        mono: {below: 2}
+        oligo: {from: 2, to: 4}
+        poly: {from: 5}
+        multiple: {from: 2}                # overlaps oligo + poly, for "ปวดหลายข้อ"
+    location:  # ตาราง 32-1
+      ask: "ปวดข้อไหนบ้าง"
+      multiple: true
+      allow_unknown: true
+      options: [knee, ankle, hip, wrist, elbow, shoulder, finger_base, finger_middle, finger_tip, toe]
+    symmetry:  # ตาราง 32-1
+      ask: "ปวดข้อเดียวกันทั้งสองข้างของร่างกายไหม"
+      options: [symmetric, asymmetric]
+    pattern:  # p.360
+      ask: "อาการปวดข้อเป็นแบบไหน"
+      options: [migratory, additive, intermittent, persistent]
+    morning_stiffness:  # p.358
+      ask: "ตอนเช้าข้อฝืดขัดนานแค่ไหน"
+      options: [over_1_hour, under_15_minutes, none]
+
+steps:
+  - {id: arthritis_vs_arthralgia}  # p.355
+  - {id: duration}  # p.357
+  - {id: joint_count}  # p.357
+  - {id: distribution}  # p.359
+  - {id: pattern}  # p.360
+
+gates: {}
+
+must_ask:
+  - when: {present: [joint_inflammation]}  # p.353, 358
+    ask: [fever, iv_drug_use, wound_near_joint, recent_infection]
+    rules_out: [septic_arthritis]
+
+tree_selection:
+  - {when: {joint_pain.swelling_redness: absent}, use: [arthralgia]}  # p.355
+  - {when: {joint_pain.swelling_redness: present, joint_pain.duration: acute}, use: [arthritis_acute]}  # p.357
+  - {when: {joint_pain.swelling_redness: present, joint_pain.duration: subacute}, use: [arthritis_acute]}
+  - {when: {joint_pain.swelling_redness: present, joint_pain.duration: chronic}, use: [arthritis_chronic]}
+  - {when: {joint_pain.pattern: intermittent}, use: [arthritis_intermittent]}  # p.358
+  - {when: {joint_pain.pattern: migratory}, use: [pattern_based]}  # p.360
+  - {when: {joint_pain.swelling_redness: unknown}, use: [arthralgia, arthritis_acute, arthritis_chronic]}
+
+branch_selection:
+  attribute: joint_pain.joint_count
+  map:
+    mono: [mono]
+    oligo: [oligo]
+    poly: [poly]
+    multiple: [oligo, poly]
+
+branch_hints: []
+
+trees:  # ภาพ 32-1
+  arthritis_acute:
+    mono: [septic_arthritis, gout, pseudogout, joint_trauma, hemarthrosis, behcet_disease]
+    oligo: [disseminated_gonococcal_infection, septic_arthritis, viral_arthritis, snsa, palindromic_rheumatism]
+    poly: [snsa, septic_arthritis, acute_hiv]
+  arthritis_intermittent: [gout, pseudogout, rheumatoid_arthritis, palindromic_rheumatism, mechanical_joint_problem]
+  arthritis_chronic:
+    mono: [chronic_tophaceous_gout, tuberculous_arthritis, snsa, osteoarthritis]
+    poly: [rheumatoid_arthritis, autoimmune_disease, viral_arthritis, paraneoplastic_arthritis, snsa,
+           osteoarthritis, chronic_tophaceous_gout, pseudogout]
+  arthralgia:
+    mono: [avascular_necrosis, osteoarthritis, loose_body]
+    oligo: [avascular_necrosis, osteoarthritis, paraneoplastic_arthralgia]
+    poly: [hypertrophic_osteoarthropathy, paraneoplastic_arthralgia, acromegaly]
+  pattern_based: [rheumatic_fever]  # p.360, not drawn in ภาพ 32-1
+
+scores: {}
+
+confirm: {}
+
+findings:
+  septic_arthritis:  # p.358
+    symptoms: [fever, joint_inflammation]
+  gout:  # p.358, ตาราง 32-1
+    symptoms: [intermittent_joint_attacks, knee_pain, ankle_pain, toe_joint_pain, asymmetric_joint_pain]
+  pseudogout:  # p.358, ตาราง 32-1
+    symptoms: [intermittent_joint_attacks, knee_pain, ankle_pain, wrist_pain, finger_base_joint_pain]
+  behcet_disease:  # p.358
+    symptoms: [oral_ulcer, genital_ulcer, red_eye, eye_pain]
+  snsa:  # p.358, ตาราง 32-1
+    symptoms: [rash, back_pain, diarrhea, urethral_discharge, red_eye, oral_ulcer, finger_tip_joint_pain,
+               asymmetric_joint_pain]
+  disseminated_gonococcal_infection:  # p.360, 361
+    symptoms: [asymmetric_joint_pain, additive_joint_pain, migratory_joint_pain]
+  viral_arthritis:  # p.361
+    symptoms: [symmetric_joint_pain, rash, lymph_node_swelling]
+  rheumatoid_arthritis:  # p.358–360, ตาราง 32-1
+    symptoms: [morning_stiffness_long, symmetric_joint_pain, additive_joint_pain, finger_base_joint_pain,
+               finger_middle_joint_pain, toe_joint_pain]
+  sle:  # p.360, 361
+    symptoms: [symmetric_joint_pain, additive_joint_pain, oral_ulcer, rash_sun_exposed, hair_loss]
+  osteoarthritis:  # p.356, 358, ตาราง 32-1
+    symptoms: [morning_stiffness_short, asymmetric_joint_pain, knee_pain, hip_pain, finger_tip_joint_pain,
+               finger_middle_joint_pain]
+  palindromic_rheumatism:  # p.360
+    symptoms: [intermittent_joint_attacks]
+  rheumatic_fever:  # p.360
+    symptoms: [migratory_joint_pain]
+  avascular_necrosis:  # p.356
+    symptoms: [hip_pain]
+  hypertrophic_osteoarthropathy:  # p.357
+    symptoms: [symmetric_joint_pain]
+    signs: [clubbing, periostitis]
+  acromegaly:  # p.357
+    symptoms: [enlarging_hands_face]
+
+branch_findings:
+  arthritis_acute:  # p.355
+    symptoms: [joint_inflammation]
+  arthritis_chronic:  # p.355
+    symptoms: [joint_inflammation]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [iv_drug_use, wound_near_joint, recent_infection], suggests: [septic_arthritis]}  # p.358
+  - {findings: [previous_similar_attack], suggests: [gout, pseudogout]}  # p.358
+  - {findings: [easy_bleeding, antithrombotic_use], suggests: [hemarthrosis]}  # p.358
+  - {findings: [sti_history, unprotected_sex], suggests: [disseminated_gonococcal_infection, acute_hiv]}  # p.358, 361
+  - {findings: [recent_trauma_surgery], suggests: [joint_trauma, avascular_necrosis, osteoarthritis]}  # p.356, 357
+  - {findings: [corticosteroid_use, alcohol, heavy_smoking], suggests: [avascular_necrosis]}  # p.356
+  - {findings: [history_cancer], suggests: [paraneoplastic_arthralgia, paraneoplastic_arthritis, hypertrophic_osteoarthropathy]}  # p.356, 357
+
+exam_clues:
+  - {sign: joint_effusion, suggests: [arthritis]}  # p.354
+  - {sign: pain_on_passive_movement_all_directions, suggests: [arthritis rather than arthralgia]}  # p.355
+  - {sign: clubbing_with_periostitis, suggests: [hypertrophic osteoarthropathy]}  # p.357
+  - {sign: synovial_wbc_over_50000_neutrophil_over_75, suggests: [septic arthritis]}  # ตาราง 32-2
+  - {sign: synovial_wbc_2000_to_50000, suggests: [inflammatory arthritis]}  # ตาราง 32-2
+  - {sign: synovial_wbc_200_to_2000, suggests: [osteoarthritis, joint trauma, avascular necrosis]}  # ตาราง 32-2
+  - {sign: urate_or_cppd_crystals, suggests: [gout, pseudogout]}  # p.360

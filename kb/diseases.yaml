@@ -1,0 +1,2833 @@
+# Disease registry shared by all chapter files.
+#
+# How to read this file. One entry per disease or disease group, under ── lines naming the chapter
+# that first needed it. Where a disease sits in a DDx tree is set in each chapter file, because the
+# same disease can sit under different branches in different chapters.
+#
+#   <id>:              the id that chapter files use
+#     th, en           display names (internal; not shown to patients)
+#     kind             disease | group (group = a category the source names with examples)
+#     examples         for groups: what the source lists under it
+#     sex              female | male -> never in the DDx for the other sex
+#     must_not_miss    true -> dangerous if missed; its red-flag questions come first
+
+# ── Systemic infection (ภาพ 3-1, ตาราง 3-2) ─────────────────────────────────
+dengue:
+  th: ไข้เลือดออก
+  en: dengue
+  kind: disease
+
+chikungunya:
+  th: ชิคุนกุนยา
+  en: chikungunya
+  kind: disease
+
+acute_hiv:
+  th: การติดเชื้อเอชไอวีระยะเฉียบพลัน
+  en: acute HIV infection
+  kind: disease
+
+infectious_mononucleosis:
+  th: โรคติดเชื้อโมโนนิวคลิโอสิส
+  en: infectious mononucleosis
+  kind: disease
+
+enteric_fever:
+  th: ไข้ไทฟอยด์
+  en: enteric fever
+  kind: disease
+
+melioidosis:
+  th: เมลิออยโดสิส
+  en: melioidosis
+  kind: disease
+
+primary_bacteremia:
+  th: ติดเชื้อแบคทีเรียในกระแสเลือด
+  en: primary bacteremia
+  kind: disease
+  must_not_miss: true
+
+scrub_typhus:
+  th: ไข้รากสาดใหญ่ชนิดสครับ
+  en: scrub typhus
+  kind: disease
+
+murine_typhus:
+  th: ไข้รากสาดใหญ่ชนิดมิวรีน
+  en: murine typhus
+  kind: disease
+
+leptospirosis:
+  th: โรคฉี่หนู
+  en: leptospirosis
+  kind: disease
+
+malaria:
+  th: มาลาเรีย
+  en: malaria
+  kind: disease
+
+# ── Localized infection (ตาราง 3-3) ───────────────────────────────────────
+meningitis:
+  th: เยื่อหุ้มสมองอักเสบ
+  en: meningitis
+  kind: disease
+  must_not_miss: true
+
+encephalitis:
+  th: สมองอักเสบ / ฝีในสมอง
+  en: encephalitis or brain abscess
+  kind: disease
+  must_not_miss: true
+
+pharyngitis:
+  th: โพรงจมูกและคออักเสบ
+  en: nasopharyngitis or pharyngitis
+  kind: disease
+
+sinusitis:
+  th: ไซนัสอักเสบ
+  en: sinusitis
+  kind: disease
+
+otitis_media:
+  th: หูชั้นกลางอักเสบ
+  en: otitis media
+  kind: disease
+
+bronchitis:
+  th: หลอดลมอักเสบ
+  en: bronchitis or bronchiolitis
+  kind: disease
+
+pneumonia:
+  th: ปอดอักเสบ
+  en: pneumonia
+  kind: disease
+
+lung_abscess:
+  th: ฝีในปอด
+  en: lung abscess
+  kind: disease
+
+infective_endocarditis:
+  th: ลิ้นหัวใจติดเชื้อ
+  en: infective endocarditis
+  kind: disease
+  must_not_miss: true
+
+gastroenteritis:
+  th: กระเพาะลำไส้อักเสบ
+  en: gastroenteritis or colitis
+  kind: disease
+
+hepatitis:
+  th: ตับอักเสบ
+  en: hepatitis
+  kind: disease
+
+liver_abscess:
+  th: ฝีในตับ
+  en: liver abscess
+  kind: disease
+
+cholecystitis:
+  th: ถุงน้ำดีอักเสบ
+  en: cholecystitis
+  kind: disease
+
+cholangitis:
+  th: ท่อน้ำดีอักเสบ
+  en: cholangitis
+  kind: disease
+  must_not_miss: true
+
+acute_pyelonephritis:
+  th: กรวยไตอักเสบเฉียบพลัน
+  en: acute pyelonephritis
+  kind: disease
+
+pelvic_inflammatory_disease:
+  th: อุ้งเชิงกรานอักเสบ
+  en: pelvic inflammatory disease
+  kind: disease
+  sex: female
+
+skin_soft_tissue_infection:
+  th: ผิวหนังและเนื้อเยื่ออ่อนติดเชื้อ
+  en: skin and soft tissue infection
+  kind: group
+  examples: [cellulitis, necrotizing fasciitis, myositis, pyomyositis]
+  must_not_miss: true  # necrotizing fasciitis
+
+septic_arthritis:
+  th: ข้ออักเสบติดเชื้อ
+  en: septic arthritis
+  kind: disease
+
+spondylodiscitis:
+  th: กระดูกสันหลังติดเชื้อ / ฝีในช่องไขสันหลัง
+  en: spondylodiscitis or epidural abscess
+  kind: disease
+  must_not_miss: true
+
+# ── Other infection groups (ตาราง 3-4; not drawn in ภาพ 3-1) ─────────────────
+opportunistic_infection:
+  th: โรคติดเชื้อฉวยโอกาส
+  en: opportunistic infection
+  kind: group
+
+nosocomial_infection:
+  th: ติดเชื้อจากโรงพยาบาล
+  en: hospital-acquired infection
+  kind: group
+  examples: [drug-resistant bacteria, C. difficile-associated diarrhea/colitis]
+
+zoonotic_infection:
+  th: โรคติดต่อจากสัตว์
+  en: zoonotic infection
+  kind: group
+  examples: [brucellosis, anthrax, Q fever, cat-scratch disease, toxoplasmosis, Capnocytophaga,
+              rat-bite fever, plague, Streptococcus suis, Erysipelothrix, cryptococcosis, histoplasmosis,
+              rabies]
+
+sexually_transmitted_infection:
+  th: โรคติดต่อทางเพศสัมพันธ์
+  en: sexually transmitted infection
+  kind: group
+
+tuberculosis:
+  th: วัณโรค
+  en: tuberculosis
+  kind: disease
+
+epidemic_infection:
+  th: โรคติดเชื้อที่กำลังระบาด
+  en: infection circulating in the household or community
+  kind: group
+
+# ── Non-infection (ภาพ 3-1, ตาราง 3-2) ─────────────────────────────────────
+autoimmune_disease:
+  th: โรคแพ้ภูมิตัวเอง
+  en: autoimmune disease
+  kind: group
+  examples: [SLE, rheumatic fever, Kawasaki disease, giant cell arteritis, Behcet disease,
+              polymyalgia rheumatica, mixed connective tissue disease, rheumatoid arthritis]
+
+autoinflammatory_disease:
+  th: โรคแพ้ภูมิตัวเอง
+  en: autoinflammatory disease
+  kind: group
+  examples: [adult-onset Still disease]
+
+other_inflammation:
+  th: ภาวะอักเสบอื่น
+  en: other inflammation
+  kind: group
+  examples: [crystal-induced arthritis, pancreatitis, thrombophlebitis, sarcoidosis,
+              inflammatory bowel disease]
+
+trauma_surgery:
+  th: การบาดเจ็บหรือผ่าตัด
+  en: trauma or surgery
+  kind: group
+
+hematologic_malignancy:
+  th: มะเร็งระบบเลือด
+  en: hematologic malignancy
+  kind: group
+  examples: [leukemia, lymphoma]
+
+solid_malignancy:
+  th: มะเร็งอวัยวะ
+  en: solid organ malignancy
+  kind: group
+  examples: [sarcoma, renal cell carcinoma, hepatoma, liver metastasis, glioblastoma multiforme,
+              bronchogenic carcinoma, pancreatic carcinoma, colon carcinoma]
+
+drug_fever:
+  th: ไข้จากยา
+  en: drug fever
+  kind: group
+  examples: [hypersensitivity, amphetamine, cocaine, NMS, serotonin syndrome, infusion reaction]
+
+central_fever:
+  th: ไข้จากความผิดปกติของสมอง
+  en: central fever
+  kind: group
+
+endocrine_fever:
+  th: โรคต่อมไร้ท่อ
+  en: endocrine disease
+  kind: group
+  examples: [pheochromocytoma, adrenal insufficiency, thyrotoxicosis]
+
+hematologic_disease:
+  th: โรคเลือด
+  en: hematologic disease
+  kind: group
+  examples: [HLH, TTP, Castleman disease]
+
+transfusion_reaction:
+  th: ปฏิกิริยาจากการรับเลือด
+  en: transfusion reaction
+  kind: group
+
+vaccine_reaction:
+  th: ผลข้างเคียงจากวัคซีน
+  en: vaccine reaction
+  kind: group
+
+thrombosis:
+  th: ลิ่มเลือดอุดตัน
+  en: thrombosis
+  kind: group
+  examples: [venous thromboembolism, pulmonary embolism]
+  must_not_miss: true
+
+hematoma:
+  th: ก้อนเลือดขนาดใหญ่
+  en: large hematoma
+  kind: group
+
+other_noninfectious:
+  th: สาเหตุอื่นที่ไม่ใช่การติดเชื้อ
+  en: other non-infectious causes
+  kind: group
+  examples: [nonbacterial thrombotic endocarditis, hereditary periodic fever syndrome, factitious fever]
+
+# ── Cough and hemoptysis (chapter 19) ─────────────────────────────────────
+asthma_exacerbation:
+  th: โรคหอบหืดกำเริบเฉียบพลัน
+  en: asthmatic attack or status asthmaticus
+  kind: disease
+  must_not_miss: true
+
+copd_exacerbation:
+  th: โรคปอดอุดกั้นเรื้อรังกำเริบเฉียบพลัน
+  en: COPD exacerbation
+  kind: disease
+  must_not_miss: true
+
+severe_pneumonia:
+  th: ปอดอักเสบรุนแรง
+  en: severe pneumonia
+  kind: disease
+  must_not_miss: true
+
+pneumothorax:
+  th: ภาวะปอดแตก
+  en: pneumothorax
+  kind: disease
+  must_not_miss: true
+
+pulmonary_embolism:
+  th: ลิ่มเลือดอุดหลอดเลือดปอด
+  en: pulmonary embolism or infarction
+  kind: disease
+  must_not_miss: true
+
+heart_failure:
+  th: ภาวะหัวใจล้มเหลว
+  en: heart failure
+  kind: disease
+  must_not_miss: true
+
+acute_rhinitis:
+  th: โพรงจมูกอักเสบ
+  en: acute rhinitis
+  kind: disease
+
+common_cold:
+  th: ไข้หวัด
+  en: common cold
+  kind: disease
+
+asthma:
+  th: โรคหอบหืด
+  en: asthma
+  kind: disease
+
+copd:
+  th: โรคปอดอุดกั้นเรื้อรัง / หลอดลมอักเสบเรื้อรัง
+  en: COPD or chronic bronchitis
+  kind: disease
+
+allergic_rhinitis:
+  th: โรคจมูกอักเสบจากภูมิแพ้
+  en: allergic rhinitis
+  kind: disease
+
+bronchiectasis:
+  th: โรคหลอดลมโป่งพอง
+  en: bronchiectasis
+  kind: disease
+
+drug_induced_cough:
+  th: ไอจากยา
+  en: drug-induced cough
+  kind: group
+  examples: [ACE inhibitors]
+
+gerd:
+  th: โรคกรดไหลย้อน
+  en: gastroesophageal reflux disease
+  kind: disease
+
+irritant_inhalation:
+  th: การสูดดมสารพิษ ฝุ่นควัน หรือบุหรี่
+  en: environmental exposure
+  kind: group
+  examples: [toxic fumes, dust, smoke, cigarette smoking, e-cigarette]
+
+post_infectious_cough:
+  th: ไอหลังการติดเชื้อ
+  en: post-infectious cough
+  kind: disease
+
+chronic_sinusitis:
+  th: ไซนัสอักเสบเรื้อรัง
+  en: chronic sinusitis
+  kind: disease
+
+upper_airway_cough_syndrome:
+  th: กลุ่มอาการไอจากทางเดินหายใจส่วนบน
+  en: upper airway cough syndrome
+  kind: disease
+
+naeb:
+  th: หลอดลมอักเสบชนิดอีโอซิโนฟิลที่ไม่ใช่หอบหืด
+  en: non-asthmatic eosinophilic bronchitis
+  kind: disease
+
+endobronchial_tb:
+  th: วัณโรคในหลอดลม
+  en: endobronchial tuberculosis
+  kind: disease
+
+endobronchial_tumor:
+  th: เนื้องอกในหลอดลม
+  en: endobronchial tumor
+  kind: disease
+  must_not_miss: true
+
+foreign_body_aspiration:
+  th: การสำลักสิ่งแปลกปลอม
+  en: foreign body aspiration
+  kind: disease
+
+ntm_infection:
+  th: การติดเชื้อมัยโคแบคทีเรียที่ไม่ใช่วัณโรค
+  en: non-tuberculous mycobacterial infection
+  kind: disease
+
+nocardiosis:
+  th: โนคาร์ดิโอสิส
+  en: nocardiosis
+  kind: disease
+
+fungal_pneumonia:
+  th: ปอดอักเสบจากเชื้อรา
+  en: fungal pneumonia
+  kind: group
+  examples: [invasive pulmonary aspergillosis, pulmonary mucormycosis, pulmonary cryptococcosis]
+
+emphysema:
+  th: ถุงลมโป่งพอง
+  en: emphysema
+  kind: disease
+
+interstitial_lung_disease:
+  th: โรคปอดอินเตอร์สติเชียล
+  en: interstitial lung disease
+  kind: disease
+
+lung_tumor:
+  th: เนื้องอกปอด
+  en: lung tumor
+  kind: group
+  examples: [primary lung cancer, lung metastasis]
+  must_not_miss: true
+
+pleural_effusion:
+  th: น้ำในเยื่อหุ้มปอด
+  en: pleural effusion
+  kind: group
+  examples: [tuberculous pleuritis, malignant pleural effusion]
+
+pleural_mass:
+  th: ก้อนที่เยื่อหุ้มปอด
+  en: pleural mass
+  kind: group
+  examples: [primary, metastasis]
+
+pulmonary_hypertension:
+  th: ความดันหลอดเลือดปอดสูง
+  en: pulmonary hypertension
+  kind: disease
+
+pulmonary_vasculitis:
+  th: หลอดเลือดฝอยในปอดอักเสบ
+  en: pulmonary vasculitis
+  kind: group
+  examples: [isolated pulmonary capillaritis, SLE, Behcet disease, Goodpasture syndrome]
+
+pulmonary_avm:
+  th: หลอดเลือดแดงและดำในปอดเชื่อมต่อผิดปกติ
+  en: pulmonary arteriovenous malformation
+  kind: disease
+  examples: [hereditary hemorrhagic telangiectasia]
+
+chest_injury:
+  th: การบาดเจ็บของทางเดินหายใจหรือปอด
+  en: airway or lung injury
+  kind: group
+  examples: [airway trauma, lung contusion, lung biopsy]
+
+mitral_stenosis:
+  th: ลิ้นหัวใจไมทรัลตีบ
+  en: mitral valve stenosis
+  kind: disease
+
+coagulopathy:
+  th: การแข็งตัวของเลือดผิดปกติ
+  en: coagulopathy
+  kind: disease
+
+platelet_defect:
+  th: ความผิดปกติของเกล็ดเลือด
+  en: platelet defect
+  kind: disease
+
+drug_induced_bleeding:
+  th: เลือดออกจากยา
+  en: drug-induced bleeding
+  kind: group
+  examples: [antiplatelets, anticoagulants, thrombolytic agents]
+
+pulmonary_endometriosis:
+  th: เยื่อบุโพรงมดลูกเจริญผิดที่ในปอด
+  en: pulmonary endometriosis
+  kind: disease
+  sex: female
+
+# ── Abdominal pain (chapter 23) ───────────────────────────────────────────
+ruptured_aaa:
+  th: หลอดเลือดแดงใหญ่ในช่องท้องโป่งพองแตก
+  en: ruptured abdominal aortic aneurysm
+  kind: disease
+  must_not_miss: true
+
+aortic_dissection:
+  th: หลอดเลือดแดงใหญ่ฉีกขาด
+  en: acute aortic dissection
+  kind: disease
+  must_not_miss: true
+
+acute_mesenteric_ischemia:
+  th: ลำไส้ขาดเลือดเฉียบพลัน
+  en: acute mesenteric ischemia
+  kind: disease
+  must_not_miss: true
+
+severe_pancreatitis:
+  th: ตับอ่อนอักเสบชนิดรุนแรง
+  en: severe pancreatitis
+  kind: disease
+  must_not_miss: true
+
+ruptured_ectopic_pregnancy:
+  th: ท้องนอกมดลูกแตก
+  en: ruptured ectopic pregnancy
+  kind: disease
+  sex: female
+  must_not_miss: true
+
+perforated_viscus:
+  th: กระเพาะอาหารหรือลำไส้ทะลุ
+  en: perforated viscus
+  kind: disease
+  must_not_miss: true
+
+ruptured_spleen:
+  th: ม้ามแตก
+  en: ruptured spleen
+  kind: disease
+  must_not_miss: true
+
+ruptured_esophagus:
+  th: หลอดอาหารแตก
+  en: ruptured esophagus
+  kind: disease
+  must_not_miss: true
+
+ruptured_diverticulitis:
+  th: ไดเวอร์ติคูลัมอักเสบแตก
+  en: ruptured diverticulitis
+  kind: disease
+  must_not_miss: true
+
+acute_myocardial_infarction:
+  th: กล้ามเนื้อหัวใจขาดเลือดเฉียบพลัน
+  en: acute myocardial infarction
+  kind: disease
+  must_not_miss: true
+
+myocarditis_pericarditis:
+  th: กล้ามเนื้อหัวใจหรือเยื่อหุ้มหัวใจอักเสบ
+  en: myocarditis or pericarditis
+  kind: disease
+
+empyema_thoracis:
+  th: หนองในเยื่อหุ้มปอด
+  en: empyema thoracis
+  kind: disease
+
+diabetic_ketoacidosis:
+  th: ภาวะเลือดเป็นกรดจากน้ำตาลในเลือดสูง
+  en: diabetic ketoacidosis
+  kind: disease
+  must_not_miss: true
+
+lead_poisoning:
+  th: พิษตะกั่ว
+  en: lead poisoning
+  kind: disease
+
+postherpetic_neuralgia:
+  th: ปวดปลายประสาทหลังงูสวัด
+  en: postherpetic neuralgia
+  kind: disease
+
+psychiatric_disorder:
+  th: โรคทางจิตเวช
+  en: psychiatric disorder
+  kind: group
+
+gastric_outlet_obstruction:
+  th: การอุดกั้นทางออกกระเพาะอาหาร
+  en: gastric outlet obstruction
+  kind: disease
+
+endometriosis:
+  th: เยื่อบุโพรงมดลูกเจริญผิดที่
+  en: endometriosis
+  kind: disease
+  sex: female
+
+ovulation_pain:
+  th: ปวดท้องช่วงไข่ตก
+  en: ovulation pain (Mittelschmerz)
+  kind: disease
+  sex: female
+
+gallstones:
+  th: นิ่วในถุงน้ำดี
+  en: gallstones
+  kind: disease
+
+bile_duct_obstruction:
+  th: ท่อน้ำดีอุดตัน
+  en: bile duct obstruction
+  kind: disease
+
+renal_stone:
+  th: นิ่วในไตหรือท่อไต
+  en: renal or ureteric stone
+  kind: disease
+
+hcc:
+  th: มะเร็งตับ
+  en: hepatocellular carcinoma
+  kind: disease
+
+cholangiocarcinoma:
+  th: มะเร็งท่อน้ำดี
+  en: cholangiocarcinoma
+  kind: disease
+
+sphincter_of_oddi_dysfunction:
+  th: หูรูดท่อน้ำดีทำงานผิดปกติ
+  en: sphincter of Oddi dysfunction
+  kind: disease
+
+pud:
+  th: แผลในกระเพาะอาหารหรือลำไส้เล็กส่วนต้น
+  en: peptic ulcer disease
+  kind: disease
+
+pancreatitis:
+  th: ตับอ่อนอักเสบ
+  en: pancreatitis
+  kind: disease
+
+functional_dyspepsia:
+  th: อาหารไม่ย่อยชนิดไม่มีแผล
+  en: functional dyspepsia
+  kind: disease
+
+pancreatic_cancer:
+  th: มะเร็งตับอ่อน
+  en: pancreatic cancer
+  kind: disease
+
+chronic_mesenteric_ischemia:
+  th: ลำไส้ขาดเลือดเรื้อรัง
+  en: chronic mesenteric ischemia
+  kind: disease
+
+splenic_abscess:
+  th: ฝีในม้าม
+  en: splenic abscess
+  kind: disease
+
+splenic_infarction:
+  th: ม้ามขาดเลือด
+  en: splenic infarction
+  kind: disease
+
+ischemic_colitis:
+  th: ลำไส้ใหญ่ขาดเลือด
+  en: ischemic colitis
+  kind: disease
+
+appendicitis:
+  th: ไส้ติ่งอักเสบ
+  en: appendicitis
+  kind: disease
+  must_not_miss: true
+
+diverticulitis:
+  th: ไดเวอร์ติคูลัมอักเสบ
+  en: diverticulitis
+  kind: disease
+
+colon_cancer:
+  th: มะเร็งลำไส้ใหญ่
+  en: colon cancer
+  kind: disease
+
+ectopic_pregnancy:
+  th: ท้องนอกมดลูก
+  en: ectopic pregnancy
+  kind: disease
+  sex: female
+  must_not_miss: true
+
+ibs:
+  th: ลำไส้แปรปรวน
+  en: irritable bowel syndrome
+  kind: disease
+
+ibd:
+  th: ลำไส้อักเสบเรื้อรัง
+  en: inflammatory bowel disease
+  kind: disease
+
+abdominal_wall_pain:
+  th: ปวดผนังหน้าท้อง
+  en: abdominal wall pain
+  kind: disease
+
+enterocolitis:
+  th: ลำไส้อักเสบ
+  en: enterocolitis
+  kind: disease
+
+abdominal_aortic_aneurysm:
+  th: หลอดเลือดแดงใหญ่ในช่องท้องโป่งพอง
+  en: abdominal aortic aneurysm
+  kind: disease
+  must_not_miss: true
+
+intestinal_obstruction:
+  th: ลำไส้อุดตัน
+  en: intestinal obstruction
+  kind: disease
+  must_not_miss: true
+
+ileus:
+  th: ลำไส้ไม่ทำงาน
+  en: bowel ileus
+  kind: disease
+
+small_bowel_tumor:
+  th: เนื้องอกลำไส้เล็ก
+  en: small bowel tumor
+  kind: disease
+
+lymphoma:
+  th: มะเร็งต่อมน้ำเหลือง
+  en: lymphoma
+  kind: disease
+
+cystitis:
+  th: กระเพาะปัสสาวะอักเสบ
+  en: cystitis
+  kind: disease
+
+endometritis:
+  th: เยื่อบุโพรงมดลูกอักเสบ
+  en: endometritis
+  kind: disease
+  sex: female
+
+bladder_cancer:
+  th: มะเร็งกระเพาะปัสสาวะ
+  en: bladder cancer
+  kind: disease
+
+rectal_cancer:
+  th: มะเร็งลำไส้ตรง
+  en: rectal cancer
+  kind: disease
+
+peritonitis:
+  th: เยื่อบุช่องท้องอักเสบ
+  en: peritonitis
+  kind: disease
+  must_not_miss: true
+
+tb_peritonitis:
+  th: วัณโรคเยื่อบุช่องท้อง
+  en: tuberculous peritonitis
+  kind: disease
+
+# ── Rash (chapter 36) ─────────────────────────────────────────────────────
+psoriasis:
+  th: โรคสะเก็ดเงิน
+  en: psoriasis
+  kind: disease
+
+pityriasis_rosea:
+  th: ผื่นกุหลาบ
+  en: pityriasis rosea
+  kind: disease
+
+lichen_planus:
+  th: ไลเคนพลานัส
+  en: lichen planus
+  kind: disease
+
+tinea_infection:
+  th: โรคกลาก
+  en: tinea infection
+  kind: disease
+
+seborrheic_dermatitis:
+  th: ผื่นแพ้ต่อมไขมัน
+  en: seborrheic dermatitis
+  kind: disease
+
+acne_vulgaris:
+  th: สิว
+  en: acne vulgaris
+  kind: disease
+
+rosacea:
+  th: โรสเซเชีย
+  en: rosacea
+  kind: disease
+
+folliculitis:
+  th: รูขุมขนอักเสบ
+  en: folliculitis
+  kind: disease
+
+perioral_dermatitis:
+  th: ผื่นรอบปาก
+  en: perioral dermatitis
+  kind: disease
+
+atopic_dermatitis:
+  th: ผื่นภูมิแพ้ผิวหนัง
+  en: atopic dermatitis
+  kind: disease
+
+nummular_eczema:
+  th: ผื่นผิวหนังอักเสบรูปเหรียญ
+  en: nummular eczema
+  kind: disease
+
+dyshidrosis:
+  th: ผื่นตุ่มน้ำใสที่มือเท้า
+  en: dyshidrosis
+  kind: disease
+
+xerotic_eczema:
+  th: ผื่นผิวแห้งอักเสบ
+  en: xerotic eczema
+  kind: disease
+
+stasis_dermatitis:
+  th: ผื่นจากเลือดดำคั่ง
+  en: stasis dermatitis
+  kind: disease
+
+contact_dermatitis:
+  th: ผื่นแพ้สัมผัสหรือผื่นระคายสัมผัส
+  en: contact dermatitis
+  kind: disease
+
+disseminated_gonococcal_infection:
+  th: การติดเชื้อหนองในแพร่กระจาย
+  en: disseminated gonococcal infection
+  kind: disease
+
+candidiasis:
+  th: โรคเชื้อราแคนดิดาที่ผิวหนัง
+  en: cutaneous candidiasis
+  kind: disease
+
+pustular_psoriasis:
+  th: สะเก็ดเงินชนิดตุ่มหนอง
+  en: pustular psoriasis
+  kind: disease
+
+agep:
+  th: ผื่นตุ่มหนองทั่วตัวเฉียบพลันจากยา
+  en: acute generalized exanthematous pustulosis
+  kind: disease
+
+sjs_ten:
+  th: กลุ่มอาการสตีเวนส์-จอห์นสัน / ผิวหนังตายลอกหลุด
+  en: Stevens-Johnson syndrome / toxic epidermal necrolysis
+  kind: disease
+  must_not_miss: true
+
+ssss:
+  th: ผิวหนังลอกจากพิษเชื้อสแตฟิโลคอคคัส
+  en: staphylococcal scalded skin syndrome
+  kind: disease
+  must_not_miss: true
+
+acute_gvhd:
+  th: ภาวะสิ่งปลูกถ่ายต่อต้านร่างกายเฉียบพลัน
+  en: acute graft-versus-host disease
+  kind: disease
+  must_not_miss: true
+
+toxic_shock_syndrome:
+  th: กลุ่มอาการท็อกซิกช็อก
+  en: toxic shock syndrome
+  kind: disease
+  must_not_miss: true
+
+dress:
+  th: ผื่นแพ้ยาชนิดรุนแรงร่วมกับอีโอซิโนฟิลสูง
+  en: drug reaction with eosinophilia and systemic symptoms
+  kind: disease
+  must_not_miss: true
+
+scarlet_fever:
+  th: ไข้อีดำอีแดง
+  en: scarlet fever
+  kind: disease
+
+kawasaki_disease:
+  th: โรคคาวาซากิ
+  en: Kawasaki disease
+  kind: disease
+
+anaphylaxis:
+  th: ภาวะแพ้รุนแรง
+  en: anaphylaxis
+  kind: disease
+  must_not_miss: true
+
+alcohol_flush:
+  th: หน้าแดงตัวแดงจากแอลกอฮอล์
+  en: alcohol flush reaction
+  kind: disease
+
+drug_eruption:
+  th: ผื่นแพ้ยา
+  en: drug eruption
+  kind: disease
+
+necrotizing_fasciitis:
+  th: โรคเนื้อเน่า
+  en: necrotizing fasciitis
+  kind: disease
+  must_not_miss: true
+
+hand_foot_mouth_disease:
+  th: โรคมือเท้าปาก
+  en: hand-foot-mouth disease
+  kind: disease
+
+eczema_herpeticum:
+  th: ผื่นผิวหนังอักเสบติดเชื้อเริม
+  en: eczema herpeticum
+  kind: disease
+
+herpes_simplex_zoster:
+  th: เริม / งูสวัด
+  en: herpes simplex or herpes zoster
+  kind: disease
+
+burn:
+  th: แผลไฟไหม้น้ำร้อนลวก
+  en: burn
+  kind: disease
+
+bullous_impetigo:
+  th: พุพองจากแบคทีเรีย
+  en: bullous impetigo
+  kind: disease
+
+insect_bite_reaction:
+  th: ผื่นจากแมลงกัด
+  en: insect bite reaction
+  kind: disease
+
+disseminated_herpes:
+  th: เริมหรืองูสวัดแพร่กระจาย
+  en: disseminated herpes zoster or simplex
+  kind: disease
+
+varicella:
+  th: อีสุกอีใส
+  en: varicella
+  kind: disease
+
+bullous_pemphigoid:
+  th: โรคตุ่มน้ำพองใส
+  en: bullous pemphigoid
+  kind: disease
+
+pemphigus_vulgaris:
+  th: โรคเพมฟิกัส
+  en: pemphigus vulgaris
+  kind: disease
+
+erythema_multiforme:
+  th: ผื่นแดงหลายรูปแบบ
+  en: erythema multiforme
+  kind: disease
+
+viral_exanthem:
+  th: ผื่นจากไวรัส เช่น หัด หัดเยอรมัน
+  en: viral exanthem
+  kind: group
+  examples: [measles, rubella]
+
+zika:
+  th: โรคติดเชื้อไวรัสซิกา
+  en: Zika virus infection
+  kind: disease
+
+meningococcemia:
+  th: การติดเชื้อมีนิงโกคอคคัสในกระแสเลือด
+  en: meningococcemia
+  kind: disease
+  must_not_miss: true
+
+leprosy:
+  th: โรคเรื้อน
+  en: early lepromatous leprosy
+  kind: disease
+
+secondary_syphilis:
+  th: ซิฟิลิสระยะที่สอง
+  en: secondary syphilis
+  kind: disease
+
+disseminated_candidiasis:
+  th: การติดเชื้อราแคนดิดาแพร่กระจาย
+  en: disseminated candidiasis
+  kind: disease
+
+toxoplasmosis:
+  th: ท็อกโซพลาสโมซิส
+  en: toxoplasmosis
+  kind: disease
+
+sle:
+  th: โรคเอสแอลอี
+  en: systemic lupus erythematosus
+  kind: disease
+
+dermatomyositis:
+  th: โรคผิวหนังและกล้ามเนื้ออักเสบ
+  en: dermatomyositis
+  kind: disease
+
+adult_onset_still_disease:
+  th: โรคสติลล์ในผู้ใหญ่
+  en: adult-onset Still disease
+  kind: disease
+
+angioimmunoblastic_t_cell_lymphoma:
+  th: มะเร็งต่อมน้ำเหลืองชนิดแองจิโออิมมิวโนบลาสติกทีเซลล์
+  en: angioimmunoblastic T-cell lymphoma
+  kind: disease
+
+leukemia_cutis:
+  th: มะเร็งเม็ดเลือดขาวที่ผิวหนัง
+  en: leukemia cutis
+  kind: disease
+
+small_vessel_vasculitis:
+  th: หลอดเลือดขนาดเล็กอักเสบ
+  en: small-vessel vasculitis
+  kind: disease
+
+urticaria:
+  th: ลมพิษ
+  en: urticaria
+  kind: disease
+
+urticarial_vasculitis:
+  th: หลอดเลือดอักเสบชนิดลมพิษ
+  en: urticarial vasculitis
+  kind: disease
+
+sunburn:
+  th: ผิวไหม้แดด
+  en: acute sunburn
+  kind: disease
+
+photoallergic_dermatitis:
+  th: ผื่นแพ้แสงจากยา
+  en: drug-induced photoallergic dermatitis
+  kind: disease
+
+# ── Joint pain (chapter 32) ───────────────────────────────────────────────
+gout:
+  th: โรคเกาต์
+  en: gout
+  kind: disease
+
+pseudogout:
+  th: โรคเกาต์เทียม
+  en: pseudogout (CPPD)
+  kind: disease
+
+joint_trauma:
+  th: การบาดเจ็บของข้อ
+  en: joint trauma
+  kind: disease
+
+hemarthrosis:
+  th: เลือดออกในข้อ
+  en: hemarthrosis
+  kind: disease
+
+behcet_disease:
+  th: โรคเบห์เชต
+  en: Behcet disease
+  kind: disease
+
+viral_arthritis:
+  th: ข้ออักเสบจากไวรัส
+  en: viral arthritis
+  kind: disease
+
+snsa:
+  th: กลุ่มโรคข้ออักเสบชนิดซีโรเนกาทีฟ
+  en: seronegative spondyloarthropathy
+  kind: group
+  examples: [reactive arthritis, psoriatic arthritis, ankylosing spondylitis]
+
+palindromic_rheumatism:
+  th: ข้ออักเสบเป็นๆ หายๆ ชนิดพาลินโดรมิก
+  en: palindromic rheumatism
+  kind: disease
+
+rheumatoid_arthritis:
+  th: โรคข้ออักเสบรูมาตอยด์
+  en: rheumatoid arthritis
+  kind: disease
+
+mechanical_joint_problem:
+  th: ปัญหาเชิงกลของข้อ
+  en: mechanical joint problem
+  kind: group
+
+chronic_tophaceous_gout:
+  th: โรคเกาต์เรื้อรังมีปุ่มโทฟัส
+  en: chronic tophaceous gout
+  kind: disease
+
+tuberculous_arthritis:
+  th: วัณโรคข้อ
+  en: tuberculous arthritis
+  kind: disease
+
+osteoarthritis:
+  th: โรคข้อเสื่อม
+  en: osteoarthritis
+  kind: disease
+
+paraneoplastic_arthritis:
+  th: ข้ออักเสบจากกลุ่มอาการพาราเนื้องอก
+  en: paraneoplastic arthritis
+  kind: disease
+
+avascular_necrosis:
+  th: หัวกระดูกตายจากการขาดเลือด
+  en: avascular necrosis
+  kind: disease
+
+loose_body:
+  th: เศษกระดูกหลุดในข้อ
+  en: loose body
+  kind: disease
+
+paraneoplastic_arthralgia:
+  th: ปวดข้อจากกลุ่มอาการพาราเนื้องอก
+  en: paraneoplastic arthralgia
+  kind: disease
+
+hypertrophic_osteoarthropathy:
+  th: โรคข้อและกระดูกโตผิดปกติ
+  en: hypertrophic osteoarthropathy
+  kind: disease
+
+acromegaly:
+  th: โรคโตเกินไม่สมส่วน
+  en: acromegaly
+  kind: disease
+
+rheumatic_fever:
+  th: ไข้รูมาติก
+  en: rheumatic fever
+  kind: disease
+
+# ── Diarrhea (chapter 25) ─────────────────────────────────────────────────
+food_poisoning:
+  th: อาหารเป็นพิษ
+  en: food poisoning
+  kind: disease
+
+drug_induced_diarrhea:
+  th: ท้องเสียจากยา
+  en: drug-induced diarrhea
+  kind: group
+  examples: [laxatives, antibiotics, colchicine, chemotherapy, NSAIDs, mefenamic acid, mycophenolate]
+
+strongyloidiasis:
+  th: โรคพยาธิสตรองจิลอยดิส
+  en: strongyloidiasis
+  kind: disease
+
+capillariasis:
+  th: โรคพยาธิคาพิลลาเรีย
+  en: capillariasis
+  kind: disease
+
+protozoal_diarrhea:
+  th: ท้องเสียจากเชื้อโปรโตซัว
+  en: protozoal diarrhea
+  kind: group
+  examples: [giardiasis, cryptosporidiosis, cyclosporiasis, microsporidiosis]
+
+sibo:
+  th: ภาวะแบคทีเรียเกินในลำไส้เล็ก
+  en: small intestinal bacterial overgrowth
+  kind: disease
+
+carcinoid_syndrome:
+  th: กลุ่มอาการคาร์ซินอยด์
+  en: carcinoid syndrome
+  kind: disease
+
+hyperthyroidism:
+  th: ภาวะไทรอยด์เป็นพิษ
+  en: hyperthyroidism
+  kind: disease
+
+diabetic_diarrhea:
+  th: ท้องเสียจากโรคเบาหวาน
+  en: diabetic diarrhea
+  kind: disease
+
+bile_acid_diarrhea:
+  th: ท้องเสียจากกรดน้ำดี
+  en: bile acid diarrhea
+  kind: disease
+
+carbohydrate_malabsorption:
+  th: การดูดซึมคาร์โบไฮเดรตผิดปกติ
+  en: carbohydrate malabsorption
+  kind: group
+  examples: [lactose intolerance, sorbitol or mannitol, FODMAPs]
+
+osmotic_laxative_diarrhea:
+  th: ท้องเสียจากยาระบายชนิดออสโมติก
+  en: osmotic laxative diarrhea
+  kind: disease
+
+intestinal_tuberculosis:
+  th: วัณโรคลำไส้
+  en: intestinal tuberculosis
+  kind: disease
+
+pseudomembranous_colitis:
+  th: ลำไส้ใหญ่อักเสบจากยาปฏิชีวนะ
+  en: pseudomembranous colitis
+  kind: disease
+
+amebiasis:
+  th: โรคบิดมีตัว
+  en: amebiasis
+  kind: disease
+
+cmv_colitis:
+  th: ลำไส้อักเสบจากเชื้อไวรัสซีเอ็มวี
+  en: cytomegalovirus colitis
+  kind: disease
+
+radiation_colitis:
+  th: ลำไส้อักเสบจากการฉายแสง
+  en: radiation colitis
+  kind: disease
+
+short_bowel_syndrome:
+  th: กลุ่มอาการลำไส้สั้น
+  en: short bowel syndrome
+  kind: disease
+
+chronic_pancreatitis:
+  th: ตับอ่อนอักเสบเรื้อรัง
+  en: chronic pancreatitis
+  kind: disease
+
+eosinophilic_gastroenteritis:
+  th: กระเพาะลำไส้อักเสบจากอีโอซิโนฟิล
+  en: eosinophilic gastroenteritis
+  kind: disease
+
+fecal_impaction:
+  th: อุจจาระอัดแน่น
+  en: fecal impaction (overflow diarrhea)
+  kind: disease
+
+anorectal_incontinence:
+  th: หูรูดทวารหนักทำงานผิดปกติ
+  en: anorectal incontinence (pseudodiarrhea)
+  kind: disease
+
+# ── Dizziness (chapter 9) ─────────────────────────────────────────────────
+orthostatic_hypotension:
+  th: ความดันเลือดตกเมื่อเปลี่ยนท่า
+  en: orthostatic hypotension
+  kind: disease
+
+cardiac_arrhythmia:
+  th: หัวใจเต้นผิดจังหวะ
+  en: cardiac arrhythmia
+  kind: disease
+  must_not_miss: true
+
+hypoglycemia:
+  th: น้ำตาลในเลือดต่ำ
+  en: hypoglycemia
+  kind: disease
+  must_not_miss: true
+
+sensory_disequilibrium:
+  th: เสียการทรงตัวจากระบบรับความรู้สึก
+  en: sensory disequilibrium
+  kind: group
+  examples: [peripheral neuropathy, posterior column disease]
+
+vertebrobasilar_insufficiency:
+  th: หลอดเลือดแดงเวอร์ทีโบรเบซิลาร์ตีบชั่วคราว
+  en: vertebrobasilar insufficiency
+  kind: disease
+  must_not_miss: true
+
+epilepsy:
+  th: โรคลมชัก
+  en: epilepsy
+  kind: disease
+
+posterior_circulation_stroke:
+  th: โรคหลอดเลือดสมองบริเวณก้านสมองหรือสมองน้อย
+  en: brainstem or cerebellar stroke
+  kind: disease
+  must_not_miss: true
+
+vertebral_dissection:
+  th: หลอดเลือดแดงเวอร์ทีบรัลฉีกขาด
+  en: vertebral artery dissection
+  kind: disease
+  must_not_miss: true
+
+posterior_fossa_mass:
+  th: ก้อนในโพรงสมองส่วนหลัง
+  en: posterior fossa mass
+  kind: disease
+  must_not_miss: true
+
+alcoholic_cerebellar_degeneration:
+  th: สมองน้อยเสื่อมจากแอลกอฮอล์
+  en: alcohol-related cerebellar degeneration
+  kind: disease
+
+bppv:
+  th: ตะกอนหินปูนในหูชั้นในหลุด
+  en: benign paroxysmal positional vertigo
+  kind: disease
+
+menieres_disease:
+  th: โรคน้ำในหูไม่เท่ากัน
+  en: Meniere disease
+  kind: disease
+
+vestibular_migraine:
+  th: ไมเกรนที่มีอาการเวียนศีรษะ
+  en: vestibular migraine
+  kind: disease
+
+vestibular_neuritis_labyrinthitis:
+  th: เส้นประสาทการทรงตัวอักเสบ / หูชั้นในอักเสบ
+  en: vestibular neuritis or labyrinthitis
+  kind: disease
+
+traumatic_vestibular_neuropathy:
+  th: หูชั้นในบาดเจ็บจากอุบัติเหตุ
+  en: traumatic vestibular neuropathy
+  kind: disease
+
+chronic_vestibular_insufficiency:
+  th: ระบบการทรงตัวเสื่อมเรื้อรัง
+  en: chronic vestibular insufficiency
+  kind: disease
+
+psychogenic_vertigo:
+  th: เวียนศีรษะจากจิตใจ
+  en: psychogenic vertigo
+  kind: disease
+
+ototoxicity:
+  th: หูชั้นในเสียหายจากยา
+  en: drug ototoxicity
+  kind: disease
+
+# ── Low back pain (chapter 31) ────────────────────────────────────────────
+prostatitis:
+  th: ต่อมลูกหมากอักเสบ
+  en: prostatitis
+  kind: disease
+  sex: male
+
+spondylosis:
+  th: กระดูกสันหลังเสื่อม
+  en: spondylosis
+  kind: disease
+
+spinal_stenosis:
+  th: โพรงกระดูกสันหลังตีบแคบ
+  en: spinal stenosis
+  kind: disease
+
+osteoporotic_fracture:
+  th: กระดูกสันหลังหักจากกระดูกพรุน
+  en: osteoporotic fracture
+  kind: disease
+
+traumatic_fracture:
+  th: กระดูกสันหลังหักจากอุบัติเหตุ
+  en: traumatic fracture
+  kind: disease
+  must_not_miss: true
+
+herniated_disc:
+  th: หมอนรองกระดูกเคลื่อนทับเส้นประสาท
+  en: herniated nucleus pulposus
+  kind: disease
+
+scoliosis:
+  th: กระดูกสันหลังคด
+  en: scoliosis
+  kind: disease
+
+spondylolisthesis:
+  th: กระดูกสันหลังเคลื่อน
+  en: spondylolisthesis
+  kind: disease
+
+primary_spinal_cancer:
+  th: มะเร็งของกระดูกสันหลังและไขสันหลัง
+  en: primary spinal cancer
+  kind: disease
+  must_not_miss: true
+
+spinal_metastasis:
+  th: มะเร็งแพร่กระจายมาที่กระดูกสันหลัง
+  en: spinal metastasis
+  kind: disease
+  must_not_miss: true
+
+spondyloarthropathy:
+  th: โรคข้อและกระดูกสันหลังอักเสบ
+  en: spondyloarthropathy
+  kind: disease
+
+lumbar_strain:
+  th: กล้ามเนื้อหลังอักเสบ
+  en: lumbar strain
+  kind: disease
+
+spinal_cord_compression:
+  th: ไขสันหลังหรือรากประสาทถูกกดทับ
+  en: spinal cord compression or cauda equina syndrome
+  kind: disease
+  must_not_miss: true
+
+# ── Edema (chapter 27) ────────────────────────────────────────────────────
+cellulitis:
+  th: ผิวหนังและเนื้อเยื่อใต้ผิวหนังอักเสบติดเชื้อ
+  en: cellulitis
+  kind: disease
+
+deep_vein_thrombosis:
+  th: ลิ่มเลือดอุดตันในหลอดเลือดดำส่วนลึก
+  en: deep vein thrombosis
+  kind: disease
+  must_not_miss: true
+
+venous_insufficiency:
+  th: หลอดเลือดดำทำงานบกพร่องเรื้อรัง
+  en: chronic venous insufficiency
+  kind: disease
+
+lymphedema:
+  th: ท่อน้ำเหลืองอุดตัน
+  en: lymphedema
+  kind: disease
+
+limb_trauma:
+  th: การบาดเจ็บของแขนขา
+  en: limb trauma
+  kind: disease
+
+drug_induced_edema:
+  th: บวมจากยา
+  en: drug-induced edema
+  kind: group
+  examples: [amlodipine, NSAIDs, thiazolidinedione, corticosteroids, estrogen]
+
+premenstrual_edema:
+  th: บวมก่อนมีประจำเดือน
+  en: premenstrual edema
+  kind: disease
+  sex: female
+
+right_heart_failure:
+  th: หัวใจห้องขวาล้มเหลว
+  en: right-sided heart failure
+  kind: disease
+
+cirrhosis:
+  th: ตับแข็ง
+  en: cirrhosis
+  kind: disease
+
+portal_vein_thrombosis:
+  th: ลิ่มเลือดอุดตันหลอดเลือดดำพอร์ทัล
+  en: portal vein thrombosis
+  kind: disease
+
+budd_chiari_syndrome:
+  th: กลุ่มอาการบัดด์-เคียรี
+  en: Budd-Chiari syndrome
+  kind: disease
+
+primary_nephrotic_syndrome:
+  th: กลุ่มอาการเนโฟรติกปฐมภูมิ
+  en: primary nephrotic syndrome
+  kind: group
+  examples: [minimal change disease, FSGS, membranous nephropathy]
+
+diabetic_nephropathy:
+  th: โรคไตจากเบาหวาน
+  en: diabetic nephropathy
+  kind: disease
+
+lupus_nephritis:
+  th: ไตอักเสบจากโรคเอสแอลอี
+  en: lupus nephritis
+  kind: disease
+
+amyloidosis:
+  th: โรคแอมีลอยด์
+  en: amyloidosis
+  kind: disease
+
+post_streptococcal_gn:
+  th: ไตอักเสบหลังติดเชื้อสเตรปโตคอคคัส
+  en: acute post-streptococcal glomerulonephritis
+  kind: disease
+
+iga_nephropathy:
+  th: โรคไตอักเสบชนิดไอจีเอ
+  en: IgA nephropathy
+  kind: disease
+
+rpgn:
+  th: ไตอักเสบชนิดรุนแรงเฉียบพลัน
+  en: rapidly progressive glomerulonephritis
+  kind: disease
+  must_not_miss: true
+
+acute_kidney_injury:
+  th: ไตบาดเจ็บเฉียบพลัน
+  en: acute kidney injury
+  kind: disease
+  must_not_miss: true
+
+acute_interstitial_nephritis:
+  th: เนื้อเยื่อไตอักเสบเฉียบพลัน
+  en: acute interstitial nephritis
+  kind: disease
+
+hypoalbuminemia:
+  th: แอลบูมินในเลือดต่ำ
+  en: severe hypoalbuminemia
+  kind: disease
+
+hypothyroidism:
+  th: ภาวะไทรอยด์ทำงานต่ำ
+  en: hypothyroidism
+  kind: disease
+
+pregnancy_edema:
+  th: บวมจากการตั้งครรภ์
+  en: edema of pregnancy
+  kind: disease
+  sex: female
+
+# ── Headache (chapter 8) ──────────────────────────────────────────────────
+subarachnoid_hemorrhage:
+  th: เลือดออกใต้เยื่อหุ้มสมอง
+  en: subarachnoid hemorrhage
+  kind: disease
+  must_not_miss: true
+
+intracranial_hemorrhage:
+  th: เลือดออกในสมอง
+  en: intracranial hemorrhage
+  kind: disease
+  must_not_miss: true
+
+cerebral_venous_sinus_thrombosis:
+  th: หลอดเลือดดำในสมองอุดตัน
+  en: cerebral venous sinus thrombosis
+  kind: disease
+  must_not_miss: true
+
+pituitary_apoplexy:
+  th: เลือดออกในต่อมใต้สมอง
+  en: pituitary apoplexy
+  kind: disease
+  must_not_miss: true
+
+tension_type_headache:
+  th: ปวดศีรษะชนิดตึงตัว
+  en: tension-type headache
+  kind: disease
+
+migraine:
+  th: ไมเกรน
+  en: migraine
+  kind: disease
+
+cluster_headache:
+  th: ปวดศีรษะคลัสเตอร์
+  en: cluster headache
+  kind: disease
+
+other_primary_headache:
+  th: ปวดศีรษะปฐมภูมิชนิดอื่น
+  en: other primary headache
+  kind: group
+
+brain_abscess:
+  th: ฝีในสมอง
+  en: brain abscess
+  kind: disease
+  must_not_miss: true
+
+brain_tumor:
+  th: เนื้องอกในสมอง
+  en: brain tumor
+  kind: disease
+  must_not_miss: true
+
+idiopathic_intracranial_hypertension:
+  th: ความดันในกะโหลกศีรษะสูงไม่ทราบสาเหตุ
+  en: idiopathic intracranial hypertension
+  kind: disease
+
+subdural_hematoma:
+  th: เลือดคั่งใต้เยื่อหุ้มสมอง
+  en: subdural hematoma
+  kind: disease
+  must_not_miss: true
+
+vascular_dissection:
+  th: หลอดเลือดแดงที่คอฉีกขาด
+  en: cervical artery dissection
+  kind: disease
+  must_not_miss: true
+
+silent_area_lesion:
+  th: รอยโรคในสมองบริเวณที่ไม่แสดงอาการ
+  en: lesion in a silent brain area
+  kind: group
+
+eye_strain:
+  th: ปวดตาจากการใช้งาน
+  en: eye strain
+  kind: disease
+
+angle_closure_glaucoma:
+  th: ต้อหินมุมปิดเฉียบพลัน
+  en: acute angle-closure glaucoma
+  kind: disease
+  must_not_miss: true
+
+temporal_arteritis:
+  th: หลอดเลือดแดงบริเวณขมับอักเสบ
+  en: temporal (giant cell) arteritis
+  kind: disease
+  must_not_miss: true
+
+trigeminal_neuralgia:
+  th: ปวดเส้นประสาทใบหน้า
+  en: trigeminal neuralgia
+  kind: disease
+
+low_csf_pressure_headache:
+  th: ปวดศีรษะจากความดันน้ำไขสันหลังต่ำ
+  en: low CSF pressure headache
+  kind: disease
+
+hypertensive_headache:
+  th: ปวดศีรษะจากความดันเลือดสูงมาก
+  en: hypertensive headache
+  kind: disease
+
+# ── Upper respiratory (guideline g1) ──────────────────────────────────────
+gabhs_pharyngitis:
+  th: คออักเสบจากเชื้อสเตรปโตคอคคัสกลุ่มเอ
+  en: group A streptococcal pharyngitis
+  kind: disease
+
+diphtheria:
+  th: โรคคอตีบ
+  en: diphtheria
+  kind: disease
+  must_not_miss: true
+
+vincent_angina:
+  th: ทอนซิลอักเสบชนิดวินเซนต์
+  en: Vincent angina
+  kind: disease
+
+pharyngoconjunctival_fever:
+  th: ไข้คอหอยและเยื่อบุตาอักเสบจากอะดีโนไวรัส
+  en: pharyngoconjunctival fever
+  kind: disease
+
+herpetic_gingivostomatitis:
+  th: เหงือกและช่องปากอักเสบจากเชื้อเริม
+  en: herpetic gingivostomatitis
+  kind: disease
+
+herpangina:
+  th: เฮอร์แปงไจนา
+  en: herpangina
+  kind: disease
+
+# ── Eye (guideline g2: eye notes) ─────────────────────────────────────────
+corneal_abrasion:
+  th: กระจกตาถลอก
+  en: corneal abrasion
+  kind: disease
+
+corneal_foreign_body:
+  th: สิ่งแปลกปลอมที่กระจกตา
+  en: corneal foreign body
+  kind: disease
+
+keratitis:
+  th: กระจกตาอักเสบหรือแผลที่กระจกตา
+  en: keratitis or corneal ulcer
+  kind: disease
+  must_not_miss: true
+
+uveitis:
+  th: ม่านตาอักเสบ
+  en: uveitis
+  kind: disease
+  must_not_miss: true
+
+scleritis:
+  th: ตาขาวอักเสบ
+  en: scleritis
+  kind: disease
+  must_not_miss: true
+
+episcleritis:
+  th: เยื่อบุตาขาวชั้นนอกอักเสบ
+  en: episcleritis
+  kind: disease
+
+blepharitis:
+  th: เปลือกตาอักเสบ
+  en: blepharitis
+  kind: disease
+
+hordeolum:
+  th: กุ้งยิง
+  en: hordeolum
+  kind: disease
+
+chalazion:
+  th: ตากุ้งยิงเรื้อรัง
+  en: chalazion
+  kind: disease
+
+dacryocystitis:
+  th: ถุงน้ำตาอักเสบ
+  en: dacryocystitis
+  kind: disease
+
+pterygium_pinguecula:
+  th: ต้อลมหรือต้อเนื้อ
+  en: pinguecula or pterygium
+  kind: disease
+
+subconjunctival_hemorrhage:
+  th: เลือดออกใต้เยื่อบุตา
+  en: subconjunctival hemorrhage
+  kind: disease
+
+allergic_conjunctivitis:
+  th: เยื่อบุตาอักเสบจากภูมิแพ้
+  en: allergic conjunctivitis
+  kind: disease
+
+viral_conjunctivitis:
+  th: เยื่อบุตาอักเสบจากไวรัส
+  en: viral conjunctivitis
+  kind: disease
+
+bacterial_conjunctivitis:
+  th: เยื่อบุตาอักเสบจากแบคทีเรีย
+  en: bacterial conjunctivitis
+  kind: disease
+
+hyperacute_bacterial_conjunctivitis:
+  th: เยื่อบุตาอักเสบจากเชื้อหนองใน
+  en: hyperacute (gonococcal) conjunctivitis
+  kind: disease
+  must_not_miss: true
+
+optic_neuritis:
+  th: เส้นประสาทตาอักเสบ
+  en: optic neuritis
+  kind: disease
+  must_not_miss: true
+
+crao:
+  th: หลอดเลือดแดงจอประสาทตาอุดตัน
+  en: central retinal artery occlusion
+  kind: disease
+  must_not_miss: true
+
+crvo:
+  th: หลอดเลือดดำจอประสาทตาอุดตัน
+  en: central retinal vein occlusion
+  kind: disease
+
+retinal_detachment:
+  th: จอประสาทตาลอก
+  en: retinal detachment
+  kind: disease
+  must_not_miss: true
+
+vitreous_hemorrhage:
+  th: เลือดออกในน้ำวุ้นตา
+  en: vitreous hemorrhage
+  kind: disease
+
+retinitis:
+  th: จอประสาทตาอักเสบ
+  en: retinitis
+  kind: disease
+
+naion:
+  th: เส้นประสาทตาขาดเลือดชนิดไม่มีหลอดเลือดอักเสบ
+  en: non-arteritic ischemic optic neuropathy
+  kind: disease
+
+traumatic_optic_neuropathy:
+  th: เส้นประสาทตาบาดเจ็บจากอุบัติเหตุ
+  en: traumatic optic neuropathy
+  kind: disease
+
+visual_pathway_lesion:
+  th: รอยโรคในทางเดินประสาทตาในสมอง
+  en: visual pathway lesion
+  kind: group
+  examples: [PCA occlusion]
+
+# ── Ear (guideline g3: ENT notes) ─────────────────────────────────────────
+otitis_externa:
+  th: หูชั้นนอกอักเสบ
+  en: otitis externa
+  kind: disease
+
+malignant_otitis_externa:
+  th: หูชั้นนอกอักเสบชนิดลุกลาม
+  en: malignant otitis externa
+  kind: disease
+  must_not_miss: true
+
+perichondritis:
+  th: กระดูกอ่อนใบหูอักเสบ
+  en: auricular perichondritis
+  kind: disease
+
+auricle_hematoma:
+  th: เลือดคั่งที่ใบหู
+  en: hematoma of the pinna
+  kind: disease
+
+bullous_myringitis:
+  th: แก้วหูอักเสบชนิดมีถุงน้ำ
+  en: bullous myringitis
+  kind: disease
+
+ear_canal_foreign_body:
+  th: สิ่งแปลกปลอมในรูหู
+  en: foreign body in the ear canal
+  kind: disease
+
+impacted_cerumen:
+  th: ขี้หูอุดตัน
+  en: impacted cerumen
+  kind: disease
+
+herpes_zoster_oticus:
+  th: งูสวัดที่หู
+  en: herpes zoster oticus (Ramsay Hunt syndrome)
+  kind: disease
+  must_not_miss: true
+
+chronic_otitis_media:
+  th: หูชั้นกลางอักเสบเรื้อรัง
+  en: chronic otitis media
+  kind: disease
+
+otitis_media_with_effusion:
+  th: หูชั้นกลางอักเสบมีน้ำขัง
+  en: otitis media with effusion
+  kind: disease
+
+cholesteatoma:
+  th: เนื้องอกคอเลสเตียโตมา
+  en: cholesteatoma
+  kind: disease
+
+traumatic_tm_perforation:
+  th: แก้วหูทะลุจากอุบัติเหตุ
+  en: traumatic tympanic membrane perforation
+  kind: disease
+
+barotrauma:
+  th: หูอื้อจากความดันเปลี่ยน
+  en: ear barotrauma
+  kind: disease
+
+otosclerosis:
+  th: โรคกระดูกหูชั้นกลางแข็ง
+  en: otosclerosis
+  kind: disease
+
+nasopharyngeal_carcinoma:
+  th: มะเร็งหลังโพรงจมูก
+  en: nasopharyngeal carcinoma
+  kind: disease
+  must_not_miss: true
+
+sudden_snhl:
+  th: ประสาทหูเสื่อมเฉียบพลัน
+  en: sudden sensorineural hearing loss
+  kind: disease
+  must_not_miss: true
+
+noise_induced_hearing_loss:
+  th: ประสาทหูเสื่อมจากเสียงดัง
+  en: noise-induced hearing loss
+  kind: disease
+
+acoustic_neuroma:
+  th: เนื้องอกเส้นประสาทการได้ยิน
+  en: vestibular schwannoma
+  kind: disease
+
+# ── Chest pain (chapter 14) ───────────────────────────────────────────────
+pericarditis:
+  th: เยื่อหุ้มหัวใจอักเสบ
+  en: pericarditis
+  kind: disease
+
+chronic_coronary_syndrome:
+  th: โรคหัวใจขาดเลือดเรื้อรัง
+  en: chronic coronary syndrome (stable angina)
+  kind: disease
+
+costochondritis:
+  th: กระดูกอ่อนซี่โครงอักเสบ
+  en: costochondritis
+  kind: disease
+
+herpes_zoster:
+  th: งูสวัด
+  en: herpes zoster
+  kind: disease
+
+# ── Dyspnea (chapter 18) ──────────────────────────────────────────────────
+ischemic_cardiomyopathy:
+  th: กล้ามเนื้อหัวใจผิดปกติจากหัวใจขาดเลือด
+  en: ischemic cardiomyopathy
+  kind: disease
+
+dilated_cardiomyopathy:
+  th: กล้ามเนื้อหัวใจห้องล่างขยายที่ไม่ได้เกิดจากหัวใจขาดเลือด
+  en: non-ischemic dilated cardiomyopathy
+  kind: disease
+
+hypertrophic_cardiomyopathy:
+  th: กล้ามเนื้อหัวใจหนาผิดปกติ
+  en: hypertrophic cardiomyopathy
+  kind: disease
+
+restrictive_cardiomyopathy:
+  th: กล้ามเนื้อหัวใจบีบรัด
+  en: restrictive cardiomyopathy
+  kind: disease
+
+valvular_heart_disease:
+  th: โรคลิ้นหัวใจ
+  en: valvular heart disease
+  kind: disease
+
+congenital_shunt:
+  th: ผนังกั้นหัวใจรั่วหรือเส้นเลือดเกินแต่กำเนิด (ASD, VSD, PDA)
+  en: ASD, VSD or PDA
+  kind: disease
+
+pericardial_effusion:
+  th: น้ำในช่องเยื่อหุ้มหัวใจ
+  en: pericardial effusion
+  kind: disease
+
+constrictive_pericarditis:
+  th: เยื่อหุ้มหัวใจหนาตัวบีบรัด
+  en: constrictive pericarditis
+  kind: disease
+
+tachyarrhythmia:
+  th: หัวใจเต้นเร็วผิดจังหวะ
+  en: tachyarrhythmia
+  kind: disease
+
+bradyarrhythmia:
+  th: หัวใจเต้นช้าผิดจังหวะ
+  en: bradyarrhythmia
+  kind: disease
+
+hypertensive_heart_disease:
+  th: โรคหัวใจจากความดันโลหิตสูง
+  en: hypertensive heart disease
+  kind: disease
+
+renal_failure:
+  th: ไตวาย
+  en: renal failure
+  kind: disease
+
+metabolic_acidosis:
+  th: ภาวะเลือดเป็นกรด
+  en: metabolic acidosis
+  kind: disease
+
+anemia:
+  th: ภาวะซีด
+  en: anemia
+  kind: disease
+
+myasthenia_gravis:
+  th: กล้ามเนื้ออ่อนแรงจากภูมิคุ้มกัน (MG)
+  en: myasthenia gravis
+  kind: disease
+
+guillain_barre_syndrome:
+  th: เส้นประสาทอักเสบเฉียบพลัน (GBS)
+  en: Guillain-Barré syndrome
+  kind: disease
+
+anxiety_disorder:
+  th: โรควิตกกังวล
+  en: anxiety disorder
+  kind: disease
+
+panic_disorder:
+  th: โรคแพนิก
+  en: panic disorder
+  kind: disease
+
+# ── Dysphagia (chapter 21) ────────────────────────────────────────────────
+stroke:
+  th: โรคหลอดเลือดสมอง
+  en: stroke
+  kind: disease
+
+parkinsons_disease:
+  th: โรคพาร์กินสัน
+  en: Parkinson's disease
+  kind: disease
+
+other_neuromuscular_disease:
+  th: โรคระบบประสาทและกล้ามเนื้ออื่นๆ
+  en: other neuromuscular disease
+  kind: group
+  examples: [amyotrophic lateral sclerosis, multiple sclerosis, myotonic dystrophy, brainstem tumor, dermatomyositis]
+
+head_neck_cancer:
+  th: มะเร็งช่องปากและคอหอย
+  en: head and neck cancer
+  kind: disease
+
+post_head_neck_treatment:
+  th: ตีบแคบหลังผ่าตัดหรือฉายแสงบริเวณศีรษะและคอ
+  en: after head and neck surgery or radiation
+  kind: disease
+
+pharyngeal_neck_infection:
+  th: การติดเชื้อบริเวณคอหอยและลำคอ
+  en: infection of the pharynx and neck
+  kind: disease
+
+thyroid_nodule:
+  th: ก้อนที่ต่อมไทรอยด์
+  en: thyroid nodule
+  kind: disease
+
+cervical_osteophyte:
+  th: กระดูกงอกที่กระดูกสันหลังส่วนคอ
+  en: cervical osteophyte
+  kind: disease
+
+cervical_web:
+  th: พังผืดในหลอดอาหารส่วนคอ
+  en: cervical web
+  kind: disease
+
+zenker_diverticulum:
+  th: กระเปาะคอหอย (Zenker)
+  en: Zenker diverticulum
+  kind: disease
+
+esophageal_ring_web:
+  th: วงแหวนหรือพังผืดในหลอดอาหาร
+  en: esophageal ring or web
+  kind: disease
+
+drug_induced_esophagitis:
+  th: หลอดอาหารอักเสบจากยา
+  en: drug-induced esophagitis
+  kind: disease
+
+esophageal_foreign_body:
+  th: สิ่งแปลกปลอมในหลอดอาหาร
+  en: esophageal foreign body
+  kind: disease
+
+eosinophilic_esophagitis:
+  th: หลอดอาหารอักเสบจากเม็ดเลือดขาวอีโอซิโนฟิล
+  en: eosinophilic esophagitis
+  kind: disease
+
+peptic_stricture:
+  th: หลอดอาหารตีบจากกรดไหลย้อน
+  en: peptic stricture
+  kind: disease
+
+caustic_stricture:
+  th: หลอดอาหารตีบจากสารกัดกร่อน
+  en: caustic stricture
+  kind: disease
+
+esophageal_diverticulum:
+  th: กระเปาะหลอดอาหาร
+  en: esophageal diverticulum
+  kind: disease
+
+esophageal_cancer:
+  th: มะเร็งหลอดอาหารหรือรอยต่อหลอดอาหารกับกระเพาะอาหาร
+  en: carcinoma of the esophagus or esophagogastric junction
+  kind: disease
+
+distal_esophageal_spasm:
+  th: หลอดอาหารหดเกร็ง
+  en: distal esophageal spasm
+  kind: disease
+
+jackhammer_esophagus:
+  th: หลอดอาหารบีบตัวแรงผิดปกติ
+  en: hypercontractile (jackhammer) esophagus
+  kind: disease
+
+hypertensive_les:
+  th: หูรูดหลอดอาหารส่วนล่างบีบตัวแรง
+  en: hypertensive lower esophageal sphincter
+  kind: disease
+
+achalasia:
+  th: หูรูดหลอดอาหารส่วนล่างไม่คลายตัว (achalasia)
+  en: achalasia
+  kind: disease
+
+scleroderma_esophagus:
+  th: หลอดอาหารผิดปกติจากโรคหนังแข็ง
+  en: scleroderma esophagus
+  kind: disease
+
+# ── GI bleeding (chapter 24) ──────────────────────────────────────────────
+esophageal_varices:
+  th: เลือดออกจากหลอดเลือดโป่งพองในหลอดอาหารหรือกระเพาะอาหาร
+  en: esophageal or gastric varices
+  kind: disease
+  must_not_miss: true
+
+portal_hypertensive_gastropathy:
+  th: กระเพาะอาหารผิดปกติจากความดันในหลอดเลือดดำพอร์ทัลสูง
+  en: portal hypertensive gastropathy
+  kind: disease
+
+upper_gi_malignancy:
+  th: มะเร็งหลอดอาหาร กระเพาะอาหาร หรือลำไส้เล็กส่วนต้น
+  en: upper gastrointestinal cancer
+  kind: disease
+  must_not_miss: true
+
+esophagitis:
+  th: แผลที่หลอดอาหารหรือหลอดอาหารอักเสบ
+  en: esophageal ulcer or esophagitis
+  kind: disease
+
+mallory_weiss_tear:
+  th: เยื่อบุรอยต่อหลอดอาหารกับกระเพาะอาหารฉีกขาด
+  en: Mallory-Weiss tear
+  kind: disease
+
+dieulafoy_lesion:
+  th: หลอดเลือดแดงใต้เยื่อบุโผล่ (Dieulafoy)
+  en: Dieulafoy's lesion
+  kind: disease
+
+diverticulosis:
+  th: กระเปาะลำไส้ใหญ่
+  en: diverticulosis
+  kind: disease
+
+colorectal_polyp:
+  th: ติ่งเนื้อในลำไส้ใหญ่
+  en: colorectal polyp
+  kind: disease
+
+infectious_colitis:
+  th: ลำไส้ใหญ่อักเสบจากการติดเชื้อ
+  en: infectious colitis
+  kind: disease
+
+post_polypectomy_bleeding:
+  th: เลือดออกหลังตัดติ่งเนื้อ
+  en: post-polypectomy bleeding
+  kind: disease
+
+hemorrhoid:
+  th: ริดสีดวงทวาร
+  en: hemorrhoid
+  kind: disease
+
+anal_fissure:
+  th: แผลขอบทวาร
+  en: anal fissure
+  kind: disease
+
+# ── Constipation (chapter 26) ─────────────────────────────────────────────
+external_compression:
+  th: ก้อนนอกลำไส้กดเบียด
+  en: external compression
+  kind: disease
+
+anal_stenosis:
+  th: รูทวารหนักตีบ
+  en: anal stenosis
+  kind: disease
+
+rectocele:
+  th: ผนังลำไส้ตรงยื่นเข้าช่องคลอด (rectocele/sigmoidocele)
+  en: rectocele or sigmoidocele
+  kind: disease
+
+systemic_sclerosis:
+  th: โรคหนังแข็ง
+  en: systemic sclerosis
+  kind: disease
+
+hypercalcemia:
+  th: แคลเซียมในเลือดสูง
+  en: hypercalcemia
+  kind: disease
+
+diabetic_dysmotility:
+  th: ลำไส้เคลื่อนไหวช้าจากเบาหวาน
+  en: diabetic bowel dysmotility
+  kind: disease
+
+multiple_sclerosis:
+  th: โรคปลอกประสาทอักเสบ (MS)
+  en: multiple sclerosis
+  kind: disease
+
+spinal_cord_lesion:
+  th: โรคของไขสันหลัง
+  en: spinal cord lesion
+  kind: disease
+
+medication_induced_constipation:
+  th: ท้องผูกจากยา
+  en: medication-induced constipation
+  kind: disease
+
+functional_constipation:
+  th: ท้องผูกเรื้อรังที่ไม่มีโรคทางกาย
+  en: functional constipation
+  kind: disease
+
+defecatory_disorder:
+  th: การเบ่งถ่ายผิดปกติ (pelvic floor dysfunction)
+  en: defecatory disorder
+  kind: disease
+
+# ── Jaundice (chapter 20) ─────────────────────────────────────────────────
+viral_hepatitis:
+  th: ไวรัสตับอักเสบ
+  en: viral hepatitis
+  kind: disease
+
+drug_induced_liver_injury:
+  th: ตับอักเสบจากยา สมุนไพร หรือสารพิษ
+  en: drug-induced liver injury
+  kind: disease
+
+alcoholic_hepatitis:
+  th: ตับอักเสบจากแอลกอฮอล์
+  en: alcoholic hepatitis
+  kind: disease
+
+autoimmune_hepatitis:
+  th: ตับอักเสบจากภูมิคุ้มกันต่อตนเอง
+  en: autoimmune hepatitis
+  kind: disease
+
+ischemic_hepatitis:
+  th: ตับขาดเลือด
+  en: ischemic hepatitis
+  kind: disease
+
+wilson_disease:
+  th: โรควิลสัน
+  en: Wilson disease
+  kind: disease
+
+pregnancy_liver_disease:
+  th: โรคตับที่สัมพันธ์กับการตั้งครรภ์
+  en: liver disease of pregnancy
+  kind: disease
+  sex: female
+
+choledocholithiasis:
+  th: นิ่วในท่อน้ำดี
+  en: choledocholithiasis
+  kind: disease
+
+sclerosing_cholangitis:
+  th: ท่อน้ำดีอักเสบชนิดแข็งตัว
+  en: sclerosing cholangitis
+  kind: disease
+
+aids_cholangiopathy:
+  th: ท่อน้ำดีผิดปกติจากโรคเอดส์
+  en: AIDS cholangiopathy
+  kind: disease
+
+biliary_stricture:
+  th: ท่อน้ำดีตีบหลังผ่าตัดหรือหัตถการ
+  en: post-procedure biliary stricture
+  kind: disease
+
+primary_biliary_cholangitis:
+  th: ท่อน้ำดีในตับอักเสบเรื้อรัง (PBC)
+  en: primary biliary cholangitis
+  kind: disease
+
+hemolytic_anemia:
+  th: โลหิตจางจากเม็ดเลือดแดงแตก
+  en: hemolytic anemia
+  kind: disease
+
+congenital_hyperbilirubinemia:
+  th: บิลิรูบินสูงแต่กำเนิด เช่น Gilbert
+  en: congenital hyperbilirubinemia
+  kind: disease
+
+# ── Weight change (chapter 5) ─────────────────────────────────────────────
+intentional_weight_loss:  # p.53
+  th: น้ำหนักลดจากการคุมอาหารหรือออกกำลังกาย
+  en: intentional weight loss
+  kind: group
+
+eating_disorder:  # p.53
+  th: กลุ่มโรคการกินผิดปกติ
+  en: eating disorder
+  kind: group
+  examples: [anorexia nervosa, bulimia nervosa]
+
+oral_dental_problem:  # p.53
+  th: ปัญหาฟันและช่องปากที่ทำให้กินได้น้อย
+  en: oral or dental disease limiting food intake
+  kind: group
+
+esophageal_disease:  # p.54; ตาราง 5-1
+  th: โรคของหลอดอาหาร
+  en: esophageal disease
+  kind: group
+
+gastric_disease:  # p.54; ตาราง 5-1
+  th: โรคของกระเพาะอาหาร
+  en: gastric disease
+  kind: group
+
+dementia:  # p.54–55
+  th: โรคสมองเสื่อม
+  en: dementia
+  kind: disease
+
+alcohol_or_substance_use:  # p.55
+  th: น้ำหนักลดจากแอลกอฮอล์หรือสารเสพติด
+  en: alcohol- or substance-related weight loss
+  kind: group
+
+drug_induced_anorexia:  # p.55
+  th: เบื่ออาหารหรือกินได้น้อยจากยา
+  en: medication-related loss of appetite
+  kind: disease
+
+chronic_kidney_disease:  # p.54; ตาราง 5-1
+  th: โรคไตเรื้อรัง
+  en: chronic kidney disease
+  kind: disease
+
+gi_parasitic_infection:  # p.55
+  th: พยาธิในทางเดินอาหารที่ทำให้ดูดซึมผิดปกติ
+  en: gastrointestinal parasitic infection causing malabsorption
+  kind: group
+
+cholestatic_liver_disease:  # p.55
+  th: โรคตับหรือทางเดินน้ำดีที่ทำให้น้ำดีคั่ง
+  en: cholestatic liver disease
+  kind: group
+
+drug_induced_malabsorption:  # p.55
+  th: ย่อยหรือดูดซึมอาหารผิดปกติจากยา
+  en: medication-induced maldigestion or malabsorption
+  kind: disease
+
+diabetes_mellitus:  # p.54, 56
+  th: โรคเบาหวาน
+  en: diabetes mellitus
+  kind: disease
+
+adrenal_insufficiency:  # p.54, 56
+  th: ภาวะต่อมหมวกไตทำงานต่ำ
+  en: adrenal insufficiency
+  kind: disease
+
+lung_cancer:  # p.54, 56
+  th: มะเร็งปอด
+  en: lung cancer
+  kind: disease
+
+leukemia:  # p.56
+  th: มะเร็งเม็ดเลือดขาว
+  en: leukemia
+  kind: disease
+
+hiv_aids:  # p.55–56
+  th: โรคเอดส์และการติดเชื้อฉวยโอกาส
+  en: AIDS and opportunistic infections
+  kind: group
+
+glomerulonephritis:  # p.48
+  th: ไตอักเสบที่โกลเมอรูลัส
+  en: glomerulonephritis
+  kind: group
+
+high_salt_intake:  # p.48
+  th: บวมน้ำจากการรับโซเดียมมาก
+  en: salt-related fluid retention
+  kind: group
+
+protein_losing_enteropathy:  # p.48–49
+  th: ภาวะสูญเสียโปรตีนทางลำไส้
+  en: protein-losing enteropathy
+  kind: group
+
+kwashiorkor:  # p.46, 48
+  th: ภาวะขาดโปรตีนรุนแรงร่วมกับบวม
+  en: kwashiorkor
+  kind: disease
+
+primary_obesity:  # p.49
+  th: โรคอ้วนจากอาหารและพฤติกรรม
+  en: primary obesity
+  kind: disease
+
+cushing_syndrome:  # p.50
+  th: กลุ่มอาการคุชชิง
+  en: Cushing syndrome
+  kind: disease
+
+pcos:  # p.50
+  th: กลุ่มอาการถุงน้ำรังไข่หลายใบ
+  en: polycystic ovary syndrome
+  kind: disease
+  sex: female
+
+insulinoma:  # p.50
+  th: เนื้องอกที่หลั่งอินซูลิน
+  en: insulinoma
+  kind: disease
+
+hypogonadism:  # p.48; ภาพ 5-1
+  th: ภาวะฮอร์โมนเพศต่ำ
+  en: hypogonadism
+  kind: disease
+
+growth_hormone_deficiency:  # p.50
+  th: ภาวะขาดโกรทฮอร์โมน
+  en: growth hormone deficiency
+  kind: disease
+
+drug_induced_weight_gain:  # p.50–51
+  th: น้ำหนักเพิ่มจากยา
+  en: medication-induced weight gain
+  kind: disease
+
+genetic_obesity:  # p.51
+  th: โรคอ้วนจากความผิดปกติทางพันธุกรรม
+  en: genetic obesity
+  kind: group
+  examples: [syndromic obesity, monogenic obesity]
+
+binge_eating_disorder:  # p.51
+  th: โรคกินอาหารมากผิดปกติแบบควบคุมไม่ได้
+  en: binge eating disorder
+  kind: disease
+
+depression:  # p.51
+  th: กลุ่มโรคซึมเศร้า
+  en: depressive disorder
+  kind: group
+
+bipolar_disorder:  # p.51
+  th: โรคอารมณ์สองขั้ว
+  en: bipolar disorder
+  kind: disease
+
+hypothalamic_disorder:  # p.52
+  th: โรคของสมองส่วนไฮโปทาลามัส
+  en: hypothalamic disorder
+  kind: group
+
+pregnancy_weight_gain:  # p.52
+  th: น้ำหนักเพิ่มจากการตั้งครรภ์
+  en: pregnancy-related weight gain
+  kind: group
+  sex: female
+
+increased_muscle_mass:  # p.52
+  th: น้ำหนักเพิ่มจากมวลกล้ามเนื้อ
+  en: increased muscle mass
+  kind: group
+
+# ── Abnormal vaginal bleeding (chapter 38) ────────────────────────────────
+urinary_bleeding_source:  # p.420; ภาพ 38-1
+  th: เลือดจากทางเดินปัสสาวะที่เข้าใจว่าออกทางช่องคลอด
+  en: urinary source of apparent vaginal bleeding
+  kind: group
+  sex: female
+
+anorectal_bleeding_source:  # p.420; ภาพ 38-1
+  th: เลือดจากทวารหนักที่เข้าใจว่าออกทางช่องคลอด
+  en: anorectal source of apparent vaginal bleeding
+  kind: group
+  sex: female
+
+vulval_lesion:  # p.423
+  th: แผลหรือรอยโรคที่อวัยวะเพศภายนอก
+  en: vulval lesion
+  kind: group
+  sex: female
+
+vaginal_laceration:  # p.423
+  th: แผลฉีกขาดในช่องคลอด
+  en: vaginal laceration
+  kind: disease
+  sex: female
+
+cervical_polyp:  # p.423
+  th: ติ่งเนื้อที่ปากมดลูก
+  en: cervical polyp
+  kind: disease
+  sex: female
+
+cervical_cancer:  # p.423
+  th: มะเร็งปากมดลูก
+  en: cervical cancer
+  kind: disease
+  sex: female
+
+miscarriage:  # p.424
+  th: ภาวะแท้ง
+  en: miscarriage
+  kind: group
+  sex: female
+
+molar_pregnancy:  # p.424
+  th: ครรภ์ไข่ปลาอุก
+  en: molar pregnancy
+  kind: disease
+  sex: female
+
+endometrial_polyp:  # p.424, 426
+  th: ติ่งเนื้อในโพรงมดลูก
+  en: endometrial polyp
+  kind: disease
+  sex: female
+
+adenomyosis:  # p.424–426
+  th: เยื่อบุโพรงมดลูกแทรกในกล้ามเนื้อมดลูก
+  en: adenomyosis
+  kind: disease
+  sex: female
+
+uterine_leiomyoma:  # p.425–426
+  th: เนื้องอกกล้ามเนื้อมดลูก
+  en: uterine leiomyoma
+  kind: disease
+  sex: female
+
+uterine_malignancy_or_hyperplasia:  # p.425
+  th: มะเร็งมดลูกหรือเยื่อบุโพรงมดลูกหนาตัวผิดปกติ
+  en: uterine malignancy or endometrial hyperplasia
+  kind: group
+  sex: female
+
+ovulatory_dysfunction:  # p.425
+  th: ภาวะไข่ตกผิดปกติ
+  en: ovulatory dysfunction
+  kind: group
+  sex: female
+
+endometrial_dysfunction:  # p.425
+  th: กลไกห้ามเลือดหรือซ่อมแซมเยื่อบุโพรงมดลูกผิดปกติ
+  en: endometrial dysfunction
+  kind: group
+  sex: female
+
+uterine_avm:  # p.425
+  th: หลอดเลือดแดงและดำของมดลูกเชื่อมต่อผิดปกติ
+  en: uterine arteriovenous malformation
+  kind: disease
+  sex: female
+
+isthmocele:  # p.425
+  th: ภาวะ isthmocele
+  en: isthmocele
+  kind: disease
+  sex: female
+
+# ── Urology (uro.pdf) ────────────────────────────────────────────────────
+benign_prostatic_hyperplasia:
+  th: ต่อมลูกหมากโตชนิดไม่ร้าย   # uro.16–17
+  en: benign prostatic hyperplasia
+  kind: disease
+  sex: male
+
+prostate_cancer:
+  th: มะเร็งต่อมลูกหมาก   # uro.18
+  en: prostate cancer
+  kind: disease
+  sex: male
+
+urethritis:
+  th: ท่อปัสสาวะอักเสบ   # uro.3, 8
+  en: urethritis
+  kind: disease
+
+urethral_stricture:
+  th: ท่อปัสสาวะตีบ   # uro.3, 8, 12
+  en: urethral stricture
+  kind: disease
+
+neurogenic_bladder:
+  th: กระเพาะปัสสาวะทำงานผิดปกติจากระบบประสาท   # uro.2–3
+  en: neurogenic bladder
+  kind: group
+
+overactive_bladder:
+  th: กระเพาะปัสสาวะไวเกิน   # uro.2–3
+  en: overactive bladder
+  kind: group
+
+detrusor_underactivity:
+  th: กล้ามเนื้อกระเพาะปัสสาวะบีบตัวน้อย   # uro.3
+  en: detrusor underactivity
+  kind: group
+
+stress_urinary_incontinence:
+  th: ปัสสาวะเล็ดจากแรงดันในท้องเพิ่ม   # uro.3
+  en: stress urinary incontinence
+  kind: group
+
+drug_related_incontinence:
+  th: กลั้นปัสสาวะผิดปกติจากยา   # uro.3
+  en: medication-related urinary incontinence
+  kind: group
+
+atrophic_vaginitis:
+  th: ช่องคลอดฝ่อ   # uro.3
+  en: atrophic vaginitis
+  kind: disease
+  sex: female
+
+mobility_related_incontinence:
+  th: ปัสสาวะเล็ดจากข้อจำกัดในการเคลื่อนไหว   # uro.3
+  en: mobility-related urinary incontinence
+  kind: group
+
+diabetes_insipidus:
+  th: โรคเบาจืด   # uro.2
+  en: diabetes insipidus
+  kind: disease
+
+diuretic_related_polyuria:
+  th: ปัสสาวะมากจากยาขับปัสสาวะ   # uro.2
+  en: diuretic-related polyuria
+  kind: group
+
+fluid_intake_polyuria:
+  th: ปัสสาวะมากจากการดื่มของเหลวมาก   # uro.2
+  en: high-fluid-intake polyuria
+  kind: group
+
+nocturnal_polyuria:
+  th: ปริมาณปัสสาวะเพิ่มเฉพาะกลางคืน   # uro.2
+  en: nocturnal polyuria
+  kind: group
+
+sleep_disorder:
+  th: โรคหรือภาวะรบกวนการนอน   # uro.2
+  en: sleep disorder
+  kind: group
+
+bladder_stone:
+  th: นิ่วในกระเพาะปัสสาวะ   # uro.12
+  en: bladder calculus
+  kind: disease
+
+urethral_stone:
+  th: นิ่วในท่อปัสสาวะ   # uro.12
+  en: urethral calculus
+  kind: disease
+
+drug_induced_retention:
+  th: ปัสสาวะคั่งจากยา   # uro.3
+  en: medication-induced urinary retention
+  kind: group
+
+volume_depletion:
+  th: ปริมาตรสารน้ำในร่างกายลดลง   # uro.4
+  en: volume depletion
+  kind: group
+
+obstructive_uropathy:
+  th: ทางเดินปัสสาวะอุดตันกระทบการระบายปัสสาวะ   # uro.6
+  en: obstructive uropathy
+  kind: group
+
+renal_cell_carcinoma:
+  th: มะเร็งเซลล์ไต   # uro.14
+  en: renal cell carcinoma
+  kind: disease
+
+renal_angiomyolipoma:
+  th: แองจิโอไมโอลิโพมาของไต   # uro.13
+  en: renal angiomyolipoma
+  kind: disease
+
+wilms_tumor:
+  th: เนื้องอกวิล์มส์   # uro.14
+  en: Wilms tumor
+  kind: disease
+
+upper_tract_urothelial_tumor:
+  th: เนื้องอกเยื่อบุทางเดินปัสสาวะส่วนบน   # uro.8, 15
+  en: upper tract urothelial tumor
+  kind: group
+
+renal_trauma:
+  th: ไตบาดเจ็บจากอุบัติเหตุ   # uro.8
+  en: renal trauma
+  kind: disease
+
+sickle_cell_disease:
+  th: โรคเม็ดเลือดแดงรูปเคียว   # uro.8
+  en: sickle cell disease
+  kind: disease
+
+hemoglobinuria:
+  th: มีฮีโมโกลบินในปัสสาวะ   # uro.8–9
+  en: hemoglobinuria
+  kind: group
+
+myoglobinuria:
+  th: มีไมโอโกลบินในปัสสาวะ   # uro.8–9
+  en: myoglobinuria
+  kind: group
+
+non_heme_pigmenturia:
+  th: ปัสสาวะมีเม็ดสีที่ไม่ใช่เลือด   # uro.8–9
+  en: non-heme urine pigmentation
+  kind: group
+
+vaginal_blood_contamination:
+  th: เลือดจากช่องคลอดปนตัวอย่างปัสสาวะ   # uro.8
+  en: vaginal blood contaminating urine
+  kind: group
+  sex: female
+

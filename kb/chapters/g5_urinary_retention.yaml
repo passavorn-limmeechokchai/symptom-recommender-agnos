@@ -1,0 +1,167 @@
+# Urinary retention and low output (ปัสสาวะคั่งและปัสสาวะออกน้อย)
+# Source: uro.pdf, pages 3–6, 11–12. `# uro.N` = PDF page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: g5
+title: {th: ปัสสาวะคั่งและปัสสาวะออกน้อย, en: Urinary retention and low urine output}
+chief_complaint: difficulty_urinating
+also_entry: [unable_to_urinate, urinary_retention, acute_urinary_retention, chronic_urinary_retention, acute_on_chronic_retention, anuria, decreased_urine]
+status: draft
+
+definitions:
+  acute_retention: "ถ่ายปัสสาวะไม่ออกเกิดขึ้นเฉียบพลัน ร่วมกับปวดและมีกระเพาะปัสสาวะเต็ม เป็นภาวะฉุกเฉิน"  # uro.3–4
+  chronic_retention: "มีปัสสาวะค้างมานาน อาจยังถ่ายออกได้บ้างและไม่ปวด"  # uro.3
+  anuria_vs_retention: "ไม่มีปัสสาวะออกต้องแยกการสร้างปัสสาวะน้อยจากปัสสาวะค้าง โดยประเมินกระเพาะปัสสาวะร่วมด้วย"  # uro.4
+
+hpi:
+  difficulty_urinating:
+    output:  # uro.3–4
+      ask: "ยังถ่ายปัสสาวะออกได้บ้าง หรือไม่ออกเลย"
+      options: [some, none]
+      allow_unknown: true
+    bladder:  # uro.3–4
+      ask: "เคยตรวจพบว่ากระเพาะปัสสาวะเต็มค้างหรือไม่ ถ้าไม่ทราบเลือกไม่แน่ใจ"
+      options: [full, not_full]
+      allow_unknown: true
+    course:  # uro.3
+      ask: "เริ่มทันทีพร้อมปวดตึง ถ่ายไม่หมดมานานแต่ไม่ปวด หรือเป็นมานานแล้วทรุดลงทันที"
+      options: [acute_painful, chronic_painless, acute_on_chronic]
+      allow_unknown: true
+  anuria:
+    bladder:  # uro.4
+      ask: "เคยตรวจพบว่ากระเพาะปัสสาวะเต็มค้างหรือไม่ ถ้าไม่ทราบเลือกไม่แน่ใจ"
+      options: [full, not_full]
+      allow_unknown: true
+  decreased_urine:
+    bladder:  # uro.4
+      ask: "เคยตรวจพบว่ากระเพาะปัสสาวะเต็มค้างหรือไม่ ถ้าไม่ทราบเลือกไม่แน่ใจ"
+      options: [full, not_full]
+      allow_unknown: true
+
+steps:
+  - {id: distinguish_anuria_from_retention}  # uro.4
+  - {id: acute_chronic_or_acute_on_chronic}  # uro.3
+  - {id: bladder_underactivity_or_outlet_obstruction}  # uro.3
+  - {id: assess_infection_obstruction_and_renal_function}  # uro.6
+
+gates:
+  acute_retention:  # uro.3–4
+    when: always
+    ask: [acute_urinary_retention, acute_on_chronic_retention]
+    if_any_yes: urgent
+  infected_obstruction:  # uro.6, 11
+    when: {present: [known_urinary_obstruction]}
+    ask: [fever]
+    if_any_yes: urgent
+  high_risk_obstruction:  # uro.6, 11
+    when: {present: [known_urinary_obstruction]}
+    ask: [solitary_kidney, kidney_transplant, acute_kidney_injury_history]
+    if_any_yes: urgent
+
+  colic_with_high_risk_features:  # uro.6, 11
+    when: {present: [colicky_flank_pain]}
+    ask: [fever, solitary_kidney, kidney_transplant, acute_kidney_injury_history]
+    if_any_yes: urgent
+  uncontrolled_colic:  # uro.6, 11
+    when: always
+    ask: [intractable_renal_colic]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # uro.3, 6
+    ask: [fever, known_urinary_obstruction, retention_drug_use]
+    rules_out: [obstructive_uropathy, drug_induced_retention]
+
+tree_selection:
+  - {when: {present: [difficulty_urinating]}, use: [outlet, underactive]}  # uro.3
+  - {when: {present: [anuria], anuria.bladder: full}, use: [outlet, underactive]}  # uro.4
+  - {when: {present: [anuria], anuria.bladder: not_full}, use: [low_production, upper_obstruction]}  # uro.4
+  - {when: {present: [anuria], anuria.bladder: unknown}, use: [outlet, underactive, low_production, upper_obstruction]}  # uro.4
+  - {when: {present: [decreased_urine], decreased_urine.bladder: full}, use: [outlet, underactive]}  # uro.4
+  - {when: {present: [decreased_urine], decreased_urine.bladder: not_full}, use: [low_production, upper_obstruction]}  # uro.4
+  - {when: {present: [decreased_urine], decreased_urine.bladder: unknown}, use: [outlet, underactive, low_production, upper_obstruction]}  # uro.4
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {sex: male, age_above: 50}, boost: outlet.prostate}  # uro.16, 18
+
+trees:
+  outlet:  # uro.3
+    prostate: [benign_prostatic_hyperplasia, prostatitis, prostate_cancer]
+    luminal: [urethral_stricture, bladder_stone, urethral_stone, urethritis]
+    extrinsic: [uterine_leiomyoma, fecal_impaction]
+  underactive: [neurogenic_bladder, detrusor_underactivity, drug_induced_retention]  # uro.3
+  low_production: [volume_depletion, acute_kidney_injury, renal_failure]  # uro.4, 6
+  upper_obstruction: [obstructive_uropathy, renal_stone]  # uro.4, 6
+
+scores: {}
+
+confirm: {}
+
+findings:
+  benign_prostatic_hyperplasia:  # uro.16
+    symptoms: [weak_urinary_stream, urinary_hesitancy, intermittent_urinary_stream, urinary_straining, incomplete_bladder_emptying]
+    signs: [smooth_enlarged_prostate]
+  urethral_stricture:  # uro.3
+    symptoms: [weak_urinary_stream, difficulty_urinating]
+  bladder_stone:  # uro.12
+    symptoms: [lower_abdominal_pain, intermittent_urinary_stream, hematuria]
+  urethral_stone:  # uro.12
+    symptoms: [dysuria, weak_urinary_stream, hematuria]
+  neurogenic_bladder:  # uro.3
+    symptoms: [incomplete_bladder_emptying, overflow_urinary_leak]
+  detrusor_underactivity:  # uro.3
+    symptoms: [incomplete_bladder_emptying, overflow_urinary_leak]
+  uterine_leiomyoma:  # uro.3
+    symptoms: [lower_abdominal_mass]
+  fecal_impaction:  # uro.3
+    symptoms: [constipation]
+  renal_stone:  # uro.4, 11
+    symptoms: [flank_pain, colicky_flank_pain, hematuria]
+
+branch_findings: {}
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [diabetes, spinal_injury_history, stroke_history], suggests: [neurogenic_bladder]}  # uro.3
+  - {findings: [retention_drug_use], suggests: [drug_induced_retention]}  # uro.3
+  - {findings: [radiation_history], suggests: [detrusor_underactivity]}  # uro.3
+  - {findings: [known_urinary_obstruction], suggests: [obstructive_uropathy]}  # uro.6
+  - {findings: [acute_kidney_injury_history], suggests: [acute_kidney_injury]}  # uro.6
+  - {findings: [family_history_prostate_cancer], suggests: [prostate_cancer]}  # uro.18
+
+exam_clues:
+  - {sign: distended_bladder, suggests: [urinary retention]}  # uro.3–4
+  - {sign: low_volume_status_on_jvp_and_intake_output_assessment, suggests: [volume_depletion]}  # uro.4
+  - {sign: hydronephrosis, suggests: [obstructive_uropathy]}  # uro.6

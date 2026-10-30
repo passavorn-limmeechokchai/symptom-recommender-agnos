@@ -1,0 +1,187 @@
+# Chapter 14 — Chest pain (เจ็บหน้าอก)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 153–160. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 14
+title: {th: เจ็บหน้าอก, en: Chest pain}
+chief_complaint: chest_pain
+also_entry: []
+status: draft
+
+definitions:  # p.154
+  chest_pain: "เจ็บ ปวด แสบ หรือไม่สบายบริเวณทรวงอก อาจร้าวไปที่อื่นด้วย"
+  typical_angina: "ครบ 3 ข้อ: เจ็บแน่นกลางอก (อาจร้าวไปกราม คอ ไหล่) แย่ลงเมื่อออกแรง และดีขึ้นเมื่อพักหรือได้ยาอมใต้ลิ้น"
+  atypical_angina: "มีไม่ครบ 3 ข้อของ typical angina หรือมาด้วยอาการอื่น เช่น เจ็บแปลบ แน่นลิ้นปี่"
+  pleuritic_chest_pain: "เจ็บแปลบที่หน้าอกหรือชายโครงเมื่อหายใจเข้าลึก ไอ หรือจาม"
+
+hpi:
+  chest_pain:
+    location:  # p.154
+      ask: "เจ็บตรงไหน ชี้ได้ไหม"
+      multiple: true
+      allow_unknown: true
+      options: [central, left, right, back]
+    onset:  # p.154, 155
+      ask: "เจ็บขึ้นมาทันทีและรุนแรง หรือค่อยๆ เป็น เป็นๆ หายๆ"
+      allow_unknown: true
+      options: [sudden_severe, gradual_or_intermittent]
+    duration:  # p.154, 156
+      ask: "เจ็บแต่ละครั้งนานกี่นาที"
+      unit: minutes
+      categories:
+        brief: {below: 15}
+        prolonged: {from: 15}
+      grey_zones:
+        - {from: 10, to: 20, both: [brief, prolonged]}
+      allow_unknown: true
+    character:  # p.154
+      ask: "เจ็บแบบไหน แน่นเหมือนของหนักทับ แปลบ เหมือนถูกฉีก หรือแสบร้อน"
+      options: [pressure, sharp, tearing, burning]
+    radiation:  # p.154
+      ask: "เจ็บร้าวไปที่ไหนไหม"
+      multiple: true
+      options: [jaw_neck_arm, back, none]
+    aggravating:  # p.154, 156, 158
+      ask: "เจ็บมากขึ้นเวลาทำอะไร"
+      multiple: true
+      options: [exertion, deep_breath, lying_flat, touch, meals, none]
+    relieving:  # p.154, 156
+      ask: "ทำอะไรแล้วดีขึ้น"
+      multiple: true
+      options: [rest, leaning_forward, antacid, none]
+    frequency:  # p.154
+      ask: "เคยเจ็บแบบนี้มาก่อนไหม"
+      options: [first_time, recurrent]
+
+steps:
+  - {id: vital_signs}  # p.155
+  - {id: acute_severe_vs_intermittent}  # p.155
+  - {id: life_threatening_heart_lungs}  # p.156
+  - {id: gastrointestinal_and_chest_wall}  # p.157
+
+gates:
+  unstable:  # p.155
+    when: always
+    ask: [near_syncope, loss_of_consciousness, severe_dyspnea, cold_extremities, low_blood_pressure]
+    if_any_yes: urgent
+  heart_attack_or_dissection:  # p.155, 156, 158
+    when: {chest_pain.onset: sudden_severe}
+    ask: [pressure_chest_pain, chest_pain_radiating_arm, prolonged_chest_pain, tearing_chest_pain]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # risk group: EKG at once; p.156
+    ask: [diabetes, history_hypertension, kidney_disease, smoking, diaphoresis]
+    rules_out: [acute_myocardial_infarction]
+  - when: {present: [pleuritic_chest_pain]}  # p.157
+    ask: [sudden_dyspnea, hemoptysis, unilateral_leg_swelling, bedridden, recent_trauma_surgery,
+          history_cancer, previous_dvt]
+    rules_out: [pulmonary_embolism]
+
+tree_selection:
+  - {when: {chest_pain.onset: sudden_severe}, use: [acute_severe]}  # p.155
+  - {when: {chest_pain.onset: gradual_or_intermittent}, use: [intermittent_gradual]}  # p.155
+  - {when: {chest_pain.onset: unknown}, use: [acute_severe, intermittent_gradual]}
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {present: [pleuritic_chest_pain]}, boost: acute_severe.lungs}  # p.157
+  - {when: {present: [exertional_chest_pain]}, boost: intermittent_gradual.heart}  # p.156
+
+trees:  # ภาพ 14-1
+  acute_severe:
+    heart: [acute_myocardial_infarction, aortic_dissection, pericarditis]
+    lungs: [pulmonary_embolism, pneumothorax]
+  intermittent_gradual:
+    heart: [chronic_coronary_syndrome]  # p.156
+    gastrointestinal: [cholecystitis, pancreatitis, pud]
+    chest_wall: [costochondritis, herpes_zoster]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  acute_myocardial_infarction:  # p.156
+    symptoms: [pressure_chest_pain, chest_pain_radiating_arm, prolonged_chest_pain, diaphoresis, palpitation,
+               dyspnea, near_syncope, dizziness, epigastric_pain]
+  chronic_coronary_syndrome:  # p.156
+    symptoms: [pressure_chest_pain, exertional_chest_pain, chest_pain_relieved_by_rest]
+  aortic_dissection:  # p.156
+    symptoms: [sudden_chest_pain, tearing_chest_pain, chest_pain_radiating_back, loss_of_consciousness,
+               limb_weakness]
+    signs: [aortic_regurgitation_murmur, asymmetric_blood_pressure, weak_leg_pulses, widened_mediastinum]
+  pericarditis:  # p.156
+    symptoms: [pleuritic_chest_pain, chest_pain_worse_lying, chest_pain_relieved_leaning_forward, fever]
+    signs: [pericardial_friction_rub, tachycardia]
+  pulmonary_embolism:  # p.157
+    symptoms: [pleuritic_chest_pain, exertional_fatigue, cough, hemoptysis, low_grade_fever,
+               unilateral_leg_swelling]
+    signs: [tachypnea, tachycardia, hypoxemia]
+  pneumothorax:  # p.157
+    symptoms: [sudden_chest_pain, pleuritic_chest_pain, cough, dyspnea]
+    signs: [decreased_breath_sounds, hyperresonance]
+  cholecystitis:  # p.157
+    symptoms: [epigastric_pain, ruq_pain, pleuritic_chest_pain, pain_radiating_right_shoulder, fever, nausea,
+               vomiting]
+    signs: [murphy_sign]
+  pancreatitis:  # p.157
+    symptoms: [epigastric_pain, pain_radiating_back, chest_pain_worse_lying, pain_relieved_leaning_forward,
+               nausea, vomiting, fever, abdominal_pain]
+  pud:  # p.157, 158
+    symptoms: [epigastric_pain, burning_abdominal_pain, nausea, vomiting, melena]
+    signs: [epigastric_tenderness]
+  costochondritis:  # p.158
+    symptoms: [chest_wall_tenderness, pleuritic_chest_pain]
+  herpes_zoster:  # p.158
+    symptoms: [burning_chest_pain, dermatomal_rash, fever, fatigue]
+
+branch_findings: {}
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [diabetes, history_hypertension, kidney_disease, smoking],
+     suggests: [acute_myocardial_infarction, chronic_coronary_syndrome]}  # p.156
+  - {findings: [bedridden, recent_trauma_surgery, history_cancer, previous_dvt], suggests: [pulmonary_embolism]}  # p.157
+  - {findings: [overweight, oral_contraceptive_use, weight_loss], suggests: [cholecystitis]}  # p.157
+  - {findings: [alcohol, smoking, overweight, diabetes], suggests: [pancreatitis]}  # p.157
+  - {findings: [nsaid_use, history_gi_liver_disease, kidney_disease, alcohol, smoking], suggests: [pud]}  # p.158
+  - {findings: [chest_trauma, chest_strain], suggests: [costochondritis]}  # p.158
+  - {findings: [immunocompromised, hiv_infection, history_cancer], suggests: [herpes_zoster]}  # p.158
+
+exam_clues:
+  - {sign: pericardial_friction_rub, suggests: [pericarditis]}  # p.156
+  - {sign: asymmetric_blood_pressure, suggests: [aortic_dissection]}  # p.156
+  - {sign: murphy_sign, suggests: [cholecystitis]}  # p.157
+  - {sign: dermatomal_vesicles, suggests: [herpes_zoster], askable_as: dermatomal_rash}  # p.158

@@ -1,0 +1,2840 @@
+# Clinical vignettes: test cases for the engine.
+#
+# How to read this file. One case per `- id:` entry, under ── lines naming the chapter.
+#   level              simple = typical case, every `expect` must pass;
+#                      book = textbook case with a confirmed diagnosis; its rank is reported, no pass/fail
+#   sex, age, chief_complaint
+#   history            what the patient could tell the app
+#     hpi              answers to chapter `hpi` questions, <symptom>.<question>: answer, in that question's
+#                      unit (fever.duration in days, cough.duration in weeks, …); null = not known
+#     present, absent  symptom and history ids answered yes / no
+#     unmapped         facts from a book case that have no id in the knowledge base
+#   expect             top3_includes / top3_includes_any = disease(s) that must rank in the top-3 DDx;
+#                      ask_first / not_ask_first = questions that must / must not come before scoring;
+#                      urgent = a gate must fire; never_recommend / never_in_ddx = sex and safety rules;
+#                      duration_categories = categories a duration answer must map to (grey zones);
+#                      switch_chief_complaint = the complaint must be re-routed
+#   exam, book_ddx, final_diagnosis   book cases only: examination, the book's DDx, the final diagnosis
+# Comments on `- id:` lines cite the book page.
+
+# ── Fever: simple cases ───────────────────────────────────────────────────
+- id: fever_pharyngitis
+  level: simple
+  sex: female
+  age: 28
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 2
+      fever.temperature: 38.0
+    present: [sore_throat, rhinorrhea, nasal_congestion]
+    absent: [cough, dyspnea]
+  expect:
+    top3_includes: pharyngitis
+
+- id: fever_pneumonia
+  level: simple
+  sex: male
+  age: 65
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 3
+      fever.temperature: 38.8
+    present: [cough, sputum, dyspnea]
+    absent: [sore_throat]
+  expect:
+    top3_includes: pneumonia
+
+- id: fever_gastroenteritis
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 1
+      fever.temperature: 38.2
+    present: [diarrhea, abdominal_pain, nausea, unsafe_food]
+  expect:
+    top3_includes: gastroenteritis
+
+- id: fever_pyelonephritis
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 2
+      fever.temperature: 39.0
+    present: [flank_pain, nausea, vomiting]
+  expect:
+    top3_includes: acute_pyelonephritis
+
+- id: fever_otitis_child
+  level: simple
+  sex: male
+  age: 8
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 2
+      fever.temperature: 38.5
+    present: [ear_pain, ear_fullness]
+  expect:
+    top3_includes: otitis_media
+
+- id: fever_leptospirosis_exposure
+  level: simple
+  sex: male
+  age: 45
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 3
+      fever.temperature: 39.2
+    present: [myalgia, flood_wading]
+    absent: [cough, sore_throat, diarrhea]
+  expect:
+    top3_includes: leptospirosis
+
+- id: fever_headache_red_flag
+  level: simple
+  sex: male
+  age: 22
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 1
+      fever.temperature: 39.0
+    present: [headache]
+  expect:
+    ask_first: [neck_stiffness, projectile_vomiting, drowsiness, confusion]
+
+- id: fever_male_lower_abdominal_pain
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 2
+      fever.temperature: 38.3
+    present: [lower_abdominal_pain]
+  expect:
+    never_recommend: [vaginal_discharge]
+    never_in_ddx: [pelvic_inflammatory_disease]
+
+# ── Fever: textbook cases ─────────────────────────────────────────────────
+- id: ch03_case1  # p.19–20, 32
+  level: book
+  sex: male
+  age: 17
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 1
+      fever.temperature: null  # "high fever" at home; 38.9 °C at the clinic
+    present: [chills, headache, anorexia, polyarthralgia, sick_contacts]
+    absent: [cough, rhinorrhea, sore_throat, dyspnea, nausea, vomiting, abdominal_pain, diarrhea, rash,
+             immunocompromised, flood_wading, forest_overnight, animal_contact, unprotected_sex]
+    unmapped: ["ไม่มีปัสสาวะแสบขัด", "ไม่มีผื่นแพ้แสง", "ไม่มีแผลในปาก", "ไม่ได้เดินทางออกนอกจังหวัด"]
+  exam: [posterior cervical lymph node 1 cm, joint tenderness without swelling]
+  book_ddx: [dengue, chikungunya, murine_typhus, primary_bacteremia]
+  final_diagnosis: chikungunya
+
+- id: ch03_case2  # p.20, 33–34
+  level: book
+  sex: male
+  age: 64
+  chief_complaint: fever
+  history:
+    hpi:
+      fever.duration: 16
+      fever.temperature: null  # low-grade fever at home; 39.0 °C at the clinic
+    present: [anorexia, fatigue, diarrhea, abdominal_pain]
+    absent: [cough, rhinorrhea, sputum, sore_throat, dyspnea, nausea, vomiting, headache, joint_pain, rash,
+             forest_overnight, flood_wading, unprotected_sex, unsafe_food, new_medication]
+    unmapped: ["ไขมันในเลือดสูง", "ถ่ายเหลวปนเนื้อ ไม่มีมูกเลือด เริ่มหลังไข้ 6 วัน", "ปวดท้องทั่วๆ เป็นๆ หายๆ"]
+  exam: [hepatomegaly (liver span 13 cm), liver percussion tenderness, no CVA tenderness]
+  book_ddx: [liver_abscess, hepatitis, enteric_fever, scrub_typhus, murine_typhus]
+  final_diagnosis: liver_abscess       # Klebsiella pneumoniae, newly diagnosed diabetes
+
+# ── Cough: simple cases ───────────────────────────────────────────────────
+- id: cough_common_cold
+  level: simple
+  sex: female
+  age: 25
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 0.5
+    present: [nasal_congestion, rhinorrhea, sore_throat, fever]
+    absent: [dyspnea, chest_pain, hemoptysis]
+  expect:
+    top3_includes_any: [common_cold, acute_rhinitis, pharyngitis]
+
+- id: cough_pneumonia
+  level: simple
+  sex: male
+  age: 60
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 0.5
+    present: [high_fever, purulent_sputum, dyspnea, pleuritic_chest_pain]
+  expect:
+    top3_includes_any: [severe_pneumonia, pneumonia]
+
+- id: cough_pulmonary_embolism
+  level: simple
+  sex: female
+  age: 40
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 0.3
+    present: [sudden_dyspnea, leg_swelling, leg_pain]
+  expect:
+    top3_includes: pulmonary_embolism
+
+- id: cough_heart_failure
+  level: simple
+  sex: male
+  age: 72
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 2
+    present: [orthopnea, paroxysmal_nocturnal_dyspnea, edema, history_heart_disease]
+  expect:
+    top3_includes: heart_failure
+
+- id: cough_post_infectious
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 4
+    present: [dry_cough, recent_respiratory_infection]
+    absent: [fever, dyspnea, hemoptysis]
+  expect:
+    top3_includes: post_infectious_cough
+
+- id: cough_ace_inhibitor
+  level: simple
+  sex: female
+  age: 62
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 5
+    present: [dry_cough, ace_inhibitor]
+    absent: [fever, dyspnea]
+  expect:
+    top3_includes: drug_induced_cough
+
+- id: cough_gerd
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 10
+    present: [heartburn, sour_regurgitation, lying_after_meals]
+    absent: [smoking, fever]
+  expect:
+    top3_includes: gerd
+
+- id: cough_chronic_smoker_red_flags
+  level: simple
+  sex: male
+  age: 58
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 12
+    present: [smoking, weight_loss, hemoptysis, hoarseness]
+  expect:
+    ask_first: [recurrent_lung_infections, heavy_smoking, hemoptysis, hoarseness, progressive_dyspnea, weight_loss]
+    top3_includes: lung_tumor
+
+- id: cough_massive_hemoptysis
+  level: simple
+  sex: male
+  age: 50
+  chief_complaint: hemoptysis
+  history:
+    present: [massive_hemoptysis]
+  expect:
+    urgent: true
+
+- id: cough_blood_is_hematemesis
+  level: simple
+  sex: male
+  age: 50
+  chief_complaint: hemoptysis
+  history:
+    hpi:
+      hemoptysis.character: coffee_ground
+    present: [nausea, vomiting, history_gi_liver_disease]
+  expect:
+    switch_chief_complaint: hematemesis
+
+# ── Cough: textbook case ──────────────────────────────────────────────────
+- id: ch19_case  # p.199, 211–212
+  level: book
+  sex: male
+  age: 32
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 9  # "more than 2 months"
+    present: [purulent_sputum, hemoptysis, low_grade_fever, night_sweats, myalgia, anorexia, weight_loss]
+    absent: [dyspnea, smoking, immunocompromised, corticosteroid_use, history_asthma]
+    unmapped: ["อาชีพพนักงานช่วยเหลือผู้ป่วย", "เสมหะเริ่มจากสีขาวแล้วเปลี่ยนเป็นเหลืองปนเขียว", "ไข้ต่ำๆ ช่วงเย็น"]
+  exam: [fever 38.6 °C, decreased breath sounds right upper lung, bronchial breath sounds, egophony]
+  book_ddx: [tuberculosis, emphysema, interstitial_lung_disease, lung_tumor]
+  final_diagnosis: tuberculosis
+
+# ── Grey zone (cough, abdominal pain) ─────────────────────────────────────
+- id: cough_grey_zone_3_weeks
+  level: simple
+  sex: female
+  age: 40
+  chief_complaint: cough
+  history:
+    hpi:
+      cough.duration: 2.5  # patient picked "< 3 weeks" but may be longer
+  expect:
+    duration_categories: [acute, subacute]
+
+- id: abdominal_pain_grey_zone_1_week
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 6
+  expect:
+    duration_categories: [acute, subacute]
+
+- id: abdominal_pain_duration_unknown
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: null
+  expect:
+    duration_categories: [acute, subacute, chronic]
+
+# ── Abdominal pain: simple cases ──────────────────────────────────────────
+- id: abd_appendicitis
+  level: simple
+  sex: male
+  age: 20
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 1
+      abdominal_pain.location: [rlq]
+    present: [migrating_pain_rlq, anorexia]
+  expect:
+    top3_includes: appendicitis
+
+- id: abd_renal_stone
+  level: simple
+  sex: male
+  age: 35
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 0.5
+      abdominal_pain.location: [llq]
+    present: [colicky_abdominal_pain, hematuria]
+  expect:
+    top3_includes: renal_stone
+
+- id: abd_pud
+  level: simple
+  sex: male
+  age: 42
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 60
+      abdominal_pain.location: [epigastrium]
+    present: [pain_worse_hungry, pain_relieved_by_food, nsaid_use]
+  expect:
+    top3_includes: pud
+
+- id: abd_pancreatitis
+  level: simple
+  sex: male
+  age: 45
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 1
+      abdominal_pain.location: [epigastrium]
+    present: [pain_radiating_back, pain_relieved_leaning_forward, vomiting]
+  expect:
+    top3_includes_any: [pancreatitis, severe_pancreatitis]
+
+- id: abd_cholangitis
+  level: simple
+  sex: female
+  age: 62
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 2
+      abdominal_pain.location: [ruq]
+    present: [high_fever, chills, jaundice]
+  expect:
+    top3_includes: cholangitis
+
+- id: abd_ectopic
+  level: simple
+  sex: female
+  age: 28
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 1
+      abdominal_pain.location: [llq]
+    present: [pain_after_missed_period]
+  expect:
+    top3_includes_any: [ectopic_pregnancy, ruptured_ectopic_pregnancy]
+
+- id: abd_male_lower_pain
+  level: simple
+  sex: male
+  age: 28
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 1
+      abdominal_pain.location: [suprapubic]
+  expect:
+    never_in_ddx: [ectopic_pregnancy, ruptured_ectopic_pregnancy, pelvic_inflammatory_disease, endometritis]
+    never_recommend: [pain_after_missed_period, pain_with_menses, vaginal_discharge]
+
+- id: abd_epigastric_mi_check
+  level: simple
+  sex: male
+  age: 62
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 0.1
+      abdominal_pain.location: [epigastrium]
+    present: [diabetes]
+  expect:
+    ask_first: [chest_pain, pain_radiating_arm, dyspnea]
+
+- id: abd_shock
+  level: simple
+  sex: female
+  age: 30
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 0.1
+    present: [sudden_abdominal_pain, cold_extremities, near_syncope]
+  expect:
+    urgent: true
+
+# ── Abdominal pain: textbook case ─────────────────────────────────────────
+- id: ch23_case  # p.247–248, 258
+  level: book
+  sex: female
+  age: 56
+  chief_complaint: abdominal_pain
+  history:
+    hpi:
+      abdominal_pain.duration: 2
+      abdominal_pain.location: [epigastrium, ruq]
+      abdominal_pain.onset: subacute
+      abdominal_pain.character: biliary
+      abdominal_pain.severity: 7
+      abdominal_pain.radiation: none
+    present: [abdominal_distension, pain_after_meals, diabetes, abdominal_surgery]
+    absent: [fever, jaundice, nausea, vomiting, vaginal_discharge, smoking, alcohol, nsaid_use]
+    unmapped: ["ไขมันในเลือดสูง", "ผ่าตัดคลอดตอนอายุ 30 ปี", "อาการปวดไม่สัมพันธ์กับท่าทาง"]
+  exam: [tenderness at epigastrium and right subcostal, no rebound or guarding, positive fist test, Murphy's sign]
+  book_ddx: [cholecystitis, gallstones, cholangitis, pud, pancreatitis, hepatitis]
+  final_diagnosis: cholecystitis       # acute calculous cholecystitis
+
+# ── Rash: simple cases ────────────────────────────────────────────────────
+- id: rash_atopic
+  level: simple
+  sex: female
+  age: 19
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [eczematous]
+      rash.location: [flexural]
+      rash.duration: subacute_chronic
+    present: [itch, history_allergy]
+  expect:
+    top3_includes: atopic_dermatitis
+
+- id: rash_psoriasis
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [scaly]
+      rash.location: [extensor]
+      rash.duration: subacute_chronic
+  expect:
+    top3_includes: psoriasis
+
+- id: rash_tinea
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [scaly]
+      rash.configuration: annular
+    present: [itch]
+  expect:
+    top3_includes: tinea_infection
+
+- id: rash_zoster
+  level: simple
+  sex: female
+  age: 65
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [blistering]
+      rash.configuration: dermatomal
+      rash.location: [localized]
+    present: [skin_burning]
+  expect:
+    top3_includes: herpes_simplex_zoster
+
+- id: rash_urticaria
+  level: simple
+  sex: female
+  age: 27
+  chief_complaint: itch
+  history:
+    hpi:
+      rash.morphology: [wheal]
+  expect:
+    top3_includes: urticaria
+
+- id: rash_candida_folds
+  level: simple
+  sex: female
+  age: 55
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [pustular]
+      rash.location: [skin_folds]
+    present: [diabetes]
+  expect:
+    top3_includes: candidiasis
+
+- id: rash_fever_purpura
+  level: simple
+  sex: male
+  age: 18
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [purpuric]
+  expect:
+    ask_first: [fever]
+
+- id: rash_drug_blisters_mucosa
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [blistering]
+      rash.location: [generalized]
+    present: [new_medication, mucosal_lesions]
+  expect:
+    urgent: true
+
+# ── Rash: textbook case ───────────────────────────────────────────────────
+- id: ch36_case  # p.397–398, 409–410
+  level: book
+  sex: male
+  age: 32
+  chief_complaint: rash
+  history:
+    hpi:
+      rash.morphology: [macular, blistering]
+      rash.location: [generalized]
+      rash.duration: acute
+    present: [fever, myalgia, generalized_rash, blisters, mucosal_lesions, new_medication]
+    absent: [alcohol, smoking]
+    unmapped: ["ได้ยา piroxicam ทุกวันมา 10 วัน", "ไม่มีหน้าบวม", "ไม่มีประวัติเดินทาง"]
+  exam: [erythematous to dusky papules and plaques with central bullae, bilateral conjunctival injection,
+         erosive oral patches, necrotic crusts on lips, detached area < 10% BSA]
+  book_ddx: [disseminated_herpes, varicella, ssss, erythema_multiforme, sjs_ten]
+  final_diagnosis: sjs_ten             # SJS
+
+# ── Joint pain: simple cases ──────────────────────────────────────────────
+- id: joint_septic
+  level: simple
+  sex: male
+  age: 50
+  chief_complaint: joint_pain
+  history:
+    hpi:
+      joint_pain.duration: 0.3
+      joint_pain.swelling_redness: present
+      joint_pain.location: [knee]
+    present: [fever, wound_near_joint]
+  expect:
+    top3_includes: septic_arthritis
+    ask_first: [fever, iv_drug_use, wound_near_joint, recent_infection]
+
+- id: joint_gout
+  level: simple
+  sex: male
+  age: 45
+  chief_complaint: joint_pain
+  history:
+    hpi:
+      joint_pain.swelling_redness: present
+      joint_pain.location: [toe]
+      joint_pain.pattern: intermittent
+    present: [previous_similar_attack]
+  expect:
+    top3_includes: gout
+
+- id: joint_rheumatoid
+  level: simple
+  sex: female
+  age: 40
+  chief_complaint: joint_pain
+  history:
+    hpi:
+      joint_pain.duration: 12
+      joint_pain.swelling_redness: present
+      joint_pain.location: [finger_base, finger_middle, wrist]
+      joint_pain.symmetry: symmetric
+      joint_pain.morning_stiffness: over_1_hour
+  expect:
+    top3_includes: rheumatoid_arthritis
+
+- id: joint_knee_oa
+  level: simple
+  sex: female
+  age: 68
+  chief_complaint: joint_pain
+  history:
+    hpi:
+      joint_pain.duration: 52
+      joint_pain.swelling_redness: absent
+      joint_pain.location: [knee]
+      joint_pain.morning_stiffness: under_15_minutes
+  expect:
+    top3_includes: osteoarthritis
+
+- id: joint_hip_steroid
+  level: simple
+  sex: male
+  age: 42
+  chief_complaint: joint_pain
+  history:
+    hpi:
+      joint_pain.swelling_redness: absent
+      joint_pain.location: [hip]
+    present: [corticosteroid_use, alcohol]
+  expect:
+    top3_includes: avascular_necrosis
+
+# ── Joint pain: textbook case ─────────────────────────────────────────────
+- id: ch32_case  # p.353–354, 360–361
+  level: book
+  sex: female
+  age: 29
+  chief_complaint: joint_pain
+  history:
+    hpi:
+      joint_pain.duration: 1.3                           # 9 days
+      joint_pain.swelling_redness: present
+      joint_pain.location: [finger_base, knee]
+      joint_pain.pattern: additive
+      joint_pain.morning_stiffness: none
+    present: [fever, unprotected_sex]
+    absent: [chills, recent_trauma_surgery, red_eye, eye_pain, rash, oral_ulcer, diarrhea, dysuria,
+             urethral_discharge, iv_drug_use]
+  exam: [warm red right thumb MCP, bilateral knee effusion]
+  book_ddx: [disseminated_gonococcal_infection, viral_arthritis, snsa, rheumatoid_arthritis, sle]
+  final_diagnosis: disseminated_gonococcal_infection
+
+# ── Diarrhea: simple cases ────────────────────────────────────────────────
+- id: diarrhea_gastroenteritis
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: diarrhea
+  history:
+    hpi:
+      diarrhea.duration: 1
+      diarrhea.character: watery
+      diarrhea.blood_mucus: absent
+      diarrhea.amount: large
+    present: [vomiting, unsafe_food]
+  expect:
+    top3_includes_any: [gastroenteritis, food_poisoning]
+
+- id: diarrhea_dysentery
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: diarrhea
+  history:
+    hpi:
+      diarrhea.duration: 2
+      diarrhea.blood_mucus: present
+      diarrhea.amount: small_frequent
+    present: [fever, tenesmus, abdominal_pain]
+  expect:
+    top3_includes: enterocolitis
+
+- id: diarrhea_ibs
+  level: simple
+  sex: female
+  age: 25
+  chief_complaint: diarrhea
+  history:
+    hpi:
+      diarrhea.duration: 180
+      diarrhea.character: watery
+      diarrhea.blood_mucus: absent
+      diarrhea.timing: daytime_only
+    present: [diarrhea_with_stress_or_spicy_food, relief_after_defecation, fecal_urgency]
+    absent: [weight_loss, nocturnal_diarrhea]
+  expect:
+    top3_includes: ibs
+
+- id: diarrhea_lactose
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: diarrhea
+  history:
+    hpi:
+      diarrhea.duration: 60
+      diarrhea.character: watery
+      diarrhea.blood_mucus: absent
+    present: [diarrhea_after_dairy, diarrhea_stops_fasting, abdominal_distension]
+  expect:
+    top3_includes: carbohydrate_malabsorption
+
+- id: diarrhea_antibiotic
+  level: simple
+  sex: female
+  age: 70
+  chief_complaint: diarrhea
+  history:
+    hpi:
+      diarrhea.duration: 35
+      diarrhea.blood_mucus: present
+    present: [recent_antibiotics, recent_hospitalization]
+  expect:
+    top3_includes: pseudomembranous_colitis
+
+- id: diarrhea_acute_appendicitis_check
+  level: simple
+  sex: male
+  age: 20
+  chief_complaint: diarrhea
+  history:
+    hpi:
+      diarrhea.duration: 1
+    present: [abdominal_pain]
+  expect:
+    ask_first: [periumbilical_pain, rlq_pain]
+
+# ── Diarrhea: textbook case ───────────────────────────────────────────────
+- id: ch25_case  # p.273–274, 286–287
+  level: book
+  sex: female
+  age: 41
+  chief_complaint: diarrhea
+  history:
+    hpi:
+      diarrhea.duration: 60
+      diarrhea.blood_mucus: present
+      diarrhea.amount: small_frequent
+      abdominal_pain.location: [rlq]
+      abdominal_pain.character: dull_aching
+    present: [abdominal_pain, fatigue, near_syncope, weight_loss]
+    absent: [fever, anorexia, tenesmus, nocturnal_diarrhea, alcohol, smoking, nsaid_use, family_history_gi_cancer, tb_contact]
+  exam: [tachycardia, pallor, right abdominal tenderness, blood in stool on rectal exam]
+  book_ddx: [ibd, intestinal_tuberculosis, cmv_colitis]
+  final_diagnosis: intestinal_tuberculosis
+
+# ── Dizziness: simple cases ───────────────────────────────────────────────
+- id: dizzy_bppv
+  level: simple
+  sex: female
+  age: 55
+  chief_complaint: dizziness
+  history:
+    hpi:
+      dizziness.character: rotational
+      dizziness.timecourse: episodic
+      dizziness.trigger: [position_change]
+    present: [nausea]
+    absent: [hearing_loss, tinnitus, diplopia, dysarthria, hemiparesis]
+  expect:
+    top3_includes: bppv
+
+- id: dizzy_meniere
+  level: simple
+  sex: male
+  age: 50
+  chief_complaint: dizziness
+  history:
+    hpi:
+      dizziness.character: rotational
+      dizziness.timecourse: episodic
+    present: [hearing_loss, tinnitus, ear_fullness]
+  expect:
+    top3_includes: menieres_disease
+
+- id: dizzy_vestibular_neuritis
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: dizziness
+  history:
+    hpi:
+      dizziness.character: rotational
+      dizziness.timecourse: acute
+      dizziness.severity: severe
+    present: [vomiting, recent_respiratory_infection]
+    absent: [diplopia, dysarthria, hemiparesis, unable_to_stand]
+  expect:
+    top3_includes: vestibular_neuritis_labyrinthitis
+
+- id: dizzy_stroke_gate
+  level: simple
+  sex: male
+  age: 68
+  chief_complaint: vertigo
+  history:
+    present: [dysarthria, history_hypertension]
+  expect:
+    urgent: true
+
+- id: dizzy_presyncope
+  level: simple
+  sex: female
+  age: 72
+  chief_complaint: dizziness
+  history:
+    hpi:
+      dizziness.character: lightheaded
+    present: [antihypertensive_use]
+  expect:
+    top3_includes: orthostatic_hypotension
+
+# ── Dizziness: textbook case ──────────────────────────────────────────────
+- id: ch09_case  # p.89, 98
+  level: book
+  sex: female
+  age: 70
+  chief_complaint: dizziness
+  history:
+    hpi:
+      dizziness.character: rotational
+      dizziness.timecourse: acute
+      dizziness.trigger: [none]
+    present: [vertigo, unsteadiness, dysarthria, nausea, vomiting, unable_to_stand, diabetes,
+              history_hypertension, dyslipidemia]
+    absent: [headache, neck_pain, hemiparesis, hearing_loss, ear_fullness]
+  exam: [BP 190/103, gaze-evoked and vertical nystagmus, right dysmetria, truncal ataxia]
+  book_ddx: [posterior_circulation_stroke, posterior_fossa_mass]
+  final_diagnosis: posterior_circulation_stroke      # right cerebellar ischemic stroke
+
+# ── Low back pain: simple cases ───────────────────────────────────────────
+- id: lbp_strain
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: back_pain
+  history:
+    hpi:
+      back_pain.duration: 1
+      back_pain.relation_to_activity: worse_with_use
+      back_pain.radiation: none
+    absent: [fever, weight_loss, leg_weakness, night_back_pain]
+  expect:
+    top3_includes: lumbar_strain
+
+- id: lbp_disc
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: back_pain
+  history:
+    hpi:
+      back_pain.duration: 2
+      back_pain.relation_to_activity: worse_with_use
+      back_pain.radiation: leg
+    present: [leg_numbness]
+  expect:
+    top3_includes: herniated_disc
+
+- id: lbp_cauda_equina
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: back_pain
+  history:
+    present: [saddle_anesthesia, urinary_or_fecal_difficulty]
+  expect:
+    urgent: true
+
+- id: lbp_ankylosing
+  level: simple
+  sex: male
+  age: 25
+  chief_complaint: back_pain
+  history:
+    hpi:
+      back_pain.duration: 20
+      back_pain.morning_stiffness: over_30_minutes
+      back_pain.onset: insidious
+      back_pain.relation_to_activity: at_rest_or_night
+  expect:
+    top3_includes: spondyloarthropathy
+
+- id: lbp_red_flags_asked
+  level: simple
+  sex: male
+  age: 60
+  chief_complaint: back_pain
+  history:
+    hpi:
+      back_pain.duration: 3
+  expect:
+    ask_first: [fever, night_back_pain, leg_weakness, weight_loss, history_cancer]
+
+# ── Low back pain: textbook case ──────────────────────────────────────────
+- id: ch31_case  # p.343–344, 350–351
+  level: book
+  sex: male
+  age: 48
+  chief_complaint: back_pain
+  history:
+    hpi:
+      back_pain.duration: 9
+      back_pain.radiation: none
+      back_pain.onset: insidious
+      back_pain.response_to_treatment: not_improved
+    present: [leg_numbness, leg_weakness, low_grade_fever, dry_cough, weight_loss]
+    absent: [night_back_pain, urinary_or_fecal_difficulty, smoking, alcohol, iv_drug_use, tb_contact, history_cancer]
+  exam: [right leg weakness grade IV, decreased pinprick below right knee, crepitation left upper lung]
+  book_ddx: [spondylodiscitis, spinal_metastasis]
+  final_diagnosis: spondylodiscitis    # tuberculous spondylitis
+
+# ── Edema: simple cases ───────────────────────────────────────────────────
+- id: edema_dvt
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: edema
+  history:
+    hpi:
+      edema.distribution: localized
+      edema.laterality: unilateral
+      edema.location: [legs]
+    present: [leg_pain, recent_trauma_surgery, oral_contraceptive_use]
+  expect:
+    top3_includes: deep_vein_thrombosis
+
+- id: edema_cellulitis
+  level: simple
+  sex: male
+  age: 60
+  chief_complaint: edema
+  history:
+    hpi:
+      edema.distribution: localized
+      edema.laterality: unilateral
+    present: [skin_inflammation, fever, diabetes]
+  expect:
+    top3_includes: cellulitis
+
+- id: edema_amlodipine
+  level: simple
+  sex: female
+  age: 65
+  chief_complaint: edema
+  history:
+    hpi:
+      edema.distribution: localized
+      edema.laterality: bilateral
+    present: [ccb_use]
+  expect:
+    top3_includes: drug_induced_edema
+
+- id: edema_heart_failure
+  level: simple
+  sex: male
+  age: 70
+  chief_complaint: edema
+  history:
+    hpi:
+      edema.distribution: generalized
+      edema.sequence: dyspnea_first
+    present: [orthopnea, paroxysmal_nocturnal_dyspnea, history_heart_disease]
+  expect:
+    top3_includes: heart_failure
+
+- id: edema_cirrhosis
+  level: simple
+  sex: male
+  age: 55
+  chief_complaint: edema
+  history:
+    hpi:
+      edema.distribution: generalized
+      edema.sequence: abdomen_first
+    present: [jaundice, alcohol]
+  expect:
+    top3_includes: cirrhosis
+
+- id: edema_nephrotic
+  level: simple
+  sex: male
+  age: 25
+  chief_complaint: edema
+  history:
+    hpi:
+      edema.distribution: generalized
+      edema.location: [eyelids, legs]
+      edema.onset: days
+    present: [foamy_urine]
+    absent: [cola_colored_urine, decreased_urine]
+  expect:
+    top3_includes: primary_nephrotic_syndrome
+
+- id: edema_dvt_pe_check
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: edema
+  history:
+    present: [unilateral_leg_swelling]
+  expect:
+    ask_first: [sudden_dyspnea, chest_pain]
+
+- id: edema_bilateral_no_pe_gate
+  level: simple
+  sex: female
+  age: 68
+  chief_complaint: edema
+  history:
+    present: [bilateral_leg_swelling, ccb_use]
+  expect:
+    not_ask_first: [sudden_dyspnea, chest_pain]
+
+# ── Edema: textbook case ──────────────────────────────────────────────────
+- id: ch27_case  # p.299, 309–311
+  level: book
+  sex: male
+  age: 18
+  chief_complaint: edema
+  history:
+    hpi:
+      edema.distribution: generalized
+      edema.location: [legs, eyelids]
+      edema.sequence: edema_first
+      edema.onset: weeks
+    present: [foamy_urine, cola_colored_urine, decreased_urine, exertional_fatigue,
+              recent_sore_throat_or_skin_infection, recent_antibiotics]
+    absent: [chest_pain, orthopnea, paroxysmal_nocturnal_dyspnea, abdominal_distension, jaundice]
+  exam: [BP 150/100, puffy eyelids, bilateral basal crepitation, bilateral pitting leg edema]
+  book_ddx: [post_streptococcal_gn, iga_nephropathy, acute_interstitial_nephritis]
+  final_diagnosis: post_streptococcal_gn
+
+# ── Headache: simple cases ────────────────────────────────────────────────
+- id: headache_thunderclap
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: headache
+  history:
+    hpi:
+      headache.onset: thunderclap
+  expect:
+    urgent: true
+
+- id: headache_migraine
+  level: simple
+  sex: female
+  age: 24
+  chief_complaint: headache
+  history:
+    hpi:
+      headache.duration: 24
+      headache.pattern: episodic_stereotyped
+      headache.character: throbbing
+      headache.location: [one_side]
+      headache.laterality_pattern: alternating
+    present: [nausea, photophobia, family_history_migraine]
+  expect:
+    top3_includes: migraine
+
+- id: headache_tension
+  level: simple
+  sex: male
+  age: 35
+  chief_complaint: headache
+  history:
+    hpi:
+      headache.duration: 12
+      headache.pattern: episodic_stereotyped
+      headache.character: band_like
+      headache.location: [both_sides]
+    present: [neck_pain, stress]
+    absent: [nausea, vomiting]
+  expect:
+    top3_includes: tension_type_headache
+
+- id: headache_cluster
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: headache
+  history:
+    hpi:
+      headache.character: stabbing_electric
+      headache.location: [around_eye]
+      headache.laterality_pattern: fixed_side
+    present: [red_eye, tearing, rhinorrhea]
+  expect:
+    top3_includes: cluster_headache
+
+- id: headache_meningitis
+  level: simple
+  sex: male
+  age: 22
+  chief_complaint: headache
+  history:
+    hpi:
+      headache.duration: 0.1
+    present: [fever, neck_stiffness, photophobia]
+  expect:
+    top3_includes_any: [meningitis, subarachnoid_hemorrhage]
+
+- id: headache_glaucoma
+  level: simple
+  sex: female
+  age: 62
+  chief_complaint: headache
+  history:
+    present: [eye_pain, blurred_vision, red_eye]
+  expect:
+    top3_includes: angle_closure_glaucoma
+
+- id: headache_red_flags_asked
+  level: simple
+  sex: male
+  age: 58
+  chief_complaint: headache
+  history:
+    hpi:
+      headache.duration: 1
+  expect:
+    ask_first: [fever, weight_loss, confusion, hemiparesis, new_or_changed_headache]
+
+# ── Headache: textbook case ───────────────────────────────────────────────
+- id: ch08_case  # p.79, 86
+  level: book
+  sex: female
+  age: 28
+  chief_complaint: headache
+  history:
+    hpi:
+      headache.onset: gradual
+      headache.duration: 0.2                       # 5 days
+      headache.pattern: new_or_changed
+      headache.character: band_like
+      headache.location: [both_sides, occipital]
+      headache.timing: wakes_from_sleep
+      headache.severity: 6
+    present: [nausea, migraine_history, oral_contraceptive_use]
+    absent: [hemiparesis, visual_aura, fever]
+  exam: [BP 150/60, no fever, normal eye movements, no papilledema, no neck stiffness, normal power and sensation]
+  book_ddx: [cerebral_venous_sinus_thrombosis, brain_tumor, migraine]
+  final_diagnosis: cerebral_venous_sinus_thrombosis
+
+# ── Upper respiratory (guideline g1): simple cases ────────────────────────
+- id: uri_common_cold
+  level: simple
+  sex: female
+  age: 30
+  chief_complaint: rhinorrhea
+  history:
+    hpi:
+      rhinorrhea.duration: 3
+      rhinorrhea.color: clear_white
+    present: [sore_throat, nasal_congestion, sneezing, cough]
+  expect:
+    top3_includes: common_cold
+
+- id: uri_strep_throat
+  level: simple
+  sex: male
+  age: 10
+  chief_complaint: sore_throat
+  history:
+    hpi:
+      sore_throat.duration: 2
+      sore_throat.severity: severe
+      fever.temperature: 38.8
+    present: [high_fever, tender_neck_lymph_node, tonsillar_exudate]
+    absent: [cough, rhinorrhea]
+  expect:
+    top3_includes: gabhs_pharyngitis
+
+- id: uri_sinusitis_persistent
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: rhinorrhea
+  history:
+    hpi:
+      rhinorrhea.duration: 14
+      rhinorrhea.color: green_yellow
+      rhinorrhea.course: not_improving
+    present: [facial_pain, postnasal_drip, daytime_cough]
+  expect:
+    top3_includes: sinusitis
+
+- id: uri_double_sickening
+  level: simple
+  sex: male
+  age: 8
+  chief_complaint: rhinorrhea
+  history:
+    hpi:
+      rhinorrhea.duration: 7
+      rhinorrhea.course: worsening_after_improving
+    present: [fever]
+  expect:
+    top3_includes: sinusitis
+
+- id: uri_bronchitis
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: rhinorrhea
+  history:
+    hpi:
+      rhinorrhea.duration: 6
+    present: [cough, purulent_sputum, nasal_congestion]
+    absent: [dyspnea]
+  expect:
+    top3_includes_any: [bronchitis, common_cold]
+
+- id: uri_strep_throat_adult
+  level: simple
+  sex: female
+  age: 32
+  chief_complaint: sore_throat
+  history:
+    hpi:
+      sore_throat.duration: 2
+    present: [fever, tonsillar_exudate, tender_neck_lymph_node]
+    absent: [cough]
+  expect:
+    top3_includes: gabhs_pharyngitis
+
+# ── Eye (guideline g2): simple cases ──────────────────────────────────────
+- id: eye_viral_conjunctivitis
+  level: simple
+  sex: female
+  age: 25
+  chief_complaint: red_eye
+  history:
+    hpi:
+      red_eye.pain: irritation_only
+      red_eye.vision: normal
+      eye_discharge.character: watery
+    present: [preauricular_lymph_node, recent_respiratory_infection]
+  expect:
+    top3_includes: viral_conjunctivitis
+
+- id: eye_allergic_conjunctivitis
+  level: simple
+  sex: male
+  age: 15
+  chief_complaint: red_eye
+  history:
+    hpi:
+      red_eye.pain: irritation_only
+      red_eye.vision: normal
+      eye_discharge.character: mucoid
+    present: [itchy_eyes, history_allergy]
+  expect:
+    top3_includes: allergic_conjunctivitis
+
+- id: eye_acute_glaucoma
+  level: simple
+  sex: female
+  age: 62
+  chief_complaint: eye_pain
+  history:
+    hpi:
+      red_eye.pain: painful
+      red_eye.vision: decreased
+    present: [halos, headache, vomiting, hyperopia]
+  expect:
+    urgent: true
+    top3_includes: angle_closure_glaucoma
+
+- id: eye_red_eye_high_risk_check
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: red_eye
+  history: {}
+  expect:
+    ask_first: [eye_pain, photophobia, blurred_vision]
+
+- id: eye_sudden_painless_loss
+  level: simple
+  sex: male
+  age: 70
+  chief_complaint: blurred_vision
+  history:
+    hpi:
+      blurred_vision.onset: sudden
+      blurred_vision.laterality: one_eye
+      blurred_vision.pain: painless
+    present: [history_hypertension, diabetes]
+  expect:
+    urgent: true
+
+- id: eye_stye
+  level: simple
+  sex: female
+  age: 22
+  chief_complaint: eyelid_lump
+  history: {}
+  expect:
+    top3_includes_any: [hordeolum, chalazion]
+
+# ── Ear (guideline g3): simple cases ──────────────────────────────────────
+- id: ear_otitis_externa
+  level: simple
+  sex: male
+  age: 25
+  chief_complaint: ear_pain
+  history:
+    present: [ear_itch, pain_pressing_tragus, water_in_ear]
+  expect:
+    top3_includes: otitis_externa
+
+- id: ear_aom_after_cold
+  level: simple
+  sex: female
+  age: 6
+  chief_complaint: ear_pain
+  history:
+    present: [fever, recent_respiratory_infection, ear_pulling]
+  expect:
+    top3_includes: otitis_media
+
+- id: ear_chronic_discharge
+  level: simple
+  sex: male
+  age: 45
+  chief_complaint: ear_discharge
+  history:
+    hpi:
+      ear_discharge.course: recurrent
+    present: [muffled_hearing]
+    absent: [fever, ear_pain]
+  expect:
+    top3_includes_any: [chronic_otitis_media, cholesteatoma]
+
+- id: ear_sudden_hearing_loss
+  level: simple
+  sex: female
+  age: 50
+  chief_complaint: hearing_loss
+  history:
+    hpi:
+      hearing_loss.onset: sudden
+      hearing_loss.laterality: one_ear
+    present: [tinnitus]
+  expect:
+    urgent: true
+
+- id: ear_barotrauma
+  level: simple
+  sex: male
+  age: 33
+  chief_complaint: ear_pain
+  history:
+    present: [flying_or_diving, muffled_hearing]
+  expect:
+    top3_includes: barotrauma
+
+- id: ear_malignant_otitis_check
+  level: simple
+  sex: male
+  age: 72
+  chief_complaint: ear_pain
+  history:
+    present: [ear_discharge]
+  expect:
+    ask_first: [diabetes, facial_weakness]
+
+# ── Chest pain: simple cases ──────────────────────────────────────────────
+- id: chest_acute_mi  # p.156
+  level: simple
+  sex: male
+  age: 62
+  chief_complaint: chest_pain
+  history:
+    hpi:
+      chest_pain.onset: sudden_severe
+      chest_pain.character: pressure
+      chest_pain.duration: 30
+    present: [chest_pain_radiating_arm, diaphoresis, diabetes, smoking]
+  expect:
+    top3_includes: acute_myocardial_infarction
+    urgent: true
+
+- id: chest_stable_angina  # p.156
+  level: simple
+  sex: male
+  age: 58
+  chief_complaint: chest_pain
+  history:
+    hpi:
+      chest_pain.onset: gradual_or_intermittent
+      chest_pain.character: pressure
+      chest_pain.duration: 4
+      chest_pain.aggravating: [exertion]
+      chest_pain.relieving: [rest]
+    present: [smoking, history_hypertension]
+  expect:
+    top3_includes: chronic_coronary_syndrome
+    urgent: false
+
+- id: chest_pulmonary_embolism  # p.157
+  level: simple
+  sex: female
+  age: 55
+  chief_complaint: chest_pain
+  history:
+    hpi:
+      chest_pain.onset: sudden_severe
+      chest_pain.aggravating: [deep_breath]
+    present: [exertional_fatigue, unilateral_leg_swelling, recent_trauma_surgery]
+  expect:
+    top3_includes: pulmonary_embolism
+    ask_first: [hemoptysis, bedridden, history_cancer, previous_dvt]
+
+- id: chest_pericarditis  # p.156
+  level: simple
+  sex: male
+  age: 25
+  chief_complaint: chest_pain
+  history:
+    hpi:
+      chest_pain.onset: sudden_severe
+      chest_pain.aggravating: [deep_breath, lying_flat]
+      chest_pain.relieving: [leaning_forward]
+    present: [fever]
+  expect:
+    top3_includes: pericarditis
+
+- id: chest_costochondritis  # p.158
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: chest_pain
+  history:
+    hpi:
+      chest_pain.onset: gradual_or_intermittent
+      chest_pain.aggravating: [touch, deep_breath]
+    present: [chest_strain]
+  expect:
+    top3_includes: costochondritis
+    urgent: false
+
+- id: chest_herpes_zoster  # p.158
+  level: simple
+  sex: female
+  age: 70
+  chief_complaint: chest_pain
+  history:
+    hpi:
+      chest_pain.onset: gradual_or_intermittent
+      chest_pain.character: burning
+    present: [dermatomal_rash]
+  expect:
+    top3_includes: herpes_zoster
+
+# ── Chest pain: textbook case ─────────────────────────────────────────────
+- id: ch14_case  # p.153, 158
+  level: book
+  sex: male
+  age: 59
+  chief_complaint: chest_pain
+  history:
+    hpi:
+      chest_pain.onset: sudden_severe
+      chest_pain.character: pressure
+      chest_pain.radiation: [jaw_neck_arm]
+      chest_pain.duration: 180
+      chest_pain.frequency: recurrent
+    present: [exertional_chest_pain, dyspnea, diaphoresis, restlessness, diabetes, history_hypertension, smoking]
+    unmapped: ["เจ็บเป็นๆ หายๆ เวลาออกแรงมา 3 เดือน", "ครั้งนี้พักแล้วไม่ดีขึ้น"]
+  exam: [BP 158/90, JVP 5 cm above sternal angle, heave, no murmur or gallop, clear lungs, no leg edema]
+  book_ddx: [acute_myocardial_infarction, aortic_dissection, pericarditis, pulmonary_embolism, pneumothorax]
+  final_diagnosis: acute_myocardial_infarction   # STEMI
+
+# ── Dyspnea: simple cases ─────────────────────────────────────────────────
+- id: dyspnea_heart_failure  # p.191, 192
+  level: simple
+  sex: male
+  age: 70
+  chief_complaint: dyspnea
+  history:
+    hpi:
+      dyspnea.onset: gradual
+      dyspnea.aggravating: [exertion, lying_flat, night]
+      dyspnea.duration: 14
+    present: [edema, weight_gain, history_hypertension, diabetes]
+  expect:
+    top3_includes_any: [ischemic_cardiomyopathy, dilated_cardiomyopathy, hypertensive_heart_disease]
+
+- id: dyspnea_asthma  # p.193
+  level: simple
+  sex: female
+  age: 25
+  chief_complaint: dyspnea
+  history:
+    hpi:
+      dyspnea.progression: intermittent
+    present: [wheezing, cough, history_asthma, trigger_exposure]
+  expect:
+    top3_includes: asthma
+
+- id: dyspnea_copd  # p.193
+  level: simple
+  sex: male
+  age: 68
+  chief_complaint: dyspnea
+  history:
+    hpi:
+      dyspnea.onset: gradual
+    present: [wheezing, cough, sputum, history_copd, smoking]
+  expect:
+    top3_includes: copd
+
+- id: dyspnea_pneumothorax  # p.194
+  level: simple
+  sex: male
+  age: 22
+  chief_complaint: dyspnea
+  history:
+    hpi:
+      dyspnea.onset: sudden
+    present: [pleuritic_chest_pain, cough]
+  expect:
+    top3_includes_any: [pneumothorax, pulmonary_embolism]
+    urgent: true
+
+- id: dyspnea_anemia  # p.195
+  level: simple
+  sex: female
+  age: 30
+  chief_complaint: dyspnea
+  history:
+    hpi:
+      dyspnea.onset: gradual
+      dyspnea.aggravating: [exertion]
+    present: [fatigue, pallor]
+    absent: [cough, wheezing, orthopnea]
+  expect:
+    top3_includes: anemia
+
+- id: dyspnea_hyperthyroidism  # p.195
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: dyspnea
+  history:
+    present: [palpitation, diaphoresis, weight_loss, irritability]
+  expect:
+    top3_includes: hyperthyroidism
+
+- id: dyspnea_tumor_red_flags  # p.193
+  level: simple
+  sex: male
+  age: 60
+  chief_complaint: dyspnea
+  history:
+    present: [smoking, hemoptysis]
+  expect:
+    ask_first: [heavy_smoking, hoarseness, progressive_dyspnea, weight_loss]
+
+# ── Dyspnea: textbook case ────────────────────────────────────────────────
+- id: ch18_case  # p.189, 196
+  level: book
+  sex: male
+  age: 65
+  chief_complaint: dyspnea
+  history:
+    hpi:
+      dyspnea.onset: gradual
+      dyspnea.aggravating: [exertion, lying_flat, night]
+      dyspnea.duration: 14
+    present: [chest_pain, weight_gain, diabetes, history_hypertension, dyslipidemia, smoking, alcohol]
+    absent: [edema]
+    unmapped: ["เคยเดินออกกำลังกายวันละ 5 กิโลเมตร", "หนุนหมอนสูงขึ้นจาก 1 เป็น 2 ใบ"]
+  exam: [irregular pulse 108/min, SpO2 90%, JVP 6 cm, displaced apex, no murmur or S3, bilateral basal crepitations,
+         leg edema 1+]
+  book_ddx: [ischemic_cardiomyopathy, dilated_cardiomyopathy, valvular_heart_disease, tachyarrhythmia]
+  final_diagnosis: ischemic_cardiomyopathy   # heart failure, atrial fibrillation with rapid ventricular response
+
+# ── Dysphagia: simple cases ───────────────────────────────────────────────
+- id: dysphagia_achalasia  # p.235
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: dysphagia
+  history:
+    hpi:
+      dysphagia.location: chest
+      dysphagia.timing: after_swallow
+      dysphagia.food_type: solids_and_liquids
+      dysphagia.course: progressive
+    present: [food_regurgitation, heartburn, weight_loss]
+  expect:
+    top3_includes: achalasia
+
+- id: dysphagia_cancer  # p.235
+  level: simple
+  sex: male
+  age: 65
+  chief_complaint: dysphagia
+  history:
+    hpi:
+      dysphagia.location: chest
+      dysphagia.food_type: solids_first
+      dysphagia.course: progressive
+    present: [weight_loss, anorexia]
+    absent: [heartburn]
+  expect:
+    top3_includes: esophageal_cancer
+    ask_first: [hematemesis, vomiting]
+
+- id: dysphagia_peptic_stricture  # p.235
+  level: simple
+  sex: male
+  age: 45
+  chief_complaint: dysphagia
+  history:
+    hpi:
+      dysphagia.location: chest
+      dysphagia.food_type: solids_first
+      dysphagia.course: progressive
+    present: [heartburn]
+    absent: [weight_loss]
+  expect:
+    top3_includes: peptic_stricture
+
+- id: dysphagia_stroke  # p.231, 234
+  level: simple
+  sex: male
+  age: 72
+  chief_complaint: dysphagia
+  history:
+    hpi:
+      dysphagia.location: throat
+      dysphagia.timing: at_start
+    present: [choking_on_swallowing, dysarthria, stroke_history]
+  expect:
+    top3_includes: stroke
+
+- id: dysphagia_pill_esophagitis  # p.232, 235
+  level: simple
+  sex: female
+  age: 68
+  chief_complaint: odynophagia
+  history:
+    present: [pill_esophagitis_drug]
+  expect:
+    top3_includes: drug_induced_esophagitis
+    ask_first: [nsaid_use, caustic_ingestion]
+
+- id: dysphagia_web  # p.234, 235
+  level: simple
+  sex: female
+  age: 30
+  chief_complaint: dysphagia
+  history:
+    hpi:
+      dysphagia.location: chest
+      dysphagia.food_type: solids_first
+      dysphagia.course: intermittent
+    present: [food_stuck_after_big_bite]
+    absent: [weight_loss]
+  expect:
+    top3_includes_any: [esophageal_ring_web, eosinophilic_esophagitis]
+
+# ── Dysphagia: textbook case ──────────────────────────────────────────────
+- id: ch21_case  # p.229, 236
+  level: book
+  sex: female
+  age: 30
+  chief_complaint: dysphagia
+  history:
+    hpi:
+      dysphagia.location: chest
+      dysphagia.timing: after_swallow
+      dysphagia.food_type: solids_and_liquids
+      dysphagia.course: progressive
+    present: [food_regurgitation, chest_pain, heartburn, weight_loss]
+    absent: [choking_on_swallowing, hoarseness, hematemesis, abdominal_pain, vomiting, bloody_stool, smoking,
+             alcohol]
+    unmapped: ["เป็นมา 1 ปี ช่วง 3 เดือนหลังเป็นบ่อยขึ้น", "กินยา omeprazole และ domperidone แล้วดีขึ้นเล็กน้อย"]
+  exam: [not pale, normal head, mouth, neck and skin, no lymph nodes, normal neurological examination]
+  book_ddx: [achalasia, esophageal_cancer, peptic_stricture, scleroderma_esophagus, esophageal_ring_web]
+  final_diagnosis: achalasia
+
+# ── GI bleeding: simple cases ─────────────────────────────────────────────
+- id: gib_varices  # ตาราง 24-1 p.265
+  level: simple
+  sex: male
+  age: 55
+  chief_complaint: hematemesis
+  history:
+    hpi:
+      hematemesis.amount: massive
+    present: [jaundice, abdominal_distension, viral_hepatitis_history]
+  expect:
+    top3_includes: esophageal_varices
+    urgent: true
+
+- id: gib_pud_nsaid  # p.266
+  level: simple
+  sex: female
+  age: 70
+  chief_complaint: bloody_stool
+  history:
+    hpi:
+      bloody_stool.color: black
+    present: [epigastric_pain, nsaid_use]
+  expect:
+    top3_includes: pud
+    urgent: true
+
+- id: gib_mallory_weiss  # p.267
+  level: simple
+  sex: male
+  age: 30
+  chief_complaint: hematemesis
+  history:
+    present: [vomiting_before_hematemesis]
+    absent: [jaundice, abdominal_distension]
+  expect:
+    top3_includes: mallory_weiss_tear
+
+- id: gib_hemorrhoid  # p.269
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: bloody_stool
+  history:
+    hpi:
+      bloody_stool.color: fresh_red
+      bloody_stool.pattern: coating_or_dripping
+    present: [anal_discomfort]
+  expect:
+    top3_includes: hemorrhoid
+    urgent: false
+
+- id: gib_colon_cancer  # p.268
+  level: simple
+  sex: male
+  age: 68
+  chief_complaint: bloody_stool
+  history:
+    hpi:
+      bloody_stool.color: fresh_red
+    present: [weight_loss, narrow_stool, bowel_habit_change]
+  expect:
+    top3_includes: colon_cancer
+    ask_first: [family_history_gi_cancer]
+
+- id: gib_diverticulosis  # p.268
+  level: simple
+  sex: male
+  age: 75
+  chief_complaint: bloody_stool
+  history:
+    hpi:
+      bloody_stool.color: fresh_red
+    present: [nsaid_use]
+    absent: [abdominal_pain, weight_loss, diarrhea]
+  expect:
+    top3_includes: diverticulosis
+
+# ── GI bleeding: textbook case ────────────────────────────────────────────
+- id: ch24_case  # p.261, 271
+  level: book
+  sex: male
+  age: 60
+  chief_complaint: hematemesis
+  history:
+    hpi:
+      hematemesis.character: fresh_blood
+      hematemesis.amount: massive
+    present: [nausea, near_syncope, dizziness, viral_hepatitis_history, history_gi_liver_disease, alcohol]
+    absent: [melena, abdominal_pain, smoking]
+    unmapped: ["อาเจียนเลือดสด 3 แก้วน้ำ แล้วอาเจียนอีก 2 ครั้งระหว่างทาง", "แม่เป็นไวรัสตับอักเสบบีและเสียชีวิตจากมะเร็งตับ"]
+  exam: [HR 120, BP 85/55, RR 24, mild icteric sclera, stigmata of chronic liver disease, soft abdomen,
+         melena on rectal examination]
+  book_ddx: [esophageal_varices, portal_hypertensive_gastropathy, pud, mallory_weiss_tear]
+  final_diagnosis: esophageal_varices   # variceal bleeding in cirrhosis from hepatitis B
+
+# ── Constipation: simple cases ────────────────────────────────────────────
+- id: constipation_functional  # p.293
+  level: simple
+  sex: female
+  age: 40
+  chief_complaint: constipation
+  history:
+    hpi:
+      constipation.duration: 24
+      constipation.frequency: 2
+    present: [hard_stools, straining]
+    absent: [abdominal_pain, weight_loss, hematochezia]
+  expect:
+    top3_includes: functional_constipation
+
+- id: constipation_ibs  # p.293, 294
+  level: simple
+  sex: female
+  age: 30
+  chief_complaint: constipation
+  history:
+    hpi:
+      constipation.duration: 8
+    present: [pain_related_to_defecation, abdominal_pain, hard_stools]
+  expect:
+    top3_includes: ibs
+
+- id: constipation_cancer_alarm  # p.290, 292
+  level: simple
+  sex: male
+  age: 66
+  chief_complaint: constipation
+  history:
+    hpi:
+      constipation.duration: 1
+    present: [narrow_stool, weight_loss, hematochezia]
+  expect:
+    top3_includes: colon_cancer
+    ask_first: [family_history_gi_cancer, melena]
+
+- id: constipation_drug  # p.293; under 50, so the drug is the only clue
+  level: simple
+  sex: male
+  age: 45
+  chief_complaint: constipation
+  history:
+    present: [constipating_drug, hard_stools]
+  expect:
+    top3_includes: medication_induced_constipation
+
+- id: constipation_defecatory  # p.294
+  level: simple
+  sex: female
+  age: 50
+  chief_complaint: constipation
+  history:
+    hpi:
+      constipation.duration: 18
+    present: [straining, tenesmus, digital_evacuation]
+  expect:
+    top3_includes: defecatory_disorder
+
+- id: constipation_obstruction  # p.292
+  level: simple
+  sex: male
+  age: 60
+  chief_complaint: constipation
+  history:
+    present: [no_stool_no_flatus]
+  expect:
+    urgent: true
+
+# ── Constipation: textbook case ───────────────────────────────────────────
+- id: ch26_case  # p.289, 294–295
+  level: book
+  sex: female
+  age: 65
+  chief_complaint: constipation
+  history:
+    hpi:
+      constipation.duration: 12
+      constipation.frequency: 1.5
+    present: [hard_stools, straining, laxative_use, family_history_gi_cancer, dyslipidemia]
+    absent: [abdominal_pain, digital_evacuation, alcohol, smoking, abdominal_surgery, constipating_drug]
+    unmapped: ["ซื้อยาถ่ายกินเองแล้วดีขึ้นบ้าง", "พ่อและพี่สาวเป็นมะเร็งลำไส้"]
+  exam: [scaphoid soft abdomen, no mass, normal anal tone at rest, straining and squeeze, hard yellow stool]
+  book_ddx: [functional_constipation, colon_cancer, ibs, defecatory_disorder]
+  final_diagnosis: functional_constipation   # colonoscopy normal
+
+# ── Jaundice: simple cases ────────────────────────────────────────────────
+- id: jaundice_viral_hepatitis  # p.220, 221
+  level: simple
+  sex: female
+  age: 25
+  chief_complaint: jaundice
+  history:
+    hpi:
+      jaundice.pain: painless
+    present: [low_grade_fever, fatigue, nausea, anorexia, unsafe_food]
+  expect:
+    top3_includes: viral_hepatitis
+    ask_first: [pregnancy, herbal_medicine, alcohol]
+
+- id: jaundice_cholangitis  # p.223
+  level: simple
+  sex: male
+  age: 60
+  chief_complaint: jaundice
+  history:
+    hpi:
+      jaundice.pain: biliary_colic
+    present: [high_fever, chills]
+  expect:
+    top3_includes: cholangitis
+    urgent: true
+
+- id: jaundice_stone  # p.223; ตาราง 20-1
+  level: simple
+  sex: female
+  age: 50
+  chief_complaint: jaundice
+  history:
+    hpi:
+      jaundice.pain: biliary_colic
+    present: [ruq_pain, pale_stool]
+    absent: [high_fever, chills]
+  expect:
+    top3_includes: choledocholithiasis
+
+- id: jaundice_painless_weight_loss  # p.223
+  level: simple
+  sex: male
+  age: 68
+  chief_complaint: jaundice
+  history:
+    hpi:
+      jaundice.pain: painless
+    present: [weight_loss, anorexia, pale_stool, itch]
+  expect:
+    top3_includes: pancreatic_cancer
+
+- id: jaundice_hemolysis  # p.224
+  level: simple
+  sex: female
+  age: 20
+  chief_complaint: jaundice
+  history:
+    present: [cola_colored_urine, pallor, fatigue, thalassemia]
+  expect:
+    top3_includes: hemolytic_anemia
+
+- id: jaundice_herbal  # p.221
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: jaundice
+  history:
+    present: [herbal_medicine, nausea, anorexia]
+    absent: [alcohol]
+  expect:
+    top3_includes: drug_induced_liver_injury
+
+- id: jaundice_alcohol  # p.222
+  level: simple
+  sex: male
+  age: 50
+  chief_complaint: jaundice
+  history:
+    present: [alcohol, abdominal_distension]
+  expect:
+    top3_includes: cirrhosis
+
+- id: jaundice_liver_failure  # p.222
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: jaundice
+  history:
+    present: [confusion]
+  expect:
+    urgent: true
+
+# ── Jaundice: textbook case ───────────────────────────────────────────────
+- id: ch20_case  # p.217, 226
+  level: book
+  sex: female
+  age: 35
+  chief_complaint: jaundice
+  history:
+    hpi:
+      jaundice.pain: painless
+    present: [low_grade_fever, myalgia, dark_urine, sick_contacts, unsafe_food]
+    absent: [abdominal_pain, weight_loss, itch, pale_stool, alcohol, smoking, new_medication, herbal_medicine]
+    unmapped: ["ไข้ลดลงเมื่อเริ่มเหลือง"]
+  exam: [T 37.5, icteric sclera, no hepatomegaly]
+  book_ddx: [viral_hepatitis, drug_induced_liver_injury, alcoholic_hepatitis]
+  final_diagnosis: viral_hepatitis   # anti-HAV IgM positive
+
+# ── Weight change: simple cases ──────────────────────────────────────────
+- id: weight_loss_voluntary_purging  # p.53
+  level: simple
+  sex: female
+  age: 23
+  chief_complaint: weight_loss
+  history:
+    hpi:
+      weight_loss.intent: voluntary
+      weight_loss.appetite: decreased
+    present: [dieting_or_exercise, purging]
+  expect:
+    top3_includes: eating_disorder
+    never_in_ddx: [diabetes_mellitus, hypothyroidism]
+    urgent: false
+
+- id: weight_loss_decreased_intake  # p.53
+  level: simple
+  sex: male
+  age: 75
+  chief_complaint: weight_loss
+  history:
+    hpi:
+      weight_loss.intent: involuntary
+      weight_loss.appetite: decreased
+    present: [chewing_problem, oral_ulcer]
+  expect:
+    top3_includes: oral_dental_problem
+    ask_first: [fever, night_sweats, lymph_node_swelling, hemoptysis, dysphagia, bloody_stool]
+    not_ask_first: [eyelid_swelling, orthopnea, pregnancy]
+    never_in_ddx: [intentional_weight_loss, eating_disorder]
+
+- id: weight_loss_malabsorption  # p.54–55
+  level: simple
+  sex: male
+  age: 48
+  chief_complaint: weight_loss
+  history:
+    hpi:
+      weight_loss.intent: involuntary
+    present: [fatty_stool, abdominal_pain]
+  expect:
+    top3_includes: chronic_pancreatitis
+
+- id: weight_loss_diabetes  # p.54, 56
+  level: simple
+  sex: male
+  age: 42
+  chief_complaint: weight_loss
+  history:
+    hpi:
+      weight_loss.intent: involuntary
+      weight_loss.appetite: same_or_more
+    present: [polydipsia, polyuria]
+  expect:
+    top3_includes: diabetes_mellitus
+    never_in_ddx: [intentional_weight_loss, eating_disorder]
+
+- id: weight_loss_heart_lung  # p.54; ตาราง 5-1
+  level: simple
+  sex: male
+  age: 69
+  chief_complaint: weight_loss
+  history:
+    hpi:
+      weight_loss.intent: involuntary
+    present: [history_heart_disease, dyspnea, orthopnea, paroxysmal_nocturnal_dyspnea]
+  expect:
+    top3_includes: heart_failure
+
+- id: weight_gain_renal_edema  # p.47–48, 54
+  level: simple
+  sex: male
+  age: 61
+  chief_complaint: weight_gain
+  history:
+    hpi:
+      weight_gain.speed: rapid
+    present: [eyelid_swelling, decreased_urine, nausea, vomiting, kidney_disease]
+  expect:
+    top3_includes: chronic_kidney_disease
+    ask_first: [leg_swelling, eyelid_swelling, abdominal_distension, orthopnea, decreased_urine]
+    not_ask_first: [pregnancy, hemoptysis, bloody_stool]
+    never_in_ddx: [pcos, pregnancy_weight_gain]
+    never_recommend: [menstrual_change, hirsutism, pregnancy]
+
+- id: weight_gain_hypothyroidism  # p.50; retain weight gain after an earlier weight-loss answer
+  level: simple
+  sex: female
+  age: 38
+  chief_complaint: weight_gain
+  history:
+    hpi:
+      weight_loss.intent: involuntary
+      weight_gain.speed: gradual
+    present: [cold_intolerance, fatigue, constipation, dry_skin, hair_loss]
+  expect:
+    top3_includes: hypothyroidism
+    ask_first: [pregnancy]
+    not_ask_first: [hemoptysis, bloody_stool]
+    never_in_ddx: [hyperthyroidism, diabetes_mellitus]
+
+- id: weight_gain_primary_obesity  # p.48–49
+  level: simple
+  sex: male
+  age: 35
+  chief_complaint: weight_gain
+  history:
+    hpi:
+      weight_loss.intent: voluntary
+      weight_gain.speed: gradual
+    present: [polyphagia, high_fat_diet, sedentary_lifestyle, smoking_cessation]
+  expect:
+    top3_includes: primary_obesity
+    never_in_ddx: [pcos, pregnancy_weight_gain, intentional_weight_loss, eating_disorder]
+    not_ask_first: [pregnancy]
+
+- id: weight_gain_pregnancy  # p.52
+  level: simple
+  sex: female
+  age: 28
+  chief_complaint: weight_gain
+  history:
+    present: [pregnancy]
+  expect:
+    top3_includes: pregnancy_weight_gain
+    ask_first: [pregnancy]
+    urgent: false
+
+- id: weight_gain_pcos  # p.50
+  level: simple
+  sex: female
+  age: 26
+  chief_complaint: weight_gain
+  history:
+    hpi:
+      weight_gain.speed: gradual
+    present: [menstrual_change, hirsutism, acne, hair_loss]
+  expect:
+    top3_includes: pcos
+    ask_first: [pregnancy]
+
+# ── Weight change: textbook case ─────────────────────────────────────────
+- id: ch05_case  # p.45–46, 56–57
+  level: book
+  sex: female
+  age: 45
+  chief_complaint: weight_loss
+  history:
+    hpi:
+      weight_loss.intent: involuntary
+      weight_loss.appetite: same_or_more
+    present: [palpitation, diaphoresis, menstrual_change, fatigue]
+    absent: [chest_pain, orthopnea, cough, fever, polydipsia, diarrhea, joint_pain, joint_swelling]
+    unmapped: ["น้ำหนักจาก 55 เหลือ 48 กิโลกรัมใน 6 เดือน ทั้งที่ไม่ได้ลดอาหาร"]
+  exam: [T 37.2, irregular pulse 104, fine tremor, soft diffuse goiter, no exophthalmos, no leg edema]
+  book_ddx: [hyperthyroidism, diabetes_mellitus, adrenal_insufficiency]
+  final_diagnosis: hyperthyroidism   # Graves disease
+
+# ── Abnormal vaginal bleeding: simple cases ───────────────────────────────
+- id: vaginal_bleeding_leiomyoma  # p.421, 423, 425–426
+  level: simple
+  sex: female
+  age: 43
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: negative
+      vaginal_bleeding.pattern: menstrual
+      vaginal_bleeding.amount: heavy
+      vaginal_bleeding.regularity: regular
+      vaginal_bleeding.episode_duration: over_8_days
+    present: [lower_abdominal_mass, urinary_frequency]
+  expect:
+    top3_includes: uterine_leiomyoma
+    never_in_ddx: [miscarriage, molar_pregnancy, ectopic_pregnancy]
+
+- id: vaginal_bleeding_polyp  # p.426
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: intermenstrual_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: negative
+  expect:
+    top3_includes: endometrial_polyp
+
+- id: vaginal_bleeding_adenomyosis  # p.425–426
+  level: simple
+  sex: female
+  age: 39
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: negative
+      vaginal_bleeding.pattern: menstrual
+      vaginal_bleeding.amount: heavy
+      vaginal_bleeding.episode_duration: over_8_days
+    present: [pain_with_menses]
+  expect:
+    top3_includes: adenomyosis
+
+- id: vaginal_bleeding_coagulopathy  # p.422, 426
+  level: simple
+  sex: female
+  age: 32
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: negative
+      vaginal_bleeding.pattern: menstrual
+      vaginal_bleeding.amount: heavy
+    present: [easy_bleeding, postpartum_hemorrhage_history]
+  expect:
+    top3_includes: coagulopathy
+    ask_first: [easy_bleeding, antithrombotic_use]
+
+- id: vaginal_bleeding_hormonal_drug  # p.422, 425
+  level: simple
+  sex: female
+  age: 30
+  chief_complaint: intermenstrual_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: negative
+    present: [oral_contraceptive_use]
+  expect:
+    top3_includes: drug_induced_bleeding
+
+- id: vaginal_bleeding_pregnancy  # p.424
+  level: simple
+  sex: female
+  age: 27
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: positive
+    present: [missed_period]
+  expect:
+    top3_includes: ectopic_pregnancy
+    never_in_ddx: [uterine_leiomyoma, coagulopathy, ovulatory_dysfunction]
+
+- id: vaginal_bleeding_acute_heavy  # p.420, 424
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.current_status: acute_heavy
+  expect:
+    urgent: true
+    ask_first: [acute_heavy_vaginal_bleeding]
+
+- id: vaginal_bleeding_chronic_not_current  # p.419, 425
+  level: simple
+  sex: female
+  age: 42
+  chief_complaint: heavy_menstrual_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.current_status: none
+      vaginal_bleeding.regularity: regular
+      vaginal_bleeding.course: 6_months_or_more
+      vaginal_bleeding.contraception: tubal_ligation
+    absent: [pregnancy, missed_period]
+  expect:
+    urgent: false
+    ask_first: [pregnancy, missed_period]
+
+- id: vaginal_bleeding_urinary_source  # p.420; ภาพ 38-1
+  level: simple
+  sex: female
+  age: 36
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: urinary
+    present: [hematuria]
+  expect:
+    top3_includes: urinary_bleeding_source
+    never_in_ddx: [uterine_leiomyoma, cervical_cancer, ectopic_pregnancy]
+
+- id: vaginal_bleeding_vaginal_injury  # p.423
+  level: simple
+  sex: female
+  age: 31
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: negative
+    present: [vaginal_injury_history]
+  expect:
+    top3_includes: vaginal_laceration
+
+# ── Abnormal vaginal bleeding: textbook case ─────────────────────────────
+- id: ch38_case  # p.419–420, 425–426
+  level: book
+  sex: female
+  age: 42
+  chief_complaint: vaginal_bleeding
+  history:
+    hpi:
+      vaginal_bleeding.current_status: none
+      vaginal_bleeding.source: vaginal
+      vaginal_bleeding.pregnancy_test: unknown
+      vaginal_bleeding.pattern: menstrual
+      vaginal_bleeding.amount: heavy
+      vaginal_bleeding.regularity: regular
+      vaginal_bleeding.interval: 24_to_38_days
+      vaginal_bleeding.episode_duration: over_8_days
+      vaginal_bleeding.course: 6_months_or_more
+      vaginal_bleeding.contraception: tubal_ligation
+    present: [fatigue, pallor]
+    absent: [intermenstrual_bleeding, lower_abdominal_pain, pain_with_menses, fever, vaginal_discharge, lower_abdominal_mass, urinary_frequency, difficulty_urinating, hematuria, bloody_stool, anorexia, weight_loss, easy_bleeding, postpartum_hemorrhage_history, gynecologic_hormone_use, obesity, acne, hirsutism, missed_period]
+    unmapped: ["เลือดออกครั้งละราว 10 วัน มีลิ่มเลือด ต้องเปลี่ยนผ้าอนามัยเต็มแผ่นทุก 2–3 ชั่วโมง"]
+  exam: [stable vital signs, mild conjunctival pallor, normal thyroid, no bruising, normal vagina and cervix, mildly enlarged nontender uterus, no adnexal mass]
+  book_ddx: [uterine_leiomyoma, adenomyosis, endometrial_polyp, uterine_malignancy_or_hyperplasia]
+  final_diagnosis: uterine_leiomyoma   # submucosal myoma on ultrasound
+
+# ── Urology: synthetic cases (uro.pdf has no patient vignettes) ─────────────
+- id: uro_cystitis  # uro.2, 7–8
+  level: simple
+  sex: female
+  age: 26
+  chief_complaint: dysuria
+  history:
+    present:
+    - urinary_frequency
+    - urinary_urgency
+    - lower_abdominal_pain
+  expect:
+    top3_includes: cystitis
+
+- id: uro_bph  # uro.16
+  level: simple
+  sex: male
+  age: 68
+  chief_complaint: weak_urinary_stream
+  history:
+    present:
+    - nocturia
+    - urinary_frequency
+    - intermittent_urinary_stream
+    - urinary_hesitancy
+    - incomplete_bladder_emptying
+    - urinary_straining
+  expect:
+    top3_includes: benign_prostatic_hyperplasia
+
+- id: uro_stress_leak  # uro.3
+  level: simple
+  sex: female
+  age: 41
+  chief_complaint: stress_urinary_leak
+  history:
+    present:
+    - multiple_vaginal_deliveries
+  expect:
+    top3_includes: stress_urinary_incontinence
+    never_in_ddx:
+    - benign_prostatic_hyperplasia
+    - prostate_cancer
+    - prostatitis
+    never_recommend:
+    - previous_prostate_surgery
+    - family_history_prostate_cancer
+
+- id: uro_urge_leak  # uro.2–3
+  level: simple
+  sex: female
+  age: 52
+  chief_complaint: urge_urinary_leak
+  history:
+    present:
+    - urinary_urgency
+    - urinary_frequency
+  expect:
+    top3_includes: overactive_bladder
+
+- id: uro_frequency_with_polyuria  # uro.2
+  level: simple
+  sex: male
+  age: 40
+  chief_complaint: urinary_frequency
+  history:
+    hpi:
+      urinary_frequency.volume: large_total
+    present:
+    - polyuria
+    - polydipsia
+  expect:
+    top3_includes: diabetes_mellitus
+
+- id: uro_diuretic_polyuria  # uro.2
+  level: simple
+  sex: female
+  age: 58
+  chief_complaint: polyuria
+  history:
+    present:
+    - diuretic_use
+  expect:
+    top3_includes: diuretic_related_polyuria
+
+- id: uro_nocturnal_polyuria  # uro.2
+  level: simple
+  sex: male
+  age: 39
+  chief_complaint: nocturia
+  history:
+    hpi:
+      nocturia.distribution: night_only
+    present:
+    - evening_fluid_alcohol
+  expect:
+    top3_includes: nocturnal_polyuria
+
+- id: uro_female_voiding  # uro.2–3
+  level: simple
+  sex: female
+  age: 49
+  chief_complaint: weak_urinary_stream
+  history:
+    present:
+    - incomplete_bladder_emptying
+  expect:
+    never_in_ddx:
+    - benign_prostatic_hyperplasia
+    - prostate_cancer
+    - prostatitis
+    never_recommend:
+    - previous_prostate_surgery
+    - family_history_prostate_cancer
+
+- id: uro_acute_retention  # uro.3–4
+  level: simple
+  sex: male
+  age: 60
+  chief_complaint: unable_to_urinate
+  history:
+    hpi:
+      difficulty_urinating.bladder: full
+      difficulty_urinating.course: acute_painful
+  expect:
+    urgent: true
+    ask_first:
+    - acute_urinary_retention
+
+- id: uro_chronic_retention  # uro.3, 16
+  level: simple
+  sex: male
+  age: 66
+  chief_complaint: chronic_urinary_retention
+  history:
+    present:
+    - weak_urinary_stream
+    - intermittent_urinary_stream
+    - incomplete_bladder_emptying
+  expect:
+    top3_includes: benign_prostatic_hyperplasia
+    urgent: false
+
+- id: uro_acute_on_chronic_retention  # uro.3
+  level: simple
+  sex: male
+  age: 66
+  chief_complaint: difficulty_urinating
+  history:
+    hpi:
+      difficulty_urinating.bladder: full
+      difficulty_urinating.course: acute_on_chronic
+  expect:
+    urgent: true
+
+- id: uro_retention_drug  # uro.3
+  level: simple
+  sex: female
+  age: 44
+  chief_complaint: urinary_retention
+  history:
+    present:
+    - retention_drug_use
+  expect:
+    top3_includes: drug_induced_retention
+
+- id: uro_neurogenic_retention  # uro.3
+  level: simple
+  sex: female
+  age: 51
+  chief_complaint: urinary_retention
+  history:
+    present:
+    - diabetes
+    - spinal_injury_history
+    - incomplete_bladder_emptying
+    - overflow_urinary_leak
+  expect:
+    top3_includes: neurogenic_bladder
+
+- id: uro_low_production  # uro.4, 6
+  level: simple
+  sex: male
+  age: 55
+  chief_complaint: decreased_urine
+  history:
+    hpi:
+      decreased_urine.bladder: not_full
+    present:
+    - acute_kidney_injury_history
+  expect:
+    top3_includes: acute_kidney_injury
+    never_in_ddx:
+    - benign_prostatic_hyperplasia
+    - urethral_stone
+
+- id: uro_infected_obstruction  # uro.6
+  level: simple
+  sex: female
+  age: 53
+  chief_complaint: anuria
+  history:
+    hpi:
+      anuria.bladder: not_full
+    present:
+    - known_urinary_obstruction
+    - fever
+  expect:
+    top3_includes: obstructive_uropathy
+    urgent: true
+
+- id: uro_extrinsic_retention  # uro.3
+  level: simple
+  sex: female
+  age: 45
+  chief_complaint: urinary_retention
+  history:
+    present:
+    - lower_abdominal_mass
+  expect:
+    top3_includes: uterine_leiomyoma
+    never_in_ddx:
+    - benign_prostatic_hyperplasia
+    - prostate_cancer
+    - prostatitis
+
+- id: uro_painless_hematuria  # uro.8–9, 15
+  level: simple
+  sex: male
+  age: 64
+  chief_complaint: hematuria
+  history:
+    hpi:
+      hematuria.confirmation: rbc_found
+      hematuria.pain: painless
+      hematuria.pattern: intermittent
+    present:
+    - smoking
+    - urothelial_chemical_exposure
+    - urinary_frequency
+    - urinary_urgency
+  expect:
+    top3_includes: bladder_cancer
+    never_in_ddx:
+    - hemoglobinuria
+    - myoglobinuria
+    - non_heme_pigmenturia
+
+- id: uro_stone_hematuria  # uro.8, 11
+  level: simple
+  sex: male
+  age: 34
+  chief_complaint: hematuria
+  history:
+    hpi:
+      hematuria.confirmation: rbc_found
+      hematuria.pain: painful
+    present:
+    - colicky_flank_pain
+    - flank_to_groin_pain
+    - nausea
+  expect:
+    top3_includes: renal_stone
+
+- id: uro_heme_without_rbc  # uro.9
+  level: simple
+  sex: female
+  age: 33
+  chief_complaint: dark_urine
+  history:
+    hpi:
+      dark_urine.confirmation: no_rbc_heme_positive
+  expect:
+    top3_includes_any:
+    - hemoglobinuria
+    - myoglobinuria
+    never_in_ddx:
+    - bladder_cancer
+    - renal_stone
+    - benign_prostatic_hyperplasia
+    - non_heme_pigmenturia
+
+- id: uro_non_heme_pigment  # uro.8–9
+  level: simple
+  sex: female
+  age: 33
+  chief_complaint: dark_urine
+  history:
+    hpi:
+      dark_urine.confirmation: no_rbc_heme_negative
+    present:
+    - urine_coloring_food_drug
+  expect:
+    top3_includes: non_heme_pigmenturia
+    never_in_ddx:
+    - bladder_cancer
+    - hemoglobinuria
+    - myoglobinuria
+
+- id: uro_dark_color_unconfirmed  # uro.8–9; ch.20 p.219–221
+  level: simple
+  sex: female
+  age: 35
+  chief_complaint: dark_urine
+  history: {}
+  expect:
+    urgent: false
+    ask_first:
+    - jaundice
+    - pale_stool
+    not_ask_first:
+    - confusion
+    - drowsiness
+    - high_fever
+    - chills
+
+- id: uro_cola_nephritic  # uro.8; ch.27 p.306–307
+  level: simple
+  sex: female
+  age: 30
+  chief_complaint: cola_colored_urine
+  history:
+    hpi:
+      cola_colored_urine.confirmation: rbc_found
+    present:
+    - foamy_urine
+    - decreased_urine
+    - edema_before_dyspnea
+  expect:
+    top3_includes: glomerulonephritis
+
+- id: uro_dark_with_jaundice  # uro.8–9; ch.20 p.220–221
+  level: simple
+  sex: female
+  age: 29
+  chief_complaint: dark_urine
+  history:
+    present:
+    - jaundice
+    - fatigue
+    - nausea
+    - anorexia
+  expect:
+    top3_includes: viral_hepatitis
+
+- id: uro_vaginal_contamination  # uro.8
+  level: simple
+  sex: female
+  age: 34
+  chief_complaint: hematuria
+  history:
+    hpi:
+      hematuria.confirmation: rbc_found
+    present:
+    - vaginal_bleeding
+  expect:
+    top3_includes: vaginal_blood_contamination
+    never_in_ddx:
+    - benign_prostatic_hyperplasia
+    - prostate_cancer
+
+- id: uro_clot_retention  # uro.3, 9
+  level: simple
+  sex: male
+  age: 61
+  chief_complaint: hematuria
+  history:
+    present:
+    - urine_blood_clots
+    - acute_urinary_retention
+  expect:
+    urgent: true
+
+- id: uro_renal_colic  # uro.7, 11
+  level: simple
+  sex: male
+  age: 34
+  chief_complaint: colicky_flank_pain
+  history:
+    hpi:
+      flank_pain.severity: controlled
+    present:
+    - hematuria
+    - flank_to_groin_pain
+    - nausea
+    - vomiting
+    - urinary_stone_history
+  expect:
+    top3_includes: renal_stone
+    urgent: false
+
+- id: uro_colic_with_fever  # uro.6, 11
+  level: simple
+  sex: female
+  age: 41
+  chief_complaint: colicky_flank_pain
+  history:
+    present:
+    - fever
+  expect:
+    urgent: true
+
+- id: uro_colic_solitary_kidney  # uro.6, 11
+  level: simple
+  sex: male
+  age: 65
+  chief_complaint: colicky_flank_pain
+  history:
+    present:
+    - solitary_kidney
+  expect:
+    urgent: true
+
+- id: uro_colic_transplant  # uro.11
+  level: simple
+  sex: female
+  age: 47
+  chief_complaint: colicky_flank_pain
+  history:
+    present:
+    - kidney_transplant
+  expect:
+    urgent: true
+
+- id: uro_uncontrolled_colic  # uro.6, 11
+  level: simple
+  sex: male
+  age: 35
+  chief_complaint: flank_pain
+  history:
+    hpi:
+      flank_pain.character: colicky
+      flank_pain.severity: uncontrolled
+  expect:
+    top3_includes: renal_stone
+    urgent: true
+
+- id: uro_pyelonephritis  # uro.7–8; ch.3 p.27, ch.23 p.252
+  level: simple
+  sex: female
+  age: 38
+  chief_complaint: flank_pain
+  history:
+    hpi:
+      flank_pain.character: steady
+    present:
+    - high_fever
+    - chills
+    - nausea
+    - vomiting
+  expect:
+    top3_includes: acute_pyelonephritis
+
+- id: uro_renal_tumor  # uro.14
+  level: simple
+  sex: male
+  age: 58
+  chief_complaint: flank_pain
+  history:
+    hpi:
+      flank_pain.character: steady
+    present:
+    - hematuria
+    - abdominal_mass
+    - weight_loss
+    - fatigue
+    - smoking
+  expect:
+    top3_includes: renal_cell_carcinoma
+
+- id: uro_wilms  # uro.14
+  level: simple
+  sex: female
+  age: 3
+  chief_complaint: flank_pain
+  history:
+    hpi:
+      flank_pain.character: steady
+    present:
+    - hematuria
+    - abdominal_mass
+  expect:
+    top3_includes: wilms_tumor
+

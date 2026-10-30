@@ -1,0 +1,178 @@
+# Ear symptoms: ear pain, blocked ear, hearing loss, ringing, discharge
+# Sources: ENT summary notes (Ramathibodi), `# ent.N` = PDF page of the notes;
+#          แนวทางการดูแลรักษาโรคติดเชื้อเฉียบพลันระบบหายใจในเด็ก พ.ศ. 2562, `# g.N` = printed page.
+# Notes, not a textbook: needs closer physician review than the book chapters.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: g3
+title: {th: "ปวดหู หูอื้อ การได้ยินลดลง", en: "Ear pain, blocked ear, hearing loss"}
+chief_complaint: ear_pain
+also_entry: [ear_fullness, hearing_loss, tinnitus, ear_discharge]
+status: draft
+
+definitions:
+  acute_otitis_media: "หูชั้นกลางอักเสบเฉียบพลัน ไม่เกิน 3 สัปดาห์"  # g.47
+  chronic_otitis_media: "หูชั้นกลางอักเสบนานกว่า 3 เดือน"  # g.47, ent.13
+  severe_otitis_media: "ปวดหูปานกลางถึงรุนแรง ปวดนานกว่า 48 ชั่วโมง หรือไข้ ≥ 39 °C"  # g.49
+  sudden_hearing_loss: "การได้ยินลดลง ≥ 30 dB อย่างน้อย 3 ความถี่ติดกัน ภายใน 3 วัน"  # ent.15
+
+hpi:
+  hearing_loss:
+    onset:  # ent.15
+      ask: "การได้ยินลดลงทันที (ภายใน 3 วัน) หรือค่อยๆ ลดลง"
+      options: [sudden, gradual]
+    laterality:  # ent.13, 15
+      ask: "เป็นข้างเดียวหรือทั้งสองข้าง"
+      options: [one_ear, both_ears]
+    character:  # ent.14, 15
+      ask: "ได้ยินเสียงเบาลง หรือได้ยินแต่ฟังไม่รู้เรื่อง"
+      options: [muffled, hears_but_unclear]
+  ear_discharge:
+    odor:  # ent.13
+      ask: "น้ำหรือหนองที่ไหลจากหูมีกลิ่นเหม็นไหม"
+      options: [foul, none]
+    course:  # ent.13
+      ask: "เป็นๆ หายๆ มานานไหม"
+      options: [acute, recurrent]
+  tinnitus:
+    character:  # ent.10
+      ask: "เสียงในหูเต้นตามจังหวะชีพจรไหม"
+      options: [pulsatile, continuous]
+
+steps:
+  - {id: gate}
+  - {id: outer_middle_inner}  # ent.10–15
+  - {id: conductive_vs_sensorineural}  # ent.14–15
+
+gates:
+  intracranial_spread:  # ent.11, ent.13
+    when: {present: [ear_pain]}
+    ask: [facial_weakness, neck_stiffness, drowsiness, confusion]
+    if_any_yes: urgent
+  sudden_hearing_loss:  # ent.15: steroid within 48 h
+    when: always
+    ask: [sudden_hearing_loss]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {present: [ear_pain], age_above: 60}  # ent.11
+    ask: [diabetes, ear_discharge, facial_weakness]
+    rules_out: [malignant_otitis_externa]
+
+tree_selection:
+  - {when: always, use: [ear]}
+
+branch_selection: {}
+
+branch_hints: []
+
+trees:  # ent.10–15
+  ear:
+    external: [otitis_externa, malignant_otitis_externa, perichondritis, auricle_hematoma, bullous_myringitis,
+               ear_canal_foreign_body, impacted_cerumen, herpes_zoster_oticus]
+    middle: [otitis_media, chronic_otitis_media, otitis_media_with_effusion, cholesteatoma,
+             traumatic_tm_perforation, barotrauma, otosclerosis, nasopharyngeal_carcinoma]
+    inner: [sudden_snhl, noise_induced_hearing_loss, ototoxicity, menieres_disease,
+            vestibular_neuritis_labyrinthitis, acoustic_neuroma]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  otitis_externa:  # ent.11
+    symptoms: [ear_pain, ear_itch, ear_discharge, ear_fullness, pain_pressing_tragus]
+    signs: [ear_canal_edema, tragal_tenderness]
+  malignant_otitis_externa:  # ent.11
+    symptoms: [ear_pain, ear_discharge, facial_weakness, fever, headache, neck_stiffness]
+    signs: [granulation_tissue_ear_canal]
+  perichondritis:  # ent.10
+    symptoms: [red_swollen_auricle]
+  auricle_hematoma:  # ent.10
+    symptoms: [red_swollen_auricle]
+  bullous_myringitis:  # ent.10
+    symptoms: [severe_ear_pain, hearing_loss, pulsatile_tinnitus, recent_respiratory_infection]
+  ear_canal_foreign_body:  # ent.10
+    symptoms: [ear_fullness]
+  impacted_cerumen:  # ent.14
+    symptoms: [ear_fullness, muffled_hearing]
+  herpes_zoster_oticus:  # ent.11
+    symptoms: [severe_ear_pain, facial_weakness, ear_vesicles]
+  otitis_media:  # ent.13, g.49
+    symptoms: [ear_pain, fever, recent_respiratory_infection, muffled_hearing, ear_discharge, ear_pulling, headache]
+    signs: [bulging_tympanic_membrane, tympanic_membrane_perforation]
+  chronic_otitis_media:  # ent.13
+    symptoms: [recurrent_ear_discharge, muffled_hearing]
+  otitis_media_with_effusion:  # ent.13
+    symptoms: [muffled_hearing, ear_fullness, delayed_speech]
+  cholesteatoma:  # ent.13
+    symptoms: [foul_ear_discharge, muffled_hearing, headache, dizziness, facial_weakness]
+  traumatic_tm_perforation:  # ent.12
+    symptoms: [ear_pain, muffled_hearing]
+  barotrauma:  # ent.12
+    symptoms: [ear_pain, muffled_hearing]
+  otosclerosis:  # ent.12
+    symptoms: [muffled_hearing]
+  nasopharyngeal_carcinoma:  # ent.13
+    symptoms: [one_sided_hearing_loss, ear_fullness]
+  sudden_snhl:  # ent.15
+    symptoms: [sudden_hearing_loss, tinnitus, one_sided_hearing_loss]
+  noise_induced_hearing_loss:  # ent.15
+    symptoms: [hears_but_unclear, tinnitus]
+  ototoxicity:  # ent.15
+    symptoms: [hears_but_unclear, tinnitus]
+  acoustic_neuroma:  # ent.15
+    symptoms: [one_sided_hearing_loss, tinnitus]
+
+branch_findings: {}
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [water_in_ear, ear_cleaning_trauma], suggests: [otitis_externa]}  # ent.11
+  - {findings: [diabetes, immunocompromised], suggests: [malignant_otitis_externa, otitis_externa]}  # ent.11
+  - {findings: [recent_respiratory_infection], suggests: [otitis_media, bullous_myringitis]}  # ent.10, ent.13, g.49
+  - {findings: [smoke_exposure, daycare_attendance], suggests: [otitis_media]}  # g.48
+  - {findings: [ear_trauma], suggests: [traumatic_tm_perforation, perichondritis, auricle_hematoma]}  # ent.10, ent.12
+  - {findings: [flying_or_diving], suggests: [barotrauma]}  # ent.12
+  - {findings: [loud_noise_exposure], suggests: [noise_induced_hearing_loss]}  # ent.15
+  - {findings: [ototoxic_drug], suggests: [ototoxicity]}  # ent.15
+  - {findings: [water_in_ear], suggests: [chronic_otitis_media]}  # ent.13
+
+exam_clues:
+  - {sign: tragal_tenderness, askable_as: pain_pressing_tragus, suggests: [acute otitis externa]}  # ent.11
+  - {sign: bulging_red_tympanic_membrane, suggests: [acute otitis media]}  # ent.13, g.49
+  - {sign: retracted_tm_with_amber_fluid, suggests: [otitis media with effusion]}  # ent.13
+  - {sign: smooth_border_tm_perforation, suggests: [chronic otitis media]}  # ent.13
+  - {sign: shaggy_border_tm_perforation, suggests: [traumatic tympanic membrane perforation]}  # ent.12
+  - {sign: weber_to_worse_ear_rinne_bc_over_ac, suggests: [conductive hearing loss]}  # ent.14
+  - {sign: weber_to_better_ear_rinne_ac_over_bc, suggests: [sensorineural hearing loss]}  # ent.15

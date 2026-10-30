@@ -1,0 +1,184 @@
+# Upper respiratory symptoms: sore throat, runny nose, blocked nose
+# Source: แนวทางการดูแลรักษาโรคติดเชื้อเฉียบพลันระบบหายใจในเด็ก พ.ศ. 2562. `# g.N` = printed page.
+# The guideline is written for children. Adults use the original Centor score (reviewer);
+# the rest of the file is pending adult review.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: g1
+title: {th: "เจ็บคอ น้ำมูกไหล คัดจมูก", en: "Sore throat, runny and blocked nose"}
+chief_complaint: sore_throat
+also_entry: [rhinorrhea, nasal_congestion, sneezing, nasal_itch]
+status: draft
+
+definitions:
+  common_cold: "การติดเชื้อทางเดินหายใจส่วนบนบริเวณโพรงจมูก อาจลามมาถึงช่องปาก อาการไม่รุนแรง"  # g.15
+  acute_pharyngitis: "การติดเชื้อของบริเวณคอหอย ทั้ง nasopharynx และ oropharynx และ/หรือต่อมทอนซิล"  # g.19
+  acute_bacterial_rhinosinusitis: "การอักเสบของเยื่อบุไซนัสน้อยกว่า 4 สัปดาห์ และอาการหายไปอย่างสมบูรณ์"  # g.27
+  acute_bronchitis: "การอักเสบของทางเดินหายใจส่วนล่างตั้งแต่ distal trachea ถึงหลอดลมขนาดกลางและใหญ่"  # g.107
+
+hpi:
+  rhinorrhea:
+    duration:  # g.16, 29
+      ask: "มีน้ำมูกมากี่วันแล้ว"
+      unit: days
+      allow_unknown: true
+      categories:
+        under_10_days: {below: 10}
+        over_10_days: {from: 10}
+      grey_zones:
+        - {from: 8, to: 12, both: [under_10_days, over_10_days]}
+    color:  # g.16
+      ask: "น้ำมูกสีอะไร"
+      allow_unknown: true
+      options: [clear_white, green_yellow]
+    course:  # g.29
+      ask: "อาการดีขึ้นแล้วกลับแย่ลงอีกไหม"
+      options: [improving, not_improving, worsening_after_improving]
+  sore_throat:
+    duration:  # g.20
+      ask: "เจ็บคอมากี่วันแล้ว"
+      unit: days
+      allow_unknown: true
+      categories:
+        up_to_3_days: {to: 3}
+        over_3_days: {above: 3}
+    severity:  # g.20
+      ask: "เจ็บคอมากแค่ไหน กลืนได้ไหม"
+      options: [mild, severe]
+  cough:
+    timing:  # g.29–30
+      ask: "ไอช่วงกลางวันด้วย หรือไอเฉพาะกลางคืน"
+      options: [daytime, night_only]
+
+steps:
+  - {id: viral_vs_bacterial}  # g.20
+  - {id: centor_score}  # g.20
+  - {id: persistent_or_worsening}  # g.16, 29
+  - {id: lower_extension}  # g.109
+
+gates: {}
+
+must_ask: []
+
+tree_selection:
+  - {when: always, use: [upper_respiratory, lower_extension]}  # g.15, 107
+  - {when: {rhinorrhea.duration: over_10_days}, use: [persistent]}  # g.16, 29
+  - {when: {rhinorrhea.course: worsening_after_improving}, use: [persistent]}  # g.29
+
+branch_selection: {}
+
+branch_hints: []
+
+trees:
+  upper_respiratory:  # g.15, 19–21
+    viral: [common_cold, pharyngitis, pharyngoconjunctival_fever, herpetic_gingivostomatitis, herpangina,
+            infectious_mononucleosis]
+    bacterial: [gabhs_pharyngitis, scarlet_fever, diphtheria, vincent_angina]
+  persistent: [sinusitis, allergic_rhinitis]  # g.16
+  lower_extension: [bronchitis]  # g.107
+
+scores:
+  gabhs_children:  # g.20 Centor / modified McIsaac, symptoms ≤ 3 days
+    applies_to: gabhs_pharyngitis
+    when: {age_below: 15}
+    items:
+      - {symptom: tonsillar_exudate}
+      - {symptom: tender_neck_lymph_node}
+      - {symptom: fever, hpi: {fever.temperature: {above: 38}}}
+      - {absent: cough}
+      - {age_between: [3, 14]}
+    threshold: {above: 4}
+  gabhs_adults:  # reviewer: original Centor
+    applies_to: gabhs_pharyngitis
+    when: {age_above: 14}
+    items:
+      - {symptom: tonsillar_exudate}
+      - {symptom: tender_neck_lymph_node}
+      - {symptom: fever}
+      - {absent: cough}
+    threshold: {at_least: 3}
+
+confirm: {}
+
+findings:
+  common_cold:  # g.15–16
+    symptoms: [sore_throat, rhinorrhea, nasal_congestion, cough, sneezing]
+    signs: [nasal_mucosa_swelling, conjunctival_injection, cervical_lymphadenopathy, postnasal_drip]
+  pharyngitis:  # g.19–20
+    symptoms: [sore_throat, fever]
+  gabhs_pharyngitis:  # g.20–21
+    symptoms: [high_fever, severe_sore_throat, tender_neck_lymph_node, tonsillar_exudate, strep_contact]
+    signs: [tonsillar_exudate, palatal_petechiae]
+  scarlet_fever:  # g.21
+    symptoms: [sore_throat, rash]
+  diphtheria:  # g.21
+    symptoms: [sore_throat]
+    signs: [grey_white_pseudomembrane]
+  vincent_angina:  # g.21
+    symptoms: [sore_throat, halitosis]
+  pharyngoconjunctival_fever:  # g.21
+    symptoms: [red_eye, eye_irritation, tearing, fever, sore_throat]
+  herpetic_gingivostomatitis:  # g.21
+    symptoms: [oral_ulcer, gum_bleeding]
+  herpangina:  # g.21
+    symptoms: [oral_ulcer, sore_throat]
+  infectious_mononucleosis:  # g.21
+    symptoms: [fever, myalgia, lymph_node_swelling]
+  sinusitis:  # g.29–31
+    symptoms: [persistent_rhinorrhea, double_sickening, purulent_rhinorrhea, high_fever, periorbital_edema,
+               facial_pain, headache, daytime_cough, postnasal_drip, ear_fullness, halitosis, hyponasal_voice,
+               anosmia, toothache]
+  allergic_rhinitis:  # g.16
+    symptoms: [persistent_rhinorrhea]
+  bronchitis:  # g.109
+    symptoms: [cough, dry_cough, sputum, purulent_sputum, chest_pain]
+
+branch_findings:
+  upper_respiratory.viral:  # g.20
+    symptoms: [rhinorrhea, nasal_congestion, sneezing, red_eye, tearing, hoarseness, oral_ulcer, diarrhea]
+  upper_respiratory.bacterial:  # g.20
+    symptoms: [high_fever, severe_sore_throat, headache, nausea, vomiting, abdominal_pain]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [strep_contact], suggests: [gabhs_pharyngitis]}  # g.20
+  - {findings: [daycare_attendance], suggests: [common_cold]}  # g.15
+  - {findings: [smoke_exposure], suggests: [bronchitis]}  # g.108
+
+exam_clues:
+  - {sign: tonsillar_exudate_or_red_swollen_tonsils, askable_as: tonsillar_exudate, suggests: [GABHS pharyngitis]}  # g.20
+  - {sign: tender_anterior_cervical_node, askable_as: tender_neck_lymph_node, suggests: [GABHS pharyngitis]}  # g.20
+  - {sign: palatal_petechiae, suggests: [GABHS pharyngitis]}  # g.21
+  - {sign: grey_white_pseudomembrane, suggests: [diphtheria]}  # g.21
+  - {sign: green_nasal_discharge_in_middle_meatus, suggests: [acute bacterial rhinosinusitis]}  # g.31
+  - {sign: sinus_tenderness, suggests: [sinusitis]}  # g.31

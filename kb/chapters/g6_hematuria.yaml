@@ -1,0 +1,214 @@
+# Hematuria and urine color (ปัสสาวะเป็นเลือดหรือสีผิดปกติ)
+# Source: uro.pdf, pages 8–9, 13–15, 18. `# uro.N` = PDF page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: g6
+title: {th: ปัสสาวะเป็นเลือดหรือสีผิดปกติ, en: Hematuria and urine discoloration}
+chief_complaint: hematuria
+also_entry: [dark_urine, cola_colored_urine, urine_blood_clots]
+status: draft
+
+definitions:
+  gross_hematuria: "เห็นปัสสาวะมีเลือดด้วยตาเปล่า ยังต้องแยกเลือดจริงจากสีหรือเม็ดสีอื่น"  # uro.8–9
+  microscopic_hematuria: "แหล่งนี้ใช้เม็ดเลือดแดงตั้งแต่ 3 เซลล์ต่อช่องกำลังขยายสูงเป็นเกณฑ์"  # uro.8
+  urine_color: "สีเข้มหรือสีแดงเพียงอย่างเดียวไม่ยืนยันเม็ดเลือดแดง ต้องอาศัยผลตรวจปัสสาวะ"  # uro.8–9
+  pigment_tests: "ไม่พบเม็ดเลือดแดงแต่ตรวจ heme เป็นบวกให้คิดถึง hemoglobin หรือ myoglobin; ถ้าเป็นลบให้คิดถึงเม็ดสีอื่น"  # uro.9
+
+hpi:
+  hematuria:
+    confirmation:  # uro.9
+      ask: "ถ้าเคยตรวจปัสสาวะ พบเม็ดเลือดแดง หรือไม่พบแต่แถบตรวจเลือดเป็นบวก หรือไม่พบและแถบตรวจเป็นลบ ถ้ายังไม่ทราบเลือกไม่แน่ใจ"
+      options: [rbc_found, no_rbc_heme_positive, no_rbc_heme_negative]
+      allow_unknown: true
+    timing:  # uro.8
+      ask: "เลือดออกช่วงเริ่มถ่าย ตลอดสาย ช่วงท้าย หรือออกระหว่างที่ไม่ได้ปัสสาวะ"
+      options: [initial, total, terminal, between_voids]
+      allow_unknown: true
+    pain:  # uro.8
+      ask: "มีปวดหรือแสบเวลาปัสสาวะร่วมด้วยไหม"
+      options: [painless, painful]
+      allow_unknown: true
+    visible_clots:  # uro.8–9
+      ask: "เห็นลิ่มเลือดในปัสสาวะไหม"
+      options: [present, absent]
+      allow_unknown: true
+    clot_shape:  # uro.8
+      ask: "ถ้ามีลิ่มเลือด เป็นเส้นยาวคล้ายตัวหนอน หรือเป็นก้อนรูปร่างไม่แน่นอน"
+      options: [worm_like, irregular]
+      allow_unknown: true
+    pattern:  # uro.15
+      ask: "เลือดออกเป็นๆ หายๆ หรือออกต่อเนื่อง"
+      options: [intermittent, continuous]
+      allow_unknown: true
+  dark_urine:
+    confirmation:  # uro.8–9
+      ask: "ถ้าเคยตรวจปัสสาวะ พบเม็ดเลือดแดง หรือไม่พบแต่แถบตรวจเลือดเป็นบวก หรือไม่พบและแถบตรวจเป็นลบ ถ้ายังไม่ทราบเลือกไม่แน่ใจ"
+      options: [rbc_found, no_rbc_heme_positive, no_rbc_heme_negative]
+      allow_unknown: true
+  cola_colored_urine:
+    confirmation:  # uro.8–9
+      ask: "ถ้าเคยตรวจปัสสาวะ พบเม็ดเลือดแดง หรือไม่พบแต่แถบตรวจเลือดเป็นบวก หรือไม่พบและแถบตรวจเป็นลบ ถ้ายังไม่ทราบเลือกไม่แน่ใจ"
+      options: [rbc_found, no_rbc_heme_positive, no_rbc_heme_negative]
+      allow_unknown: true
+
+steps:
+  - {id: distinguish_rbc_heme_and_other_pigments}  # uro.8–9
+  - {id: exclude_vaginal_contamination}  # uro.8
+  - {id: pain_timing_and_clots}  # uro.8
+  - {id: assess_malignancy_risk_and_renal_findings}  # uro.8
+  - {id: microscopy_dipstick_renal_function_and_imaging}  # uro.9
+
+gates:
+  clot_retention:  # uro.3, 9
+    when: always
+    ask: [acute_urinary_retention, acute_on_chronic_retention]
+    if_any_yes: urgent
+  bleeding_with_instability:  # uro.9, 13
+    when: {present: [hematuria]}
+    ask: [low_blood_pressure]
+    if_any_yes: urgent
+
+  colic_with_high_risk_features:  # uro.6, 11
+    when: {present: [colicky_flank_pain]}
+    ask: [fever, solitary_kidney, kidney_transplant, acute_kidney_injury_history]
+    if_any_yes: urgent
+  uncontrolled_colic:  # uro.6, 11
+    when: always
+    ask: [intractable_renal_colic]
+    if_any_yes: urgent
+  infected_known_obstruction:  # uro.6, 11
+    when: {present: [known_urinary_obstruction]}
+    ask: [fever]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # uro.8, 15
+    ask: [smoking, urothelial_chemical_exposure, analgesic_overuse]
+    rules_out: [bladder_cancer, renal_cell_carcinoma, upper_tract_urothelial_tumor]
+  - when: {sex: female}  # uro.8
+    ask: [vaginal_bleeding]
+    rules_out: [vaginal_blood_contamination]
+  - when: {present: [dark_urine]}  # ch.20 p.219–221
+    ask: [jaundice, pale_stool]
+    rules_out: [viral_hepatitis, choledocholithiasis]
+
+tree_selection:
+  - {when: {present: [hematuria], hematuria.confirmation: rbc_found}, use: [blood, contamination]}  # uro.8–9
+  - {when: {present: [hematuria], hematuria.confirmation: no_rbc_heme_positive}, use: [heme_pigment]}  # uro.9
+  - {when: {present: [hematuria], hematuria.confirmation: no_rbc_heme_negative}, use: [other_pigment]}  # uro.9
+  - {when: {present: [hematuria], hematuria.confirmation: unknown}, use: [blood, heme_pigment, other_pigment, contamination]}  # uro.8–9
+  - {when: {present: [dark_urine], dark_urine.confirmation: rbc_found}, use: [blood, contamination]}  # uro.8–9
+  - {when: {present: [dark_urine], dark_urine.confirmation: no_rbc_heme_positive}, use: [heme_pigment]}  # uro.9
+  - {when: {present: [dark_urine], dark_urine.confirmation: no_rbc_heme_negative}, use: [other_pigment]}  # uro.9
+  - {when: {present: [dark_urine], dark_urine.confirmation: unknown}, use: [blood, heme_pigment, other_pigment, contamination]}  # uro.8–9
+  - {when: {present: [cola_colored_urine], cola_colored_urine.confirmation: rbc_found}, use: [blood, contamination]}  # uro.8–9
+  - {when: {present: [cola_colored_urine], cola_colored_urine.confirmation: no_rbc_heme_positive}, use: [heme_pigment]}  # uro.9
+  - {when: {present: [cola_colored_urine], cola_colored_urine.confirmation: no_rbc_heme_negative}, use: [other_pigment]}  # uro.9
+  - {when: {present: [cola_colored_urine], cola_colored_urine.confirmation: unknown}, use: [blood, heme_pigment, other_pigment, contamination]}  # uro.8–9
+  - {when: {present: [jaundice]}, use: [hepatobiliary]}  # ch.20 p.219–224
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {hematuria.pain: painless}, boost: blood.malignancy}  # uro.8
+  - {when: {hematuria.timing: initial}, boost: blood.outlet}  # uro.8
+  - {when: {hematuria.timing: terminal}, boost: blood.outlet}  # uro.8
+  - {when: {hematuria.clot_shape: worm_like}, boost: blood.upper_tract}  # uro.8
+  - {when: {hematuria.pattern: intermittent, hematuria.pain: painless}, boost: blood.malignancy.bladder}  # uro.15
+
+trees:
+  blood:  # uro.8
+    systemic: [coagulopathy, drug_induced_bleeding, leukemia, sickle_cell_disease]
+    renal: [glomerulonephritis, acute_pyelonephritis, renal_trauma, renal_angiomyolipoma]
+    upper_tract: [renal_stone, renal_cell_carcinoma, upper_tract_urothelial_tumor, wilms_tumor]
+    outlet: [cystitis, urethritis, urethral_stricture, benign_prostatic_hyperplasia, prostatitis, bladder_stone, urethral_stone]
+    malignancy:
+      bladder: [bladder_cancer]
+      prostate: [prostate_cancer]
+      renal: [renal_cell_carcinoma, wilms_tumor, upper_tract_urothelial_tumor]
+  heme_pigment: [hemoglobinuria, myoglobinuria]  # uro.8–9
+  other_pigment: [non_heme_pigmenturia]  # uro.8–9
+  contamination: [vaginal_blood_contamination]  # uro.8
+  hepatobiliary: [viral_hepatitis, choledocholithiasis, hemolytic_anemia]  # ch.20 p.220–224
+
+scores: {}
+
+confirm: {}
+
+findings:
+  bladder_cancer:  # uro.15
+    symptoms: [hematuria, dysuria, urinary_frequency, urinary_urgency]
+  renal_cell_carcinoma:  # uro.8, 14
+    symptoms: [hematuria, flank_pain, abdominal_mass, fever, weight_loss, fatigue]
+  renal_angiomyolipoma:  # uro.13
+    symptoms: [hematuria, flank_pain, abdominal_mass, low_blood_pressure]
+  wilms_tumor:  # uro.14
+    symptoms: [hematuria, flank_pain, abdominal_mass]
+  renal_stone:  # uro.8, 11
+    symptoms: [hematuria, colicky_flank_pain, flank_to_groin_pain, nausea, vomiting]
+  bladder_stone:  # uro.12
+    symptoms: [hematuria, lower_abdominal_pain, intermittent_urinary_stream]
+  urethral_stone:  # uro.12
+    symptoms: [hematuria, dysuria, weak_urinary_stream]
+  cystitis:  # uro.7–8
+    symptoms: [dysuria, urinary_frequency, lower_abdominal_pain]
+  prostate_cancer:  # uro.18
+    symptoms: [hematuria, dysuria, urinary_frequency, back_pain, hip_pain]
+  coagulopathy:  # uro.8; bleeding history: ch.38 p.422
+    symptoms: [easy_bleeding]
+  glomerulonephritis:  # uro.8; ch.27 p.306–307
+    symptoms: [cola_colored_urine, foamy_urine, decreased_urine, edema_before_dyspnea]
+  vaginal_blood_contamination:  # uro.8
+    symptoms: [vaginal_bleeding]
+  viral_hepatitis:  # ch.20 p.220–221
+    symptoms: [jaundice, dark_urine, fatigue, nausea, anorexia]
+  choledocholithiasis:  # ch.20 p.223
+    symptoms: [jaundice, pale_stool, biliary_type_pain]
+  hemolytic_anemia:  # ch.20 p.224
+    symptoms: [cola_colored_urine, pallor, fatigue]
+
+branch_findings: {}
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [smoking, urothelial_chemical_exposure, analgesic_overuse], suggests: [bladder_cancer, renal_cell_carcinoma, upper_tract_urothelial_tumor]}  # uro.8, 14–15
+  - {findings: [antithrombotic_use], suggests: [drug_induced_bleeding]}  # uro.8
+  - {findings: [recent_trauma_surgery], suggests: [renal_trauma]}  # uro.8
+  - {findings: [urine_coloring_food_drug], suggests: [non_heme_pigmenturia]}  # uro.8–9
+  - {findings: [family_history_prostate_cancer], suggests: [prostate_cancer]}  # uro.18
+
+exam_clues:
+  - {sign: dysmorphic_rbc_or_rbc_casts, suggests: [glomerulonephritis]}  # uro.9; p.307
+  - {sign: palpable_abdominal_mass, suggests: [renal_cell_carcinoma, renal_angiomyolipoma, wilms_tumor], askable_as: abdominal_mass}  # uro.8, 13–14
+  - {sign: pink_serum_without_urinary_rbc, suggests: [hemoglobinuria]}  # uro.9
+  - {sign: normal_serum_color_without_urinary_rbc_but_positive_heme, suggests: [myoglobinuria]}  # uro.9

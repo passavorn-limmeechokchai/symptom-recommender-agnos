@@ -1,0 +1,255 @@
+# Chapter 5 — Weight change (น้ำหนักเปลี่ยนแปลง)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 45–57. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 5
+title: {th: น้ำหนักเปลี่ยนแปลง, en: Weight change}
+chief_complaint: weight_loss
+also_entry: [weight_gain]
+status: draft
+
+definitions:  # p.46
+  overweight: "BMI 23–24.9 กก./ตร.ม."
+  obesity: "BMI ตั้งแต่ 25 กก./ตร.ม.; ระดับ 1 คือ 25–29.9 ระดับ 2 คือ 30–39.9 และระดับ 3 คือตั้งแต่ 40"
+  involuntary_weight_loss: "น้ำหนักลดอย่างน้อย 5% ใน 6–12 เดือน โดยไม่ได้ตั้งใจและไม่ใช่ผลการรักษาที่คาดไว้"
+  significant_weight_loss: "น้ำหนักลดมากกว่า 5% ใน 1 เดือน หรือมากกว่า 10% ใน 6 เดือน"
+  kwashiorkor: "ขาดโปรตีนรุนแรงจนบวม อาจมีท้องโต เส้นผมบางเปราะ และผิวหนังลอกง่าย"
+
+hpi:
+  weight_loss:
+    intent:  # p.46, 53
+      ask: "ตั้งใจลดน้ำหนักด้วยการคุมอาหารหรือออกกำลังกายไหม"
+      options: [voluntary, involuntary]
+    appetite:  # p.53, 56
+      ask: "ช่วงที่น้ำหนักลด กินอาหารน้อยลง หรือกินเท่าเดิมหรือมากขึ้น"
+      options: [decreased, same_or_more]
+      allow_unknown: true
+  weight_gain:
+    speed:  # p.47, 49
+      ask: "น้ำหนักขึ้นเร็วในไม่กี่วันถึงไม่กี่สัปดาห์ หรือค่อยๆ เพิ่ม"
+      options: [rapid, gradual]
+      allow_unknown: true
+
+steps:
+  - {id: weight_amount_duration_and_diet_history}  # p.47
+  - {id: weight_gain_edema_before_obesity}  # p.49
+  - {id: weight_gain_primary_secondary_or_other}  # p.49–52
+  - {id: weight_loss_voluntary_or_involuntary}  # p.53
+  - {id: weight_loss_intake_absorption_or_expenditure}  # p.53–56
+
+gates: {}
+
+must_ask:
+  - when: {present: [weight_loss]}  # p.53–55; ตาราง 5-1
+    ask: [fever, night_sweats, lymph_node_swelling, hemoptysis, dysphagia, bloody_stool]
+    rules_out: [lymphoma, tuberculosis, lung_cancer, upper_gi_malignancy, colon_cancer]
+  - when: {present: [weight_gain]}  # p.47–49
+    ask: [leg_swelling, eyelid_swelling, abdominal_distension, orthopnea, decreased_urine]
+    rules_out: [heart_failure, chronic_kidney_disease, cirrhosis, primary_nephrotic_syndrome]
+  - when: {present: [weight_gain], sex: female, age_between: [15, 50]}  # p.52
+    ask: [pregnancy]
+    rules_out: [pregnancy_weight_gain]
+
+tree_selection:
+  - {when: {present: [weight_loss]}, use: [weight_loss]}  # ภาพ 5-2
+  - {when: {present: [weight_gain]}, use: [weight_gain]}  # ภาพ 5-1
+
+branch_selection:
+  attribute: weight_loss.intent
+  map:  # p.53; keep the weight-gain tree if a weight-loss answer is also present
+    voluntary: [voluntary, weight_gain]
+    involuntary: [involuntary, weight_gain]
+
+branch_hints:
+  - {when: {weight_loss.appetite: same_or_more}, boost: weight_loss.involuntary.increased_expenditure}  # p.56
+  - {when: {weight_loss.appetite: decreased}, boost: weight_loss.involuntary.decreased_intake}  # p.53
+  - {when: {weight_gain.speed: rapid}, boost: weight_gain.edema}  # p.47
+  - {when: {weight_gain.speed: gradual}, boost: weight_gain.fat}  # p.49
+
+trees:
+  weight_loss:  # ภาพ 5-2
+    voluntary: [intentional_weight_loss, eating_disorder]  # p.53
+    involuntary:
+      decreased_intake:  # p.53–55
+        oral_gi: [oral_dental_problem, esophageal_disease, gastric_disease]
+        neurologic: [stroke, dementia, parkinsons_disease]
+        drugs_substances: [alcohol_or_substance_use, drug_induced_anorexia]
+        uremia: [chronic_kidney_disease]
+      malabsorption:  # p.55; chronic pancreatitis: ch.25 p.280
+        intestinal: [gi_parasitic_infection, ibd, short_bowel_syndrome]
+        hepatobiliary_pancreatic: [cholestatic_liver_disease, chronic_pancreatitis]
+        medication: [drug_induced_malabsorption]
+      increased_expenditure:  # p.56; ตาราง 5-1
+        endocrine: [hyperthyroidism, diabetes_mellitus, adrenal_insufficiency]
+        cancer: [lung_cancer, upper_gi_malignancy, colon_cancer, pancreatic_cancer, hcc, lymphoma, head_neck_cancer, leukemia]
+        chronic_infection: [hiv_aids, tuberculosis]
+        chronic_inflammation: [sle, rheumatoid_arthritis]
+      heart_lung: [heart_failure, infective_endocarditis, copd]  # p.54; ตาราง 5-1
+  weight_gain:  # ภาพ 5-1
+    edema:
+      salt_water_retention: [heart_failure, chronic_kidney_disease, glomerulonephritis, high_salt_intake, drug_induced_edema]  # p.48
+      hypoalbuminemia: [cirrhosis, primary_nephrotic_syndrome, protein_losing_enteropathy, kwashiorkor]  # p.48–49
+    fat:
+      primary: [primary_obesity]  # p.49
+      secondary:
+        endocrine: [cushing_syndrome, hypothyroidism, pcos, insulinoma, hypogonadism, growth_hormone_deficiency]  # p.48, 50
+        medication: [drug_induced_weight_gain]  # p.50–51
+        genetic: [genetic_obesity]  # p.51
+        psychiatric: [binge_eating_disorder, depression, bipolar_disorder]  # p.51
+        hypothalamic: [hypothalamic_disorder]  # p.52
+    others: [pregnancy_weight_gain, increased_muscle_mass]  # p.52
+
+scores: {}
+
+confirm: {}
+
+findings:
+  oral_dental_problem:  # p.53
+    symptoms: [chewing_problem, oral_ulcer]
+  esophageal_disease:  # p.54; ตาราง 5-1
+    symptoms: [dysphagia, odynophagia, vomiting]
+  gastric_disease:  # p.54; ตาราง 5-1
+    symptoms: [abdominal_pain, early_satiety, nausea, vomiting]
+  stroke:  # p.55
+    symptoms: [dysphagia]
+  dementia:  # p.54–55
+    symptoms: [forgetfulness, dysphagia]
+  parkinsons_disease:  # p.54–55
+    symptoms: [dysphagia, resting_tremor]
+  chronic_kidney_disease:  # p.53–54; ตาราง 5-1
+    symptoms: [nausea, vomiting, decreased_urine, pallor]
+    signs: [pale_conjunctiva, general_wasting]
+  eating_disorder:  # p.53
+    symptoms: [purging]
+  drug_induced_anorexia:  # p.55
+    symptoms: [anorexia]
+  chronic_pancreatitis:  # p.54–55; pancreatic disease in ตาราง 5-1; ch.25 p.280
+    symptoms: [fatty_stool, abdominal_pain]
+  cholestatic_liver_disease:  # p.54; ตาราง 5-1
+    symptoms: [jaundice, abdominal_distension]
+  cirrhosis:  # p.48–49, 54
+    symptoms: [jaundice, abdominal_distension]
+  hyperthyroidism:  # p.45, 54, 56; ตาราง 5-1
+    symptoms: [heat_intolerance, palpitation, menstrual_change, diaphoresis, neck_lump]
+    signs: [tachycardia, goiter, thyroid_bruit, moist_skin, exophthalmos, fine_tremor]
+  diabetes_mellitus:  # p.54; ตาราง 5-1
+    symptoms: [polydipsia, polyuria]
+    signs: [acanthosis_nigricans, shin_spots]
+  adrenal_insufficiency:  # p.54; ตาราง 5-1
+    symptoms: [fatigue]
+    signs: [low_blood_pressure]
+  lung_cancer:  # p.54; ตาราง 5-1
+    symptoms: [cough, hemoptysis, fatigue]
+  upper_gi_malignancy:  # p.54; ตาราง 5-1
+    symptoms: [abdominal_pain, abdominal_distension, bloody_stool]
+  colon_cancer:  # p.54; ตาราง 5-1
+    symptoms: [abdominal_pain, abdominal_distension, bloody_stool, bowel_habit_change]
+  lymphoma:  # p.54; ตาราง 5-1
+    symptoms: [lymph_node_swelling, fever, night_sweats]
+  head_neck_cancer:  # p.54; ตาราง 5-1
+    symptoms: [dysphagia, mouth_pain, sore_throat]
+  hiv_aids:  # p.55; ตาราง 5-1
+    symptoms: [fever, rash, sore_throat, dysphagia]
+    signs: [oral_hairy_leukoplakia, pruritic_papular_eruption]
+  tuberculosis:  # p.55; ตาราง 5-1
+    symptoms: [low_grade_fever, cough, hemoptysis, fatigue]
+  sle:  # p.55; ตาราง 5-1
+    symptoms: [rash_sun_exposed, pallor, hair_loss, joint_pain, joint_swelling]
+    signs: [photosensitivity, rash, oral_ulcer]
+  rheumatoid_arthritis:  # p.55; ตาราง 5-1
+    symptoms: [joint_pain, joint_swelling]
+    signs: [joint_deformities]
+  heart_failure:  # p.47, 54
+    symptoms: [dyspnea, orthopnea, paroxysmal_nocturnal_dyspnea, leg_swelling]
+  infective_endocarditis:  # p.54; ตาราง 5-1
+    symptoms: [dyspnea, orthopnea]
+    signs: [heart_murmur]
+  copd:  # p.54; ตาราง 5-1
+    symptoms: [dyspnea, wheezing, cough]
+  kwashiorkor:  # p.46
+    symptoms: [generalized_edema, hair_loss]
+    signs: [thin_brittle_hair, thin_peeling_skin]
+  primary_obesity:  # p.48–49
+    symptoms: [polyphagia]
+  cushing_syndrome:  # p.50
+    symptoms: [purple_striae, proximal_muscle_weakness]
+  hypothyroidism:  # p.50
+    symptoms: [cold_intolerance, fatigue, constipation, dry_skin, hair_loss, menstrual_change, depressed_mood, neck_lump]
+    signs: [goiter]
+  pcos:  # p.50
+    symptoms: [menstrual_change, hirsutism, acne, hair_loss]
+  insulinoma:  # p.50
+    symptoms: [hypoglycemia_episodes]
+  binge_eating_disorder:  # p.51
+    symptoms: [binge_eating]
+  depression:  # p.51
+    symptoms: [depressed_mood, insomnia]
+  bipolar_disorder:  # p.51
+    symptoms: [manic_episodes, depressed_mood]
+
+branch_findings:
+  weight_gain.edema:  # p.47
+    symptoms: [leg_swelling, abdominal_distension, eyelid_swelling, dyspnea, orthopnea, paroxysmal_nocturnal_dyspnea, decreased_urine]
+    signs: [puffy_eyelids, fine_crepitations, pleural_effusion, ascites, leg_edema]
+  weight_gain.edema.hypoalbuminemia:  # p.48
+    symptoms: [generalized_edema, abdominal_distension]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [dieting_or_exercise], suggests: [intentional_weight_loss, eating_disorder]}  # p.53
+  - {findings: [stroke_history], suggests: [stroke]}  # p.54; ตาราง 5-1
+  - {findings: [alcohol, substance_use], suggests: [alcohol_or_substance_use]}  # p.55
+  - {findings: [polypharmacy], suggests: [drug_induced_anorexia]}  # p.55
+  - {findings: [malabsorption_drug], suggests: [drug_induced_malabsorption]}  # p.55
+  - {findings: [kidney_disease], suggests: [chronic_kidney_disease]}  # p.54
+  - {findings: [history_heart_disease], suggests: [heart_failure, infective_endocarditis]}  # p.54
+  - {findings: [diabetes], suggests: [diabetes_mellitus]}  # p.54
+  - {findings: [corticosteroid_use], suggests: [adrenal_insufficiency]}  # p.54
+  - {findings: [smoking], suggests: [lung_cancer, copd]}  # p.54
+  - {findings: [hiv_infection], suggests: [hiv_aids]}  # p.55
+  - {findings: [high_salt_diet], suggests: [high_salt_intake]}  # p.48
+  - {findings: [nsaid_use, ccb_use], suggests: [drug_induced_edema]}  # p.48
+  - {findings: [high_fat_diet, sedentary_lifestyle, sleep_deprivation, smoking_cessation], suggests: [primary_obesity]}  # p.49
+  - {findings: [corticosteroid_use], suggests: [cushing_syndrome, drug_induced_weight_gain]}  # p.50–51
+  - {findings: [weight_gain_drug], suggests: [drug_induced_weight_gain]}  # p.50–51
+  - {findings: [childhood_obesity], suggests: [genetic_obesity]}  # p.51
+  - {findings: [head_trauma, brain_disease_history], suggests: [hypothalamic_disorder]}  # p.52
+  - {findings: [muscle_training], suggests: [increased_muscle_mass]}  # p.52
+  - {findings: [pregnancy], suggests: [pregnancy_weight_gain]}  # p.52
+
+exam_clues:
+  - {sign: tachycardia_with_fine_tremor_and_goiter, suggests: [hyperthyroidism]}  # p.54, 56–57
+  - {sign: low_blood_pressure, suggests: [adrenal_insufficiency], askable_as: low_blood_pressure}  # p.54
+  - {sign: nasopharyngeal_mass, suggests: [head_neck_cancer]}  # p.54
+  - {sign: heart_murmur, suggests: [infective_endocarditis]}  # p.54
+  - {sign: increased_muscle_mass, suggests: [increased_muscle_mass]}  # p.52

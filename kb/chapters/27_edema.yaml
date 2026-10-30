@@ -1,0 +1,174 @@
+# Chapter 27 — Edema (บวม)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 299–311. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 27
+title: {th: บวม, en: Edema}
+chief_complaint: edema
+also_entry: []
+status: draft
+
+definitions:  # p.300
+  nephrotic_syndrome: "บวมทั้งตัว โปรตีนในปัสสาวะ ≥ 3.5 กรัมต่อวัน แอลบูมินในเลือด < 3.5 กรัม/เดซิลิตร"
+  nephritic_syndrome: "ไตอักเสบจากการทำลายเยื่อบุโกลเมอรูลัส ทำให้โปรตีนหรือเม็ดเลือดแดงรั่วออกมาในปัสสาวะ"
+
+hpi:
+  edema:
+    distribution:  # p.301
+      ask: "บวมที่ไหน บวมเฉพาะที่หรือบวมทั้งตัว"
+      allow_unknown: true
+      options: [localized, generalized]
+    laterality:  # p.301
+      ask: "ถ้าบวมที่ขา บวมข้างเดียวหรือสองข้าง"
+      options: [unilateral, bilateral]
+    location:  # p.304–309
+      ask: "บวมเด่นที่ตรงไหน"
+      multiple: true
+      options: [legs, face, eyelids, abdomen, generalized]
+    sequence:  # p.304, 305, 308
+      ask: "อะไรเกิดก่อนกัน บวม เหนื่อย หรือท้องโต"
+      options: [dyspnea_first, edema_first, abdomen_first]
+    onset:  # p.306
+      ask: "บวมขึ้นมาภายในกี่วัน"
+      options: [days, weeks, months]
+    timing:  # p.311
+      ask: "บวมสัมพันธ์กับช่วงก่อนมีประจำเดือนไหม"
+      sex: female
+      options: [premenstrual, none]
+
+steps:
+  - {id: localized_vs_generalized}  # p.301
+  - {id: unilateral_vs_bilateral}  # p.301
+  - {id: system}  # p.303
+
+gates:
+  pulmonary_embolism:  # p.302 DVT -> PE; questions from ch.19 p.202, 210
+    when: {present: [unilateral_leg_swelling]}
+    ask: [sudden_dyspnea, chest_pain]
+    if_any_yes: urgent
+
+must_ask: []
+
+tree_selection:
+  - {when: {edema.distribution: localized, edema.laterality: unilateral}, use: [localized_unilateral]}  # p.301
+  - {when: {edema.distribution: localized, edema.laterality: bilateral}, use: [localized_bilateral]}  # p.301
+  - {when: {edema.distribution: generalized}, use: [generalized]}  # p.303
+  - {when: {edema.distribution: unknown}, use: [localized_unilateral, localized_bilateral, generalized]}
+
+branch_selection: {}
+
+branch_hints: []
+
+trees:  # ภาพ 27-1
+  localized_unilateral: [cellulitis, deep_vein_thrombosis, venous_insufficiency, lymphedema, limb_trauma]
+  localized_bilateral: [drug_induced_edema, deep_vein_thrombosis, venous_insufficiency, lymphedema,
+                        premenstrual_edema]
+  generalized:
+    cardiovascular: [heart_failure, right_heart_failure]
+    hepatic: [cirrhosis, portal_vein_thrombosis, budd_chiari_syndrome]
+    renal:
+      nephrotic: [primary_nephrotic_syndrome, diabetic_nephropathy, lupus_nephritis, amyloidosis]
+      nephritic: [post_streptococcal_gn, iga_nephropathy, lupus_nephritis, rpgn]
+      azotemia: [acute_kidney_injury, acute_interstitial_nephritis]
+    others: [hypoalbuminemia, hypothyroidism, pregnancy_edema, drug_induced_edema]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  cellulitis:  # p.301
+    symptoms: [skin_inflammation, fever]
+  deep_vein_thrombosis:  # p.301–302
+    symptoms: [leg_pain, skin_inflammation, unilateral_leg_swelling]
+  venous_insufficiency:  # p.302
+    symptoms: [bilateral_leg_swelling]
+    signs: [hyperpigmentation, skin_induration, stasis_eczema]
+  lymphedema:  # p.303
+    symptoms: [recurrent_cellulitis]
+    signs: [non_pitting_edema, peau_d_orange]
+  heart_failure:  # p.304
+    symptoms: [dyspnea_before_edema, exertional_fatigue, orthopnea, paroxysmal_nocturnal_dyspnea, leg_swelling]
+    signs: [bilateral_crepitation, s3_gallop, raised_jvp]
+  right_heart_failure:  # p.305
+    symptoms: [edema_before_dyspnea, leg_swelling, abdominal_distension]
+    signs: [raised_jvp, hepatomegaly, ascites]
+  post_streptococcal_gn:  # p.307
+    symptoms: [recent_sore_throat_or_skin_infection]
+  iga_nephropathy:  # p.307
+    symptoms: [recent_respiratory_infection]
+  lupus_nephritis:  # p.307
+    symptoms: [joint_pain, rash_sun_exposed, oral_ulcer]
+  acute_kidney_injury:  # p.308
+    symptoms: [decreased_urine, edema_before_dyspnea]
+  premenstrual_edema:  # p.311
+    symptoms: [premenstrual_swelling]
+
+branch_findings:
+  localized_unilateral:  # p.301
+    symptoms: [unilateral_leg_swelling]
+  localized_bilateral:  # p.301
+    symptoms: [bilateral_leg_swelling]
+  generalized:  # p.303
+    symptoms: [generalized_edema]
+  generalized.hepatic:  # p.308–309
+    symptoms: [ascites_before_edema, abdominal_distension, jaundice]
+    signs: [spider_nevi, splenomegaly, palmar_erythema]
+  generalized.renal.nephrotic:  # p.305–306
+    symptoms: [foamy_urine, periorbital_edema, face_swelling]
+  generalized.renal.nephritic:  # p.306–307
+    symptoms: [cola_colored_urine, foamy_urine, decreased_urine, edema_before_dyspnea]
+    signs: [hypertension, raised_jvp]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [bedridden, recent_trauma_surgery, previous_dvt, pregnancy, oral_contraceptive_use, history_cancer],
+     suggests: [deep_vein_thrombosis]}  # p.302
+  - {findings: [diabetes], suggests: [diabetic_nephropathy, cellulitis]}  # p.301, 306
+  - {findings: [immunocompromised], suggests: [cellulitis]}  # p.301
+  - {findings: [ccb_use, nsaid_use, corticosteroid_use, oral_contraceptive_use], suggests: [drug_induced_edema]}  # p.303
+  - {findings: [lymph_node_surgery_or_radiation, recurrent_cellulitis], suggests: [lymphedema]}  # p.303
+  - {findings: [history_heart_disease], suggests: [heart_failure]}  # p.304
+  - {findings: [viral_hepatitis_history, alcohol], suggests: [cirrhosis]}  # p.308–309
+  - {findings: [connective_tissue_disease], suggests: [lupus_nephritis]}  # p.306–307
+  - {findings: [recent_antibiotics, nsaid_use], suggests: [acute_interstitial_nephritis]}  # p.310
+  - {findings: [pregnancy], suggests: [pregnancy_edema]}  # p.311
+
+exam_clues:
+  - {sign: unilateral_calf_larger_than_other_side, suggests: [deep vein thrombosis]}  # p.302
+  - {sign: non_pitting_edema_peau_d_orange, suggests: [lymphedema]}  # p.303
+  - {sign: bilateral_crepitation_s3_gallop, suggests: [left-sided heart failure]}  # p.304
+  - {sign: raised_jvp_hepatomegaly_without_lung_crepitation, suggests: [right-sided heart failure]}  # p.305
+  - {sign: xanthelasma_muehrcke_lines, suggests: [nephrotic syndrome]}  # p.306
+  - {sign: hypertension_with_raised_jvp, suggests: [nephritic syndrome, renal azotemia]}  # p.306, 308
+  - {sign: shifting_dullness_spider_nevi_splenomegaly, suggests: [cirrhosis with portal hypertension]}  # p.308–309

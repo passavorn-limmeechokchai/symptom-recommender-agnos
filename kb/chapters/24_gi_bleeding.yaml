@@ -1,0 +1,173 @@
+# Chapter 24 — Gastrointestinal bleeding (เลือดออกในทางเดินอาหาร)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 261–272. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 24
+title: {th: เลือดออกในทางเดินอาหาร, en: Gastrointestinal bleeding}
+chief_complaint: bloody_stool
+also_entry: [hematemesis]
+status: draft
+
+definitions:  # p.262
+  upper_gi_hemorrhage: "เลือดออกตั้งแต่ปากถึงลำไส้เล็กส่วนต้น เหนือ ampulla of Vater; ส่องกล้องทางเดินอาหารส่วนบนเห็นได้"
+  lower_gi_hemorrhage: "เลือดออกตั้งแต่ลำไส้ใหญ่ถึงรูทวารหนัก; ส่องกล้องลำไส้ใหญ่เห็นได้"
+  mid_gi_hemorrhage: "เลือดออกในลำไส้เล็กใต้ ampulla of Vater ถึงลำไส้เล็กส่วนปลาย; พบไม่บ่อย"
+  melena: "อุจจาระดำเหลวเหนียวคล้ายยางมะตอย กลิ่นเหม็นจำเพาะ"  # p.263
+
+hpi:
+  bloody_stool:
+    color:  # p.263; same question as chapter 23
+      ask: "อุจจาระเป็นสีอะไร ดำเหมือนยางมะตอย แดงคล้ำ หรือแดงสด"
+      allow_unknown: true
+      options: [black, maroon, fresh_red]
+    pattern:  # p.269
+      ask: "เลือดปนอยู่ในอุจจาระ หรือหยด/เคลือบอยู่บนอุจจาระหลังถ่าย"
+      options: [mixed, coating_or_dripping]
+  hematemesis:
+    character:  # p.263
+      ask: "อาเจียนเป็นเลือดสด หรือเป็นสีน้ำตาลดำเหมือนกากกาแฟ"
+      options: [fresh_blood, coffee_ground]
+    amount:  # p.265
+      ask: "อาเจียนเป็นเลือดมากแค่ไหน"
+      options: [small, massive]
+
+steps:
+  - {id: upper_or_lower}  # p.264
+  - {id: variceal_or_not}  # p.264, ตาราง 24-1
+  - {id: risk_stratification}  # p.267, 270
+
+gates:
+  unstable_or_ongoing:  # p.263, 267, 270
+    when: always
+    ask: [near_syncope, cold_extremities, low_blood_pressure, confusion, drowsiness, persistent_bleeding,
+          massive_hematemesis]
+    if_any_yes: urgent
+  upper_bleeding:  # upper GI bleeding needs risk stratification at once; p.264, 267
+    when: always
+    ask: [hematemesis, melena]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # variceal bleeding must not be missed; ตาราง 24-1 p.265
+    ask: [jaundice, abdominal_distension, viral_hepatitis_history, alcohol, history_gi_liver_disease]
+    rules_out: [esophageal_varices, portal_hypertensive_gastropathy]
+  - when: always  # drugs that cause or worsen bleeding; p.263, 265
+    ask: [nsaid_use, antithrombotic_use, herbal_medicine]
+  - when: {present: [hematochezia]}  # colorectal neoplasm must not be missed; p.262, 268
+    ask: [weight_loss, narrow_stool, bowel_habit_change, family_history_gi_cancer]
+    rules_out: [colon_cancer]
+
+tree_selection:
+  - {when: {present: [hematemesis]}, use: [upper]}  # p.263
+  - {when: {bloody_stool.color: black}, use: [upper]}  # p.263
+  - {when: {bloody_stool.color: maroon}, use: [upper, lower]}  # p.263
+  - {when: {bloody_stool.color: fresh_red}, use: [lower]}  # p.263
+  - {when: {bloody_stool.color: unknown}, use: [upper, lower]}
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {present: [jaundice]}, boost: upper.variceal}  # ตาราง 24-1 p.265
+  - {when: {present: [abdominal_distension]}, boost: upper.variceal}  # ตาราง 24-1 p.265
+  - {when: {present: [massive_hematemesis]}, boost: upper.variceal}  # ตาราง 24-1 p.265
+
+trees:  # ภาพ 24-1
+  upper:
+    variceal: [esophageal_varices, portal_hypertensive_gastropathy]
+    non_variceal: [pud, upper_gi_malignancy, esophagitis, mallory_weiss_tear, dieulafoy_lesion]  # ตาราง 24-1
+  lower:
+    diverticulosis: [diverticulosis]
+    neoplasm: [colorectal_polyp, colon_cancer]
+    colitis: [ischemic_colitis, ibd, infectious_colitis]  # p.268, 269
+    post_polypectomy: [post_polypectomy_bleeding]
+    anorectal: [hemorrhoid, anal_fissure]  # p.269
+
+scores: {}
+
+confirm: {}
+
+findings:
+  esophageal_varices:  # ตาราง 24-1 p.265
+    symptoms: [hematemesis, massive_hematemesis, melena, jaundice, abdominal_distension]
+    signs: [splenomegaly, ascites, stigmata_of_chronic_liver_disease]
+  portal_hypertensive_gastropathy:  # p.265, 266
+    symptoms: [melena, pallor, fatigue]
+  pud:  # ตาราง 24-1 p.265; p.266
+    symptoms: [epigastric_pain, burning_abdominal_pain, pain_after_meals, nausea, vomiting, melena, hematemesis]
+  upper_gi_malignancy:  # p.266
+    symptoms: [dysphagia, anorexia, weight_loss, vomiting, melena]
+    signs: [abdominal_mass]
+  esophagitis:  # p.266, 267
+    symptoms: [odynophagia, heartburn, sour_regurgitation, hematemesis]
+  mallory_weiss_tear:  # p.267
+    symptoms: [vomiting_before_hematemesis, hematemesis, coffee_ground_vomitus]
+  dieulafoy_lesion:  # p.267
+    symptoms: [melena, hematemesis]
+  diverticulosis:  # p.268
+    symptoms: [hematochezia]
+  colon_cancer:  # p.268
+    symptoms: [hematochezia, weight_loss, narrow_stool, bowel_habit_change, pallor, fatigue]
+  ischemic_colitis:  # p.268
+    symptoms: [hematochezia, abdominal_pain]
+  ibd:  # p.268
+    symptoms: [diarrhea, bloody_mucoid_stool, abdominal_pain, fever, weight_loss]
+  infectious_colitis:  # p.269
+    symptoms: [diarrhea, abdominal_pain, fever]
+  hemorrhoid:  # p.269
+    symptoms: [blood_on_stool_surface, anal_discomfort]
+  anal_fissure:  # p.269
+    symptoms: [blood_on_stool_surface, painful_defecation]
+
+branch_findings:
+  upper:  # p.263
+    symptoms: [melena, hematemesis, coffee_ground_vomitus]
+  lower:  # p.263, 267
+    symptoms: [hematochezia]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [viral_hepatitis_history, alcohol, history_gi_liver_disease],
+     suggests: [esophageal_varices, portal_hypertensive_gastropathy]}  # ตาราง 24-1 p.265
+  - {findings: [nsaid_use, antithrombotic_use, h_pylori_history, herbal_medicine], suggests: [pud]}  # p.263, 265, 266
+  - {findings: [pill_esophagitis_drug], suggests: [esophagitis]}  # p.267
+  - {findings: [nsaid_use], suggests: [diverticulosis]}  # p.268
+  - {findings: [history_heart_disease, abdominal_surgery], suggests: [ischemic_colitis]}  # p.268
+  - {findings: [recent_polypectomy], suggests: [post_polypectomy_bleeding]}  # p.269
+  - {findings: [family_history_gi_cancer], suggests: [colon_cancer, upper_gi_malignancy]}  # p.263
+  - {findings: [antithrombotic_use], suggests: [hemorrhoid, anal_fissure]}  # severe bleeding from them; p.269
+
+exam_clues:
+  - {sign: hypotension_tachycardia, suggests: [hypovolemia from bleeding]}  # p.263
+  - {sign: stigmata_of_chronic_liver_disease, suggests: [variceal bleeding]}  # p.263, 265
+  - {sign: telangiectasia_lips, suggests: [hereditary hemorrhagic telangiectasia]}  # p.263
+  - {sign: melena_on_rectal_exam, suggests: [upper gastrointestinal bleeding], askable_as: melena}  # p.263

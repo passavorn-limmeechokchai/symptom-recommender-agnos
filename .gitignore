@@ -1,0 +1,45 @@
+# Agnos data is confidential: never commit it. Only the empty folder is kept.
+/data/*
+!/data/raw/
+/data/raw/*
+!/data/raw/.gitkeep
+# second guard, in case a copy of the dataset lands elsewhere
+*CONFIDENTIAL*
+*.csv
+!tests/fixtures/fake_sessions.csv
+
+# Local presentation, development handoff and source documents
+/presentation/
+/plan.md
+*.[pP][dD][fF]
+
+# Generated from the data by `make build`
+/build/*
+!/build/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Notebooks: outputs are cleared before committing; checkpoints never go in
+.ipynb_checkpoints/
+
+# Editor and OS
+.DS_Store
+.vscode/
+.idea/
+
+# Local settings
+.env
+.env.*
+
+# Temporary lock for scripts updating the consolidated report
+/.REPORT.md.lock

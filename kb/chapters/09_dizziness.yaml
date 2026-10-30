@@ -1,0 +1,177 @@
+# Chapter 9 — Dizziness (เวียนศีรษะ)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 89–99. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 9
+title: {th: เวียนศีรษะ, en: Dizziness}
+chief_complaint: dizziness
+also_entry: [vertigo, near_syncope]       # near_syncope: reviewer (presyncope branch)
+status: draft
+
+definitions:  # p.90, 93
+  dizziness: "รู้สึกมึนศีรษะ ศีรษะไม่โล่ง ไม่สดชื่นแจ่มใส"
+  vertigo: "รู้สึกว่าสภาวะแวดล้อมหมุนหรือตนเองหมุน"
+  episodic_vestibular_syndrome: "หลายวินาทีถึงหลายชั่วโมง"
+  acute_vestibular_syndrome: "มากกว่า 24 ชั่วโมงถึงหลายสัปดาห์"
+  chronic_vestibular_syndrome: "หลายเดือนถึงหลายปี (มากกว่า 3 เดือน)"
+
+hpi:
+  dizziness:
+    character:  # p.90, 93
+      ask: "เวียนศีรษะแบบไหน บ้านหมุน หวิวๆ จะเป็นลม หรือทรงตัวไม่อยู่"
+      allow_unknown: true
+      options: [rotational, lightheaded, unsteady]
+    timecourse:  # p.91, 93
+      ask: "แต่ละครั้งเป็นนานแค่ไหน และเป็นมานานเท่าไหร่แล้ว"
+      allow_unknown: true
+      options: [episodic, acute, chronic]
+    onset:  # ตาราง 9-1
+      ask: "เวียนขึ้นมาทันทีทันใด หรือค่อยๆ เป็น"
+      options: [sudden, gradual]
+    trigger:  # p.91
+      ask: "อะไรทำให้เวียนมากขึ้น"
+      multiple: true
+      options: [position_change, valsalva, loud_noise, none]
+    severity:  # ตาราง 9-1
+      ask: "เวียนมากแค่ไหน ลุกยืนหรือเดินได้ไหม"
+      options: [severe, mild]
+
+steps:
+  - {id: gate}  # p.96
+  - {id: vertigo_vs_non_vertigo}  # p.93
+  - {id: central_vs_peripheral}  # p.93, ตาราง 9-1
+  - {id: timecourse}  # p.93
+
+gates:
+  posterior_circulation_stroke:  # p.94, 96
+    when: always
+    ask: [diplopia, dysarthria, dysphagia, perioral_numbness, hemiparesis, unable_to_stand]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {present: [vertigo]}  # p.96
+    ask: [diplopia, dysarthria, hemiparesis, unable_to_stand, headache, neck_pain]
+    rules_out: [posterior_circulation_stroke, vertebral_dissection]
+
+tree_selection:
+  - {when: {dizziness.character: rotational}, use: [central, peripheral]}  # p.93
+  - {when: {dizziness.character: lightheaded}, use: [non_vertigo]}  # p.93
+  - {when: {dizziness.character: unsteady}, use: [non_vertigo, central]}  # p.93, 96
+  - {when: {dizziness.character: unknown}, use: [non_vertigo, central, peripheral]}
+
+branch_selection:
+  attribute: dizziness.timecourse
+  map:
+    episodic: [episodic]
+    acute: [acute]
+    chronic: [chronic]
+
+branch_hints: []
+
+trees:  # ภาพ 9-1
+  non_vertigo:
+    presyncope: [orthostatic_hypotension, cardiac_arrhythmia, hypoglycemia]  # p.93
+    disequilibrium: [sensory_disequilibrium]  # p.93
+  central:
+    episodic: [vertebrobasilar_insufficiency, epilepsy]
+    acute: [posterior_circulation_stroke, vertebral_dissection]
+    chronic: [posterior_fossa_mass, alcoholic_cerebellar_degeneration]
+  peripheral:
+    episodic: [bppv, menieres_disease, vestibular_migraine]
+    acute: [vestibular_neuritis_labyrinthitis, traumatic_vestibular_neuropathy]
+    chronic: [chronic_vestibular_insufficiency, psychogenic_vertigo, ototoxicity]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  cardiac_arrhythmia:  # p.93
+    symptoms: [palpitation]
+  vertebrobasilar_insufficiency:  # p.94
+    symptoms: [sudden_vertigo, diplopia, dysphagia, dysarthria, perioral_numbness, hemiparesis, nausea]
+  epilepsy:  # p.94
+    symptoms: [olfactory_hallucination, loss_of_consciousness]
+  posterior_circulation_stroke:  # p.96
+    symptoms: [sudden_vertigo, unable_to_stand, diplopia, dysarthria, dysphagia, perioral_numbness, hemiparesis,
+               limb_incoordination]
+  vertebral_dissection:  # p.96
+    symptoms: [neck_pain]
+  posterior_fossa_mass:  # p.96
+    symptoms: [unsteadiness, headache, vomiting]
+  alcoholic_cerebellar_degeneration:  # p.96
+    symptoms: [unsteadiness]
+  bppv:  # p.96
+    symptoms: [positional_vertigo, sudden_vertigo, nausea, vomiting]
+  menieres_disease:  # p.96–97
+    symptoms: [hearing_loss, tinnitus, ear_fullness]
+  vestibular_migraine:  # p.97
+    symptoms: [headache]
+  vestibular_neuritis_labyrinthitis:  # p.97
+    symptoms: [severe_vertigo, nausea, vomiting, hearing_loss, ear_fullness, ear_vesicles]
+  traumatic_vestibular_neuropathy:  # p.97
+    symptoms: [ear_pain]
+
+branch_findings:
+  non_vertigo.presyncope:  # p.93
+    symptoms: [lightheadedness, near_syncope]
+  non_vertigo.disequilibrium:  # p.93
+    symptoms: [unsteadiness]
+  central:  # p.91, ตาราง 9-1
+    symptoms: [vertigo, unsteadiness, unable_to_stand]
+    signs: [direction_changing_or_vertical_nystagmus, cerebellar_signs]
+  peripheral:  # ตาราง 9-1
+    symptoms: [vertigo, severe_vertigo, hearing_loss, tinnitus, nausea, vomiting]
+    signs: [unidirectional_horizontal_nystagmus]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [history_hypertension, diabetes, dyslipidemia, smoking, stroke_history],
+     suggests: [posterior_circulation_stroke, vertebrobasilar_insufficiency]}  # p.91, 94, 96
+  - {findings: [neck_manipulation, recent_trauma_surgery], suggests: [vertebral_dissection]}  # p.96
+  - {findings: [head_trauma], suggests: [traumatic_vestibular_neuropathy]}  # p.91, 97
+  - {findings: [recent_respiratory_infection, fever], suggests: [vestibular_neuritis_labyrinthitis]}  # p.91, 97
+  - {findings: [ototoxic_drug], suggests: [ototoxicity]}  # p.92, 97
+  - {findings: [alcohol], suggests: [alcoholic_cerebellar_degeneration]}  # p.92, 96
+  - {findings: [migraine_history], suggests: [vestibular_migraine]}  # p.97
+  - {findings: [chronic_ear_disease], suggests: [menieres_disease, vestibular_neuritis_labyrinthitis]}  # p.91
+  - {findings: [antihypertensive_use], suggests: [orthostatic_hypotension]}  # p.92
+
+exam_clues:
+  - {sign: orthostatic_hypotension, suggests: [presyncope]}  # p.92
+  - {sign: gaze_evoked_or_vertical_nystagmus, suggests: [central vertigo]}  # ตาราง 9-1
+  - {sign: horizontal_nystagmus_suppressed_by_fixation, suggests: [peripheral vertigo]}  # ตาราง 9-1
+  - {sign: positive_dix_hallpike, suggests: [BPPV]}  # p.96
+  - {sign: impaired_finger_to_nose_or_truncal_ataxia, suggests: [cerebellar lesion]}  # p.98
+  - {sign: low_frequency_hearing_loss_on_audiogram, suggests: [Meniere disease]}  # p.97
+  - {sign: vesicles_around_ear_or_face, askable_as: ear_vesicles, suggests: [herpes zoster vestibular neuritis]}  # p.97

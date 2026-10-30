@@ -1,0 +1,146 @@
+# Words the normalizer uses to read what a patient types.
+#
+# How to read this file. General Thai and English, written without looking at the data; how well
+# the normalizer maps the data's own wording is measured, not tuned by hand.
+#
+#   fillers_start, fillers_end   words that add nothing before or after a symptom ("มีเสมหะ" -> "เสมหะ")
+#   negations                    the patient does not have what follows ("ไม่มีไข้")
+#   sensations                   sensation -> the words for it. "sore" (เจ็บ) reads like "pain" (ปวด)
+#                                unless a body part says otherwise: เจ็บคอ is not ปวดคอ.
+#   body_parts                   body part -> its words, and the symptom each sensation there means.
+#                                Word order does not matter: "แสบท้อง" and "ท้องแสบ" read the same.
+#                                A list means the first symptom, with the others offered as
+#                                alternatives worth asking about.
+#   time_units                   word -> days, for reading how long ("2 สัปดาห์" -> 14 days)
+#   less_than, more_than         words that turn a duration into "up to" or "more than"
+#   ambiguous                    phrases that can mean different symptoms: the patient is asked to
+#                                choose, and the phrase is never learned from the data
+
+fillers_start: [มีอาการ, อาการ, รู้สึกว่า, รู้สึก, มี, เป็น, ประวัติ, history of]
+fillers_end: [มากๆ, มาก, นิดหน่อย, เล็กน้อย, บ้าง, ค่ะ, ครับ]
+negations: [ไม่มี, ไม่ได้, ไม่]
+
+sensations:
+  pain: [ปวด]
+  sore: [เจ็บ]
+  burning: [แสบร้อน, แสบ]               # p.248
+  itch: [คัน]
+  swelling: [บวม]
+  numbness: [ชา]
+
+body_parts:
+  abdomen:
+    words: [ท้อง, พุง]
+    pain: abdominal_pain
+    burning: burning_abdominal_pain     # p.248
+  lower_abdomen:
+    words: [ท้องน้อย, หัวหน่าว]
+    pain: lower_abdominal_pain
+  epigastrium:
+    words: [ลิ้นปี่]
+    pain: epigastric_pain
+  head:
+    words: [ศีรษะ, หัว]
+    pain: headache
+  neck_or_throat:
+    words: [คอ]
+    pain: neck_pain                       # reviewer: ปวดคอ = pain at the neck
+    sore: sore_throat                     # reviewer: เจ็บคอ = pain inside the throat
+    burning: [heartburn, sore_throat]     # reviewer: แสบคอ leans to reflux; sore throat not ruled out
+  throat:
+    words: [ลำคอ, ในคอ, ในลำคอ]
+    pain: sore_throat
+    burning: [heartburn, sore_throat]     # reviewer
+  neck:
+    words: [ต้นคอ]
+    pain: neck_pain
+  chest:
+    words: [หน้าอก, อก]
+    pain: chest_pain
+    burning: heartburn
+  back:
+    words: [หลัง]
+    pain: back_pain
+  flank:
+    words: [เอว, บั้นเอว]
+    pain: flank_pain
+  ear:
+    words: [หู]
+    pain: ear_pain
+    itch: ear_itch
+  eye:
+    words: [ตา, ดวงตา]
+    pain: eye_pain
+    itch: itchy_eyes
+    burning: eye_irritation
+  nose:
+    words: [จมูก]
+    itch: nasal_itch
+  joint:
+    words: [ข้อ]
+    pain: joint_pain
+  knee:
+    words: [เข่า, หัวเข่า, ข้อเข่า]
+    pain: knee_pain
+  ankle:
+    words: [ข้อเท้า]
+    pain: ankle_pain
+  wrist:
+    words: [ข้อมือ]
+    pain: wrist_pain
+  elbow:
+    words: [ศอก, ข้อศอก]
+    pain: elbow_pain
+  shoulder:
+    words: [ไหล่, หัวไหล่, ข้อไหล่]
+    pain: shoulder_pain
+  hip:
+    words: [สะโพก, ข้อสะโพก]
+    pain: hip_pain
+  leg:
+    words: [ขา]
+    pain: leg_pain
+    swelling: leg_swelling
+    numbness: leg_numbness
+  skin:
+    words: [ผิว, ผิวหนัง]
+    itch: itch
+    burning: skin_burning
+  urination:
+    words: [ปัสสาวะ, ฉี่]
+    pain: dysuria
+    burning: dysuria
+  cheek:
+    words: [แก้ม]
+    pain: cheek_pain
+  tooth:
+    words: [ฟัน]
+    pain: toothache
+  around_mouth:
+    words: [รอบปาก]
+    numbness: perioral_numbness
+
+time_units:
+  ชั่วโมง: 0.0417
+  ชม: 0.0417
+  วัน: 1
+  สัปดาห์: 7
+  อาทิตย์: 7
+  เดือน: 30
+  ปี: 365
+  hours: 0.0417
+  hour: 0.0417
+  days: 1
+  day: 1
+  weeks: 7
+  week: 7
+  months: 30
+  month: 30
+  years: 365
+  year: 365
+
+less_than: [ไม่เกิน, ไม่ถึง, น้อยกว่า, ต่ำกว่า, ภายใน, less, within, under, up to]
+more_than: [มากกว่า, นานกว่า, เกิน, more, over, longer]
+
+ambiguous:
+  หายใจไม่สะดวก: [nasal_congestion, dyspnea]   # reviewer

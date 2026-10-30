@@ -1,0 +1,334 @@
+# Chapter 23 — Abdominal pain (ปวดท้อง)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 247–259. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 23
+title: {th: ปวดท้อง, en: Abdominal pain}
+chief_complaint: abdominal_pain
+also_entry: []
+status: draft
+
+definitions:                               # p.248
+  duration:
+    acute: "ปวดรุนแรงฉับพลันทันที หรือปวดน้อยกว่า 7 วัน"
+    subacute: "มากกว่า 7 วัน แต่น้อยกว่า 6 เดือน"
+    chronic: "ปวดคงที่ เป็นๆ หายๆ หรือค่อยๆ เพิ่มขึ้น อย่างน้อย 6 เดือน"
+  visceral_pain: "ระบุตำแหน่งไม่ชัด ปวดแนวกลางลำตัว ลิ้นปี่ = foregut, รอบสะดือ = midgut, ท้องน้อย = hindgut"
+  somatic_pain: "ระบุตำแหน่งได้ชัด ฉับพลันและรุนแรง ผู้ป่วยนอนนิ่ง"
+  referred_pain: "ปวดห่างจากอวัยวะที่มีพยาธิสภาพ เช่น ถุงน้ำดีอักเสบปวดร้าวไหล่ขวา"
+
+hpi:
+  abdominal_pain:
+    duration:
+      ask: "ปวดท้องมานานเท่าไหร่แล้ว"
+      unit: days
+      allow_unknown: true
+      categories:
+        acute: {below: 7}
+        subacute: {from: 7, to: 180}
+        chronic: {above: 180}
+      grey_zones:
+        - {from: 5, to: 10, both: [acute, subacute]}
+        - {from: 150, to: 210, both: [subacute, chronic]}
+    location:
+      ask: "ปวดตรงไหน"
+      multiple: true
+      allow_unknown: true
+      options: [ruq, epigastrium, luq, rlq, periumbilical, llq, suprapubic, diffuse]
+    onset:
+      ask: "ปวดขึ้นมาทันทีทันใด หรือค่อยๆ ปวด"
+      options: [sudden, subacute, gradual]       # p.250–251
+    character:
+      ask: "ปวดแบบไหน"
+      options: [colicky, biliary, burning, dull_aching, constant_severe, dermatomal_burning]
+    severity:
+      ask: "ปวดมากแค่ไหน ถ้าให้คะแนน 0–10"
+      unit: score
+      categories:
+        mild: {to: 3}
+        moderate: {from: 4, to: 6}
+        severe: {from: 7}
+    radiation:
+      ask: "ปวดร้าวไปที่ไหนไหม"
+      options: [right_shoulder, back, arm, none]
+    migration:
+      ask: "ตำแหน่งที่ปวดย้ายที่ไหม"
+      options: [periumbilical_to_rlq, none]
+    aggravating:
+      ask: "อะไรทำให้ปวดมากขึ้น"
+      multiple: true
+      options: [hunger, meals, fatty_food, spicy_food, movement, none]
+    relieving:
+      ask: "อะไรทำให้ปวดลดลง"
+      multiple: true
+      options: [leaning_forward, food_or_antacid, none]
+    menstrual_relation:
+      ask: "ปวดสัมพันธ์กับประจำเดือนไหม"
+      sex: female
+      options: [with_menses, mid_cycle, after_missed_period, none]
+  vomiting:
+    content:
+      ask: "อาเจียนออกมาเป็นอะไร"
+      options: [large_food, other]
+  diarrhea:
+    amount:  # same question as chapter 25
+      ask: "ถ่ายครั้งละมากๆ หรือกะปริบกะปรอย"
+      allow_unknown: true
+      options: [large, small_frequent]
+    blood_mucus:  # same question as chapter 25
+      ask: "มีมูกหรือเลือดปนไหม"
+      allow_unknown: true
+      options: [present, absent]
+  bloody_stool:
+    color:  # same question as chapter 24
+      ask: "อุจจาระเป็นสีอะไร ดำเหมือนยางมะตอย แดงคล้ำ หรือแดงสด"
+      allow_unknown: true
+      options: [black, maroon, fresh_red]
+
+steps:
+  - {id: life_threatening}  # p.255
+  - {id: intra_vs_extra_abdominal}  # p.255
+  - {id: location}  # p.257
+  - {id: duration}  # p.258
+  - {id: pathogenesis}          # colicky, inflammation, ischemia, tumor; p.258
+
+gates:
+  unstable:  # p.255
+    when: always
+    ask: [restlessness, cold_extremities, near_syncope, low_blood_pressure, drowsiness, confusion]
+    if_any_yes: urgent
+  severe_pain:  # p.255
+    when: always
+    ask: [severe_abdominal_pain, sudden_abdominal_pain]
+    if_any_yes: {prioritize: life_threatening}
+
+must_ask:
+  - when: {present: [epigastric_pain]}     # extra-abdominal cause that must not be missed; p.256
+    ask: [chest_pain, pain_radiating_arm, dyspnea]
+    rules_out: [acute_myocardial_infarction]
+  - when: {sex: female, age_between: [15, 49]}  # p.252
+    ask: [pain_after_missed_period, vaginal_discharge]
+    rules_out: [ruptured_ectopic_pregnancy, ectopic_pregnancy, pelvic_inflammatory_disease]
+
+tree_selection:
+  - {when: always, use: [life_threatening, extra_abdominal, history_based]}  # p.256
+  - {when: {abdominal_pain.location: ruq}, use: [ruq]}  # p.257
+  - {when: {abdominal_pain.location: epigastrium}, use: [epigastrium]}  # p.257
+  - {when: {abdominal_pain.location: luq}, use: [luq]}  # p.257
+  - {when: {abdominal_pain.location: rlq}, use: [rlq]}  # p.257
+  - {when: {abdominal_pain.location: periumbilical}, use: [periumbilical]}  # p.257
+  - {when: {abdominal_pain.location: llq}, use: [llq]}  # p.257
+  - {when: {abdominal_pain.location: suprapubic}, use: [suprapubic]}  # p.257
+  - {when: {abdominal_pain.location: diffuse}, use: [diffuse]}  # p.257
+  - {when: {abdominal_pain.location: unknown}, use: [ruq, epigastrium, luq, rlq, periumbilical, llq, suprapubic, diffuse]}
+
+branch_selection:
+  attribute: abdominal_pain.duration
+  map:
+    acute: [acute]
+    subacute: [acute, chronic]
+    chronic: [chronic]
+
+branch_hints: []
+
+trees:
+  life_threatening:                        # ภาพ 23-2, top box
+    intra_abdominal: [ruptured_aaa, aortic_dissection, acute_mesenteric_ischemia, severe_pancreatitis,
+                      ruptured_ectopic_pregnancy, perforated_viscus, ruptured_spleen, ruptured_esophagus,
+                      ruptured_diverticulitis]
+    extra_abdominal: [acute_myocardial_infarction, pneumothorax, pulmonary_embolism]
+  extra_abdominal:                         # ภาพ 23-2
+    heart: [myocarditis_pericarditis]
+    lungs: [pneumonia, empyema_thoracis]
+    metabolic: [diabetic_ketoacidosis]
+    toxic: [lead_poisoning]
+    neurologic: [postherpetic_neuralgia]
+    psychiatric: [psychiatric_disorder]
+  history_based:                           # named in the text, not in the flowchart (p.252)
+    gastrointestinal: [gastric_outlet_obstruction]
+    gynecologic: [endometriosis, ovulation_pain]
+  ruq:                                     # ตาราง 23-1
+    acute: [cholecystitis, cholangitis, gallstones, bile_duct_obstruction, liver_abscess, hepatitis,
+            renal_stone, acute_pyelonephritis]
+    chronic: [gallstones, hcc, cholangiocarcinoma, sphincter_of_oddi_dysfunction]
+  epigastrium:
+    acute: [pud, gerd, pancreatitis, cholecystitis, cholangitis]
+    chronic: [pud, functional_dyspepsia, gerd, gallstones, pancreatitis, pancreatic_cancer, chronic_mesenteric_ischemia]
+  luq:
+    acute: [pud, pancreatitis, splenic_abscess, splenic_infarction, ischemic_colitis]
+    chronic: [pud, functional_dyspepsia, pancreatitis, pancreatic_cancer]
+  rlq:
+    acute: [appendicitis, diverticulitis, colon_cancer, ectopic_pregnancy]
+    chronic: [colon_cancer, ibs, ibd, abdominal_wall_pain]
+  periumbilical:
+    acute: [gastroenteritis, enterocolitis, abdominal_aortic_aneurysm, appendicitis, intestinal_obstruction,
+            ileus, acute_mesenteric_ischemia]
+    chronic: [ibs, ibd, small_bowel_tumor, lymphoma, abdominal_wall_pain]
+  llq:
+    acute: [diverticulitis, renal_stone, ectopic_pregnancy]
+    chronic: [colon_cancer, ibs, ibd, abdominal_wall_pain]
+  suprapubic:
+    acute: [cystitis, pelvic_inflammatory_disease, diverticulitis, endometritis]
+    chronic: [bladder_cancer, rectal_cancer, abdominal_wall_pain]
+  diffuse:
+    acute: [peritonitis, gastroenteritis, ibs, ibd]
+    chronic: [ibs, ibd, tb_peritonitis]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  # pathogenesis (p.250–251, 258)
+  intestinal_obstruction:  # p.250, 251, 252
+    symptoms: [colicky_abdominal_pain, sudden_abdominal_pain, abdominal_distension, no_stool_no_flatus, vomiting]
+    signs: [visible_peristalsis]
+  ileus:  # p.252, 254
+    symptoms: [abdominal_distension, no_stool_no_flatus]
+    signs: [hypoactive_bowel_sounds]
+  renal_stone:  # p.251, 252
+    symptoms: [colicky_abdominal_pain, hematuria, urine_sediment]
+  bile_duct_obstruction:  # p.251, 252, 255
+    symptoms: [biliary_type_pain, jaundice, pale_stool]
+  gallstones:  # p.251, 252
+    symptoms: [biliary_type_pain, pain_after_fatty_food]
+  cholecystitis:  # p.249, 251, 254
+    symptoms: [biliary_type_pain, pain_radiating_right_shoulder, pain_after_fatty_food]
+    signs: [murphy_sign]
+  cholangitis:  # p.252
+    symptoms: [high_fever, chills, jaundice]
+  hepatitis:  # p.250, 252
+    symptoms: [jaundice]
+  liver_abscess:  # p.250, 254
+    symptoms: [fever]
+    signs: [positive_fist_test]
+  acute_pyelonephritis:  # p.252
+    symptoms: [high_fever, chills]
+  cystitis:  # p.252
+    symptoms: [dysuria, cloudy_urine]
+  pelvic_inflammatory_disease:  # p.252
+    symptoms: [vaginal_discharge]
+  pancreatitis:  # p.251, 252
+    symptoms: [pain_radiating_back, pain_relieved_leaning_forward, pain_after_fatty_food]
+  pud:  # p.251, 252
+    symptoms: [pain_worse_hungry, pain_relieved_by_food, pain_after_meals, pain_after_spicy_food, gradual_abdominal_pain]
+  gastric_outlet_obstruction:  # p.252, 254
+    symptoms: [vomiting_large_food]
+    signs: [succussion_splash]
+  gastroenteritis:  # p.252
+    symptoms: [diarrhea, voluminous_diarrhea, vomiting]
+  enterocolitis:  # p.252
+    symptoms: [small_frequent_stools, bloody_mucoid_stool]
+  appendicitis:  # p.249, 254
+    symptoms: [migrating_pain_rlq]
+    signs: [psoas_sign, obturator_sign, rovsing_sign]
+  peritonitis:  # p.251, 252, 253, 254
+    symptoms: [severe_constant_abdominal_pain, pain_worse_moving, fever]
+    signs: [guarding, rigidity, rebound_tenderness, absent_bowel_sounds]
+  acute_mesenteric_ischemia:  # p.251, 258
+    symptoms: [sudden_abdominal_pain, severe_constant_abdominal_pain]
+  perforated_viscus:  # p.250, 254
+    symptoms: [sudden_abdominal_pain, severe_abdominal_pain]
+    signs: [loss_of_liver_dullness]
+  ruptured_aaa:  # p.250, 254
+    symptoms: [sudden_abdominal_pain, severe_abdominal_pain]
+    signs: [abdominal_bruit]
+  aortic_dissection:  # p.250
+    symptoms: [sudden_abdominal_pain, severe_abdominal_pain]
+  ruptured_ectopic_pregnancy:  # p.252, 253
+    symptoms: [pain_after_missed_period, pallor]
+  ectopic_pregnancy:  # p.252
+    symptoms: [pain_after_missed_period]
+  endometriosis:  # p.252
+    symptoms: [pain_with_menses]
+  ovulation_pain:  # p.252
+    symptoms: [mid_cycle_pain]
+  colon_cancer:  # p.252, 255, 258
+    symptoms: [anorexia, weight_loss, pallor, bloody_stool, hematochezia, gradual_abdominal_pain]
+    signs: [rectal_mass]
+  ibd:  # p.252
+    symptoms: [anorexia, weight_loss, pallor, bloody_stool, bloody_mucoid_stool]
+  hcc:  # p.253, 254
+    symptoms: [pallor, gradual_abdominal_pain]
+    signs: [hepatomegaly, chronic_liver_disease_stigmata]
+  pancreatic_cancer:  # p.258
+    symptoms: [gradual_abdominal_pain]
+  small_bowel_tumor:  # p.253, 258
+    symptoms: [pallor, gradual_abdominal_pain]
+  tb_peritonitis:  # p.251
+    symptoms: [gradual_abdominal_pain]
+  acute_myocardial_infarction:  # p.256
+    symptoms: [pain_radiating_arm, chest_pain, dyspnea]
+  postherpetic_neuralgia:  # p.251
+    symptoms: [dermatomal_burning_pain]
+
+branch_findings: {}
+
+reviewer_findings:
+  pud: {symptoms: [burning_abdominal_pain]}
+  gerd: {symptoms: [burning_abdominal_pain]}
+  functional_dyspepsia: {symptoms: [burning_abdominal_pain]}
+
+history_clues:
+  - {findings: [diabetes], suggests: [diabetic_ketoacidosis, pancreatitis]}  # p.253
+  - {findings: [thalassemia], suggests: [gallstones]}  # p.253
+  - {findings: [abdominal_surgery], suggests: [intestinal_obstruction]}  # p.253
+  - {findings: [viral_hepatitis_history, past_jaundice], suggests: [hcc]}  # p.253
+  - {findings: [family_history_gi_cancer], suggests: [colon_cancer, pancreatic_cancer]}  # p.253
+  - {findings: [nsaid_use, gi_irritant_drug], suggests: [pud]}  # p.253
+  - {findings: [recent_trauma_surgery], suggests: [ruptured_spleen]}  # p.255
+  - {findings: [recent_shingles], suggests: [postherpetic_neuralgia]}  # p.251
+  - {findings: [lead_exposure], suggests: [lead_poisoning]}  # p.256
+  - {findings: [low_blood_pressure], suggests: [ruptured_ectopic_pregnancy, ruptured_aaa, ruptured_spleen, perforated_viscus]}  # p.253
+
+exam_clues:
+  - {sign: chronic_liver_disease_stigmata, suggests: [cirrhosis]}  # p.254
+  - {sign: left_supraclavicular_node, askable_as: lymph_node_swelling,
+     suggests: [gastric cancer, colon cancer, pancreatic cancer, liver cancer, gynecologic cancer]}  # p.254
+  - {sign: surgical_scar_or_incisional_hernia, suggests: [adhesion, incisional hernia]}  # p.254
+  - {sign: ascites, suggests: [ascites]}  # p.254, 255
+  - {sign: hypoactive_or_absent_bowel_sounds, suggests: [paralytic ileus, peritonitis]}  # p.254
+  - {sign: succussion_splash, suggests: [gastric outlet obstruction]}  # p.254
+  - {sign: abdominal_bruit, suggests: [aortic aneurysm, renal artery stenosis]}  # p.254
+  - {sign: guarding_tenderness_rigidity, suggests: [intra-abdominal inflammation]}  # p.254
+  - {sign: rebound_tenderness, suggests: [peritonitis]}  # p.254
+  - {sign: hepatomegaly, suggests: [liver cancer, leukemia]}  # p.254
+  - {sign: splenomegaly, suggests: [portal hypertension, leukemia, lymphoma, thalassemia]}  # p.254
+  - {sign: loss_of_liver_dullness, suggests: [perforated hollow viscus]}  # p.254
+  - {sign: murphy_sign, suggests: [acute cholecystitis]}  # p.254
+  - {sign: psoas_obturator_rovsing_sign, suggests: [acute appendicitis]}  # p.254
+  - {sign: positive_fist_test, suggests: [liver abscess]}  # p.254
+  - {sign: rectal_mass_or_shelf, suggests: [rectal or intra-abdominal tumor]}  # p.255
+  - {sign: pale_stool, askable_as: pale_stool, suggests: [bile duct obstruction, periampullary cancer]}  # p.255
+  - {sign: melena, askable_as: melena, suggests: [upper gastrointestinal bleeding]}  # p.255
+  - {sign: hematochezia, askable_as: hematochezia, suggests: [colorectal cancer, infective colitis]}  # p.255
+  - {sign: pallor, askable_as: pallor, suggests: [ruptured hepatoma, ruptured ectopic pregnancy, gastrointestinal bleeding]}  # p.253

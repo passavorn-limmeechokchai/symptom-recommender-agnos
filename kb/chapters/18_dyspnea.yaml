@@ -1,0 +1,238 @@
+# Chapter 18 — Dyspnea (หายใจลำบาก)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 189–198. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 18
+title: {th: หายใจลำบาก, en: Dyspnea}
+chief_complaint: dyspnea
+also_entry: []
+status: draft
+
+definitions:  # p.190
+  acute_dyspnea: "หายใจลำบากที่เกิดขึ้นภายในเป็นชั่วโมงถึงเป็นวัน"
+  chronic_dyspnea: "หายใจลำบากนานกว่า 4 สัปดาห์"
+  orthopnea: "เหนื่อยเมื่อนอนราบ มักบอกเป็นจำนวนหมอนที่ต้องหนุน"
+  paroxysmal_nocturnal_dyspnea: "ตื่นขึ้นมาหอบหลังหลับไปแล้ว 2–4 ชั่วโมง ต้องลุกนั่งหรือยืนจึงค่อยๆ ดีขึ้น"
+  trepopnea: "เหนื่อยเมื่อนอนตะแคงข้างใดข้างหนึ่ง"
+  platypnea: "เหนื่อยเมื่อนั่งหรือยืน ดีขึ้นเมื่อนอนราบ"
+
+hpi:
+  dyspnea:
+    onset:  # p.190, 194
+      ask: "เหนื่อยขึ้นมาทันทีหรือค่อยๆ เหนื่อย"
+      options: [sudden, gradual]
+    progression:  # p.193
+      ask: "เหนื่อยมากขึ้นเรื่อยๆ คงที่ หรือเป็นๆ หายๆ"
+      options: [worsening, stable, intermittent]
+    aggravating:  # p.190, 195
+      ask: "เหนื่อยมากขึ้นเวลาไหน"
+      multiple: true
+      options: [exertion, lying_flat, night, lying_on_side, sitting_up, bending_forward, none]
+    severity:
+      ask: "เหนื่อยมากแค่ไหน"
+      options: [mild, moderate, severe]
+    duration:  # p.190; subacute between the two: reviewer
+      ask: "เหนื่อยมานานกี่วันแล้ว"
+      unit: days
+      categories:
+        acute: {below: 7}
+        subacute: {from: 7, to: 28}
+        chronic: {above: 28}
+      grey_zones:
+        - {from: 5, to: 10, both: [acute, subacute]}
+        - {from: 21, to: 35, both: [subacute, chronic]}
+      allow_unknown: true
+
+steps:
+  - {id: organic_or_not}  # p.190
+  - {id: heart_lungs_others}  # p.191
+  - {id: heart_failure_cause}  # p.192
+  - {id: lung_anatomy}  # p.193
+  - {id: other_systems}  # p.195
+
+gates:
+  life_threatening:  # p.189, 194, 195; list: reviewer
+    when: always
+    ask: [severe_dyspnea, sudden_dyspnea, chest_pain, near_syncope, cold_extremities, low_blood_pressure,
+          kussmaul_breathing, drowsiness, confusion]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # red flags of an endobronchial tumor; p.193
+    ask: [heavy_smoking, hemoptysis, hoarseness, progressive_dyspnea, weight_loss]
+    red_flag_when: {present: [smoking], age_above: 45}
+    rules_out: [endobronchial_tumor, lung_tumor]
+  - when: {present: [sudden_dyspnea]}  # p.194; risk factors from ch.14 p.157
+    ask: [pleuritic_chest_pain, hemoptysis, unilateral_leg_swelling, bedridden, recent_trauma_surgery,
+          history_cancer, previous_dvt]
+    rules_out: [pulmonary_embolism]
+
+tree_selection:
+  - {when: always, use: [organic, non_organic]}  # ภาพ 18-1
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {present: [orthopnea]}, boost: organic.heart}  # p.191
+  - {when: {present: [paroxysmal_nocturnal_dyspnea]}, boost: organic.heart}  # p.191
+  - {when: {present: [cough]}, boost: organic.lungs}  # p.193
+  - {when: {present: [wheezing]}, boost: organic.lungs.airway}  # p.193
+  - {when: {dyspnea.progression: intermittent}, boost: organic.lungs.airway}  # p.193
+
+trees:  # ภาพ 18-1
+  organic:
+    heart:
+      myocardium: [ischemic_cardiomyopathy, dilated_cardiomyopathy, hypertrophic_cardiomyopathy,
+                   restrictive_cardiomyopathy]
+      endocardium: [valvular_heart_disease, congenital_shunt]
+      pericardium: [pericardial_effusion, constrictive_pericarditis]
+      arrhythmia: [tachyarrhythmia, bradyarrhythmia]
+      abnormal_loading: [hypertensive_heart_disease, renal_failure, pulmonary_hypertension]
+    lungs:
+      airway: [asthma, copd, endobronchial_tumor, foreign_body_aspiration]
+      parenchyma: [pneumonia, lung_tumor, interstitial_lung_disease]
+      pleura: [pleural_effusion, pneumothorax]
+      vascular: [pulmonary_embolism, pulmonary_hypertension]
+    others:
+      metabolic: [metabolic_acidosis]
+      endocrine: [hyperthyroidism, hypothyroidism]
+      hematologic: [anemia]
+      neurologic: [myasthenia_gravis, guillain_barre_syndrome]
+  non_organic: [anxiety_disorder, panic_disorder]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  ischemic_cardiomyopathy:  # left or both sides of the heart; p.191, 192
+    symptoms: [exertional_fatigue, orthopnea, paroxysmal_nocturnal_dyspnea, cough, edema, weight_gain]
+    signs: [fine_crepitations, cardiomegaly, s3_gallop, raised_jvp]
+  dilated_cardiomyopathy:  # p.191, 192
+    symptoms: [exertional_fatigue, orthopnea, paroxysmal_nocturnal_dyspnea, cough, edema, weight_gain]
+    signs: [fine_crepitations, cardiomegaly, s3_gallop]
+  hypertrophic_cardiomyopathy:  # p.192
+    symptoms: [exertional_fatigue]
+    signs: [systolic_murmur]
+  restrictive_cardiomyopathy:  # right side of the heart; p.191, 192
+    symptoms: [edema, abdominal_distension, weight_gain]
+    signs: [raised_jvp, hepatomegaly]
+  valvular_heart_disease:  # p.192
+    symptoms: [chest_pain, fatigue, dizziness, palpitation, fever]
+    signs: [murmur, thrill]
+  congenital_shunt:  # p.192
+    symptoms: [platypnea, palpitation, fatigue]
+    signs: [murmur]
+  pericardial_effusion:  # p.192
+    symptoms: [edema, abdominal_distension]
+    signs: [distant_heart_sounds, pulsus_paradoxus, raised_jvp]
+  constrictive_pericarditis:  # p.192
+    symptoms: [edema, abdominal_distension]
+    signs: [pericardial_knock, raised_jvp]
+  tachyarrhythmia:  # p.192
+    symptoms: [palpitation, orthopnea]
+  bradyarrhythmia:  # p.192
+    symptoms: [near_syncope, fatigue]
+  hypertensive_heart_disease:  # p.193
+    symptoms: [exertional_fatigue, orthopnea]
+  renal_failure:  # p.193
+    symptoms: [edema, decreased_urine]
+  pulmonary_hypertension:  # right side of the heart; p.194, 195
+    symptoms: [exertional_fatigue, edema]
+    signs: [parasternal_heave, loud_p2]
+  asthma:  # p.193
+    symptoms: [wheezing, cough]
+    signs: [prolonged_expiration, rhonchi_or_wheezing]
+  copd:  # p.193
+    symptoms: [wheezing, cough, sputum]
+    signs: [increased_ap_diameter, prolonged_expiration]
+  endobronchial_tumor:  # p.193
+    symptoms: [hemoptysis, hoarseness, progressive_dyspnea, weight_loss, wheezing]
+  foreign_body_aspiration:  # p.193
+    symptoms: [wheezing, cough]
+  pneumonia:  # p.193
+    symptoms: [high_fever, cough, sputum, pleuritic_chest_pain]
+    signs: [crepitation, consolidation]
+  lung_tumor:  # p.194
+    symptoms: [hemoptysis, hoarseness, progressive_dyspnea, weight_loss, lymph_node_swelling]
+  interstitial_lung_disease:  # p.194
+    symptoms: [exertional_fatigue, dry_cough]
+    signs: [fine_crepitations, clubbing]
+  pleural_effusion:  # p.194
+    symptoms: [pleuritic_chest_pain]
+    signs: [dullness_on_percussion, decreased_breath_sounds]
+  pneumothorax:  # p.194
+    symptoms: [sudden_dyspnea, cough, pleuritic_chest_pain]
+    signs: [decreased_breath_sounds, hyperresonance, tracheal_shift]
+  pulmonary_embolism:  # p.194
+    symptoms: [sudden_dyspnea, hemoptysis, pleuritic_chest_pain]
+    signs: [tachypnea, hypoxemia]
+  metabolic_acidosis:  # p.195
+    symptoms: [kussmaul_breathing]
+  hyperthyroidism:  # p.195
+    symptoms: [palpitation, diaphoresis, irritability, weight_loss]
+  hypothyroidism:  # p.195
+    symptoms: [fatigue, exertional_fatigue, constipation, periorbital_edema, face_swelling, generalized_edema,
+               dry_skin, depressed_mood, forgetfulness, weight_gain]
+  anemia:  # p.195
+    symptoms: [fatigue, exertional_fatigue, pallor]
+  myasthenia_gravis:  # p.195
+    symptoms: [dyspnea_bending_forward, limb_weakness]
+  guillain_barre_syndrome:  # p.195
+    symptoms: [dyspnea_bending_forward, limb_weakness]
+
+branch_findings:
+  organic.lungs:  # p.193
+    symptoms: [cough, sputum, wheezing, trepopnea, pleuritic_chest_pain]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [smoking, diabetes, history_hypertension, dyslipidemia, overweight, family_history_heart_disease],
+     suggests: [ischemic_cardiomyopathy]}  # p.192
+  - {findings: [tb_contact, connective_tissue_disease, history_cancer, chest_trauma],
+     suggests: [pericardial_effusion, constrictive_pericarditis]}  # p.192
+  - {findings: [history_hypertension], suggests: [hypertensive_heart_disease]}  # p.193
+  - {findings: [kidney_disease], suggests: [renal_failure]}  # p.193
+  - {findings: [history_asthma, trigger_exposure], suggests: [asthma]}  # p.193
+  - {findings: [history_copd, smoking], suggests: [copd]}  # p.193
+  - {findings: [heavy_smoking], suggests: [endobronchial_tumor, lung_tumor]}  # p.193
+  - {findings: [choking_history], suggests: [foreign_body_aspiration]}  # p.193
+  - {findings: [connective_tissue_disease], suggests: [interstitial_lung_disease]}  # p.194
+  - {findings: [tb_contact], suggests: [pleural_effusion]}  # p.194
+  - {findings: [diabetes, alcohol], suggests: [metabolic_acidosis]}  # p.195
+
+exam_clues:
+  - {sign: raised_jvp_hepatomegaly_edema, suggests: [right-sided heart failure]}  # p.191
+  - {sign: fine_crepitations_s3_cardiomegaly, suggests: [left-sided heart failure]}  # p.191
+  - {sign: pulsus_paradoxus, suggests: [cardiac tamponade]}  # p.192
+  - {sign: clubbing, suggests: [interstitial lung disease]}  # p.194

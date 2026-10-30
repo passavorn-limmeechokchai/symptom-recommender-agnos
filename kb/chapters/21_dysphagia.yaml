@@ -1,0 +1,181 @@
+# Chapter 21 — Dysphagia (กลืนลำบาก)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 229–238. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 21
+title: {th: กลืนลำบาก, en: Dysphagia}
+chief_complaint: dysphagia
+also_entry: [odynophagia]                  # odynophagia: reviewer
+status: draft
+
+definitions:  # p.230
+  dysphagia: "รู้สึกกลืนไม่ได้ กลืนลำบาก หรืออาหารติดค้างระหว่างทางลงหลอดอาหาร"
+  oropharyngeal_dysphagia: "ติดตั้งแต่เริ่มกลืน อาหารผ่านคอหอยเข้าหลอดอาหารส่วนบนไม่ได้"
+  esophageal_dysphagia: "กลืนลงไปได้ แต่อาหารค้างหรือเคลื่อนช้าในหลอดอาหาร รู้สึกติดหลังกลืนไปสักพัก"
+  odynophagia: "เจ็บในหลอดอาหารขณะกลืน"
+  heartburn: "แสบร้อนบริเวณลิ้นปี่ ยอดอก หรือลำคอ มักหลังอาหารราว 1 ชั่วโมง อาจมีรสเปรี้ยวหรือขมในปาก"
+  regurgitation: "น้ำย่อยหรืออาหารไหลย้อนขึ้นมาโดยไม่คลื่นไส้ มักเป็นตอนเอนตัวหรือกลางคืน"
+  globus: "จุกเหมือนมีก้อนที่คอโดยไม่สัมพันธ์กับการกลืน; ไม่ใช้คำนี้ถ้ามีกลืนลำบากหรือกลืนเจ็บ"
+
+hpi:
+  dysphagia:
+    location:  # p.231
+      ask: "รู้สึกอาหารติดตรงไหน ที่คอ หรือที่กลางอก/ลิ้นปี่"
+      allow_unknown: true
+      options: [throat, chest]
+    timing:  # p.231
+      ask: "ติดทันทีที่เริ่มกลืน หรือกลืนลงไปแล้วสักพักจึงติด"
+      allow_unknown: true
+      options: [at_start, after_swallow]
+    food_type:  # p.231, 234
+      ask: "กลืนอะไรลำบาก ของแข็งก่อน หรือทั้งของแข็งและของเหลวตั้งแต่แรก"
+      allow_unknown: true
+      options: [solids_first, solids_and_liquids]
+    course:  # p.231, 232
+      ask: "เป็นๆ หายๆ หรือเป็นมากขึ้นเรื่อยๆ"
+      allow_unknown: true
+      options: [intermittent, progressive]
+
+steps:
+  - {id: oropharyngeal_or_esophageal}  # p.233
+  - {id: neuromuscular_or_structural}  # p.234
+  - {id: food_type_and_course}  # p.234, 235
+  - {id: endoscopy_first}  # p.235
+
+gates:
+  cannot_swallow_or_bleeding:  # p.231, 232; urgency: reviewer
+    when: always
+    ask: [cannot_swallow_saliva, hematemesis]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # alarm features of cancer; p.230, 232, 235
+    ask: [weight_loss, anorexia, hematemesis, vomiting]
+    red_flag_when: {age_above: 50}
+    rules_out: [esophageal_cancer, head_neck_cancer]
+  - when: {present: [odynophagia]}  # p.232, 235
+    ask: [pill_esophagitis_drug, nsaid_use, caustic_ingestion]
+    rules_out: [drug_induced_esophagitis, caustic_stricture]
+
+tree_selection:
+  - {when: {dysphagia.location: throat}, use: [oropharyngeal]}  # p.231
+  - {when: {dysphagia.timing: at_start}, use: [oropharyngeal]}  # p.231
+  - {when: {dysphagia.location: chest}, use: [esophageal]}  # p.231
+  - {when: {dysphagia.timing: after_swallow}, use: [esophageal]}  # p.231
+  - {when: {dysphagia.location: unknown, dysphagia.timing: unknown}, use: [oropharyngeal, esophageal]}
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {dysphagia.food_type: solids_first}, boost: esophageal.structural}  # p.234
+  - {when: {dysphagia.food_type: solids_and_liquids}, boost: esophageal.neuromuscular}  # p.235
+  - {when: {dysphagia.course: intermittent}, boost: esophageal.structural.intermittent}  # p.234
+  - {when: {dysphagia.course: intermittent}, boost: esophageal.neuromuscular.intermittent}  # p.235
+  - {when: {dysphagia.course: progressive}, boost: esophageal.structural.progressive}  # p.235
+  - {when: {dysphagia.course: progressive}, boost: esophageal.neuromuscular.progressive}  # p.235
+  - {when: {present: [heartburn]}, boost: esophageal.structural.progressive.heartburn_no_weight_loss}  # p.235
+  - {when: {age_above: 50}, boost: esophageal.structural.progressive.age_over_50_or_weight_loss}  # p.235
+  - {when: {present: [weight_loss]}, boost: esophageal.structural.progressive.age_over_50_or_weight_loss}  # p.235
+
+trees:  # ภาพ 21-1
+  oropharyngeal:
+    neuromuscular: [stroke, parkinsons_disease, myasthenia_gravis, other_neuromuscular_disease]
+    structural: [head_neck_cancer, post_head_neck_treatment, pharyngeal_neck_infection, thyroid_nodule,
+                 cervical_osteophyte, cervical_web, zenker_diverticulum]
+  esophageal:
+    structural:
+      intermittent: [esophageal_ring_web, drug_induced_esophagitis, esophageal_foreign_body,
+                     eosinophilic_esophagitis]
+      progressive:
+        heartburn_no_weight_loss: [peptic_stricture, caustic_stricture, esophageal_diverticulum]
+        age_over_50_or_weight_loss: [esophageal_cancer]
+    neuromuscular:
+      intermittent: [distal_esophageal_spasm, jackhammer_esophagus, hypertensive_les]
+      progressive: [achalasia, scleroderma_esophagus]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  stroke:  # p.234
+    symptoms: [dizziness, dysarthria, hemiparesis]
+  parkinsons_disease:  # p.234
+    symptoms: [resting_tremor, slow_movement]
+  head_neck_cancer:  # p.232, 234
+    symptoms: [weight_loss, hoarseness, lymph_node_swelling]
+  thyroid_nodule:  # p.232, 234
+    symptoms: [neck_lump]
+  esophageal_ring_web:  # p.234, 235
+    symptoms: [food_stuck_after_big_bite]
+  drug_induced_esophagitis:  # p.232, 235
+    symptoms: [odynophagia]
+  eosinophilic_esophagitis:  # p.232, 235
+    symptoms: [odynophagia, food_stuck_after_big_bite]
+  peptic_stricture:  # p.235
+    symptoms: [heartburn]
+  esophageal_diverticulum:  # p.235
+    symptoms: [food_regurgitation]
+  esophageal_cancer:  # p.232, 235
+    symptoms: [weight_loss, anorexia, nausea, vomiting, hematemesis]
+  distal_esophageal_spasm:  # p.235
+    symptoms: [chest_pain, pain_with_hot_or_cold_drinks]
+  jackhammer_esophagus:  # p.235
+    symptoms: [chest_pain]
+  hypertensive_les:  # p.235
+    symptoms: [chest_pain]
+  achalasia:  # p.232, 235
+    symptoms: [heartburn, food_regurgitation, weight_loss, vomiting]
+  scleroderma_esophagus:  # p.232, 235
+    symptoms: [heartburn, sour_regurgitation]
+
+branch_findings:
+  oropharyngeal:  # p.231
+    symptoms: [choking_on_swallowing, nasal_regurgitation, drooling, dysarthria, hoarseness, hyponasal_voice,
+               weight_loss]
+  esophageal:  # p.231
+    symptoms: [heartburn, food_regurgitation]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [stroke_history], suggests: [stroke]}  # p.232
+  - {findings: [connective_tissue_disease], suggests: [scleroderma_esophagus]}  # p.232, 235
+  - {findings: [head_neck_surgery_or_radiation], suggests: [post_head_neck_treatment]}  # p.232
+  - {findings: [pill_esophagitis_drug, nsaid_use], suggests: [drug_induced_esophagitis]}  # p.232, 235
+  - {findings: [caustic_ingestion], suggests: [caustic_stricture]}  # p.235
+
+exam_clues:
+  - {sign: cervical_lymph_node, suggests: [nasopharyngeal, oral or pharyngeal cancer]}  # p.232
+  - {sign: right_supraclavicular_lymph_node, suggests: [esophageal or mediastinal cancer]}  # p.232
+  - {sign: neck_mass_or_thyroid_mass, suggests: [extrinsic compression], askable_as: neck_lump}  # p.232
+  - {sign: cranial_nerve_or_motor_deficit, suggests: [neuromuscular dysphagia]}  # p.233

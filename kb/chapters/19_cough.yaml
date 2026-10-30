@@ -1,0 +1,316 @@
+# Chapter 19 — Cough and hemoptysis (ไอ และไอเป็นเลือด)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 199–213. `# p.N` = book page.
+# `signs` need a physical exam: kept for the exam-plan layer, never asked to patients.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 19
+title: {th: ไอ และไอเป็นเลือด, en: Cough and hemoptysis}
+chief_complaint: cough
+also_entry: [hemoptysis, sputum]           # a patient may start from "ไอเป็นเลือด"; sputum: reviewer
+status: draft
+
+definitions:                               # p.200
+  duration:
+    acute: "น้อยกว่า 3 สัปดาห์"
+    subacute: "3–8 สัปดาห์"
+    chronic: "มากกว่า 8 สัปดาห์"
+  hemoptysis: "ไอแล้วมีเลือดออกจากทางเดินหายใจส่วนล่าง"
+  massive_hemoptysis: "เลือดออกมากกว่า 200 มล. ต่อการไอหนึ่งครั้ง หรือมากกว่า 600 มล. ต่อวัน"
+  pseudohemoptysis: "ไอแล้วมีเลือดปน แต่เลือดมาจากทางเดินอาหาร โพรงจมูก หรือลำคอ"
+
+hpi:
+  cough:
+    duration:
+      ask: "ไอมานานเท่าไหร่แล้ว"
+      unit: weeks
+      allow_unknown: true
+      categories:
+        acute: {below: 3}
+        subacute: {from: 3, to: 8}
+        chronic: {above: 8}
+      grey_zones:
+        - {from: 2, to: 4, both: [acute, subacute]}
+        - {from: 6, to: 10, both: [subacute, chronic]}
+    character:
+      ask: "ไอแห้งๆ หรือมีเสมหะ"
+      options: [dry, productive]
+  sputum:
+    color:
+      ask: "เสมหะสีอะไร"
+      options: [white_clear, green_yellow]
+    odor:
+      ask: "เสมหะมีกลิ่นเหม็นไหม"
+      options: [foul, none]
+    amount:
+      ask: "เสมหะออกมากไหม"
+      options: [large, small]
+  dyspnea:  # same questions as chapter 18
+    onset:
+      ask: "เหนื่อยขึ้นมาทันทีหรือค่อยๆ เหนื่อย"
+      options: [sudden, gradual]
+    progression:
+      ask: "เหนื่อยมากขึ้นเรื่อยๆ คงที่ หรือเป็นๆ หายๆ"
+      options: [worsening, stable, intermittent]
+    aggravating:
+      ask: "เหนื่อยมากขึ้นเวลาไหน"
+      multiple: true
+      options: [exertion, lying_flat, night, lying_on_side, sitting_up, bending_forward, none]
+    severity:
+      ask: "เหนื่อยมากแค่ไหน"
+      options: [mild, moderate, severe]
+  chest_pain:
+    aggravating:  # same question as chapter 14
+      ask: "เจ็บมากขึ้นเวลาทำอะไร"
+      multiple: true
+      options: [exertion, deep_breath, lying_flat, touch, meals, none]
+  smoking:
+    amount:
+      ask: "สูบบุหรี่วันละกี่มวน มานานกี่ปี"
+      unit: pack_years
+      categories:
+        over_20_pack_years: {above: 20}
+    type:
+      ask: "สูบบุหรี่มวนหรือบุหรี่ไฟฟ้า"
+      options: [cigarette, e_cigarette]
+  hemoptysis:
+    amount:
+      ask: "ไอเป็นเลือดออกมาประมาณเท่าไหร่"
+      unit: ml
+      allow_unknown: true
+      categories:
+        massive: {per_episode_above: 200, per_day_above: 600}
+    character:
+      ask: "เลือดที่ออกมาลักษณะอย่างไร"
+      options: [frothy_bright_red, clots, coffee_ground, dark_brown]
+
+steps:
+  - {id: duration}  # p.200
+  - {id: gate}  # p.200
+  - {id: life_threatening_vs_not}  # p.200
+  - {id: system_and_anatomy}          # lungs (airway, parenchyma, pleura, vascular) / heart / others; p.201
+  - {id: infection_vs_noninfection}  # p.202
+  - {id: chronic_red_flags}  # p.204
+  - {id: confirm_hemoptysis}  # p.208
+  - {id: hemoptysis_amount}  # p.209
+
+gates:
+  acute_life_threatening:  # p.200
+    when: {cough.duration: acute}
+    ask: [dyspnea, chest_pain, hemoptysis, near_syncope, cold_extremities, low_blood_pressure]
+    if_any_yes: {prioritize: acute.potentially_life_threatening}
+  massive_hemoptysis:  # p.209
+    when: {present: [hemoptysis]}
+    ask: [massive_hemoptysis]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {cough.duration: chronic}              # red flag signs; p.204
+    ask: [recurrent_lung_infections, heavy_smoking, hemoptysis, hoarseness, progressive_dyspnea, weight_loss]
+    red_flag_when: {present: [smoking], age_above: 45}
+    rules_out: [lung_tumor, endobronchial_tumor, endobronchial_tb]
+
+tree_selection:
+  - {when: {cough.duration: acute}, use: [acute]}  # p.200
+  - {when: {cough.duration: subacute}, use: [subacute, acute, chronic]}  # p.204
+  - {when: {cough.duration: chronic}, use: [chronic]}  # p.204
+  - {when: {present: [hemoptysis]}, use: [hemoptysis]}  # p.212
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {present: [fever]}, boost: acute.non_life_threatening.infection}  # p.202
+  - {when: {cough.duration: subacute, present: [recent_respiratory_infection]}, boost: subacute.post_infection}  # p.204
+  - {when: {cough.duration: subacute, absent: [recent_respiratory_infection]}, boost: chronic}  # p.204
+
+trees:
+  acute:                                   # ภาพ 19-1
+    potentially_life_threatening:
+      lungs:
+        airway: [asthma_exacerbation, copd_exacerbation]
+        parenchyma: [severe_pneumonia]
+        pleura: [pneumothorax]
+        vascular: [pulmonary_embolism]
+      heart: [heart_failure]
+    non_life_threatening:
+      infection:
+        upper_respiratory: [acute_rhinitis, pharyngitis, common_cold]
+        lower_respiratory: [bronchitis, bronchiectasis, pneumonia]
+      non_infection:
+        airway: [asthma, copd, allergic_rhinitis]
+        others: [drug_induced_cough, gerd, irritant_inhalation]
+  subacute:
+    post_infection: [post_infectious_cough]
+  chronic:                                 # ภาพ 19-2
+    lungs:
+      airway:
+        upper: [chronic_sinusitis, upper_airway_cough_syndrome]
+        lower: [asthma, copd, bronchiectasis, endobronchial_tb, endobronchial_tumor, naeb, foreign_body_aspiration]
+      parenchyma:
+        chronic_infection: [tuberculosis, ntm_infection, nocardiosis, fungal_pneumonia]
+        non_infection: [emphysema, interstitial_lung_disease, lung_tumor]
+      pleura: [pleural_effusion, pleural_mass]
+      vascular: [pulmonary_hypertension]
+    heart: [heart_failure]
+    others: [drug_induced_cough, gerd, irritant_inhalation]
+  hemoptysis:                              # ภาพ 19-3, ตาราง 19-3
+    lungs:
+      airway: [bronchiectasis, copd, endobronchial_tumor, foreign_body_aspiration]
+      parenchyma:
+        infection: [pneumonia, lung_abscess, tuberculosis, fungal_pneumonia]
+        tumor: [lung_tumor]
+        vasculitis: [pulmonary_vasculitis]
+        injury: [chest_injury]
+      vascular: [pulmonary_embolism, pulmonary_avm]
+    heart: [heart_failure, mitral_stenosis]
+    others: [coagulopathy, platelet_defect, drug_induced_bleeding, pulmonary_endometriosis]
+
+scores: {}
+
+confirm:
+  hemoptysis:  # p.208, ตาราง 19-2
+    supports: [dyspnea, history_asthma, history_copd]
+    against: [nausea, vomiting, history_gi_liver_disease]
+    hpi:
+      hemoptysis.character:
+        supports: [frothy_bright_red, clots]
+        against: [coffee_ground, dark_brown]
+    if_against: {switch_chief_complaint: hematemesis}
+
+findings:
+  asthma_exacerbation:  # p.201
+    symptoms: [dyspnea]
+    signs: [wheezing, expiratory_rhonchi, decreased_breath_sounds, distant_heart_sounds]
+  copd_exacerbation:  # p.201
+    symptoms: [dyspnea]
+    signs: [wheezing, expiratory_rhonchi]
+  severe_pneumonia:  # p.202
+    symptoms: [high_fever, dyspnea, pleuritic_chest_pain]
+    signs: [crepitation, consolidation]
+  pneumothorax:  # p.202
+    symptoms: [sudden_dyspnea, pleuritic_chest_pain]
+    signs: [decreased_breath_sounds, decreased_vocal_resonance, hyperresonance, tracheal_shift]
+  pulmonary_embolism:  # p.202, 210
+    symptoms: [sudden_dyspnea, hemoptysis, leg_swelling, leg_pain]
+    signs: [tachypnea, desaturation]
+  heart_failure:  # p.202
+    symptoms: [orthopnea, paroxysmal_nocturnal_dyspnea]
+    signs: [bilateral_fine_crepitation, cardiomegaly, s3_gallop]
+  allergic_rhinitis:  # p.203
+    symptoms: [nasal_congestion, rhinorrhea, itchy_eyes]
+  gerd:  # p.206
+    symptoms: [heartburn, sour_regurgitation, dysphagia, odynophagia, hoarseness]
+  chronic_sinusitis:  # p.204
+    symptoms: [nasal_congestion, purulent_rhinorrhea, halitosis, headache, cheek_pain]
+    signs: [paranasal_sinus_tenderness, postnasal_drip]
+  upper_airway_cough_syndrome:  # p.205
+    symptoms: [nasal_itch, sneezing, nasal_congestion, postnasal_drip, throat_clearing]
+  asthma:  # p.205
+    symptoms: [dry_cough, white_sputum, dyspnea]
+    signs: [expiratory_rhonchi, wheezing]
+  copd:  # p.205, 209
+    symptoms: [dry_cough, white_sputum, dyspnea, hemoptysis]
+    signs: [expiratory_rhonchi, wheezing]
+  bronchiectasis:  # p.205, 209
+    symptoms: [purulent_sputum, hemoptysis]
+    signs: [crepitation, rhonchi, wheezing, inspiratory_squeaks, clubbing]
+  endobronchial_tumor:  # p.205, 209
+    symptoms: [fever, weight_loss, copious_sputum, hemoptysis]
+    signs: [localized_lower_airway_obstruction]
+  foreign_body_aspiration:  # p.205, 209
+    symptoms: [hemoptysis]
+    signs: [localized_lower_airway_obstruction]
+  tuberculosis:  # p.205, 210, 212
+    symptoms: [low_grade_fever, weight_loss, night_sweats, anorexia, myalgia, hemoptysis, lymph_node_swelling]
+    signs: [cachexia, consolidation]
+  interstitial_lung_disease:  # p.206
+    symptoms: [dry_cough, exertional_fatigue]
+    signs: [late_inspiratory_crepitation, connective_tissue_disease_signs]
+  lung_tumor:  # p.204, 206
+    symptoms: [hemoptysis, hoarseness, progressive_dyspnea, weight_loss, lymph_node_swelling]
+    signs: [consolidation, distant_metastasis]
+  pleural_effusion:  # p.206
+    symptoms: [pleuritic_chest_pain]
+    signs: [decreased_vocal_resonance, dullness_on_percussion, decreased_breath_sounds]
+  pulmonary_hypertension:  # p.206
+    symptoms: [exertional_fatigue, edema]
+    signs: [right_heart_failure_signs]
+  pneumonia:  # p.210
+    symptoms: [high_fever, sputum, dyspnea]
+    signs: [crepitation, consolidation]
+  lung_abscess:  # p.210
+    symptoms: [foul_sputum, low_grade_fever, dyspnea, pleuritic_chest_pain]
+  pulmonary_avm:  # p.210
+    symptoms: [epistaxis]
+    signs: [mucocutaneous_telangiectasia]
+
+branch_findings:
+  acute.non_life_threatening.infection:  # p.202
+    symptoms: [fever, chills, myalgia]
+  acute.non_life_threatening.infection.upper_respiratory:  # p.202
+    symptoms: [nasal_congestion, rhinorrhea, sore_throat]
+    signs: [nasal_mucosa_swelling, pharyngeal_erythema]
+  acute.non_life_threatening.infection.lower_respiratory:  # p.203
+    symptoms: [sputum, purulent_sputum, dyspnea]
+    signs: [fine_crepitation, coarse_crepitation]
+  chronic.lungs.parenchyma.chronic_infection:  # p.205
+    symptoms: [fever, dyspnea]
+    signs: [crepitation, consolidation]
+  hemoptysis.lungs.parenchyma.infection:  # p.210
+    symptoms: [fever, dyspnea]
+    signs: [crepitation, consolidation]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [history_asthma], suggests: [asthma_exacerbation, asthma]}  # p.201
+  - {findings: [history_copd, smoking], suggests: [copd_exacerbation, copd]}  # p.201
+  - {findings: [trigger_exposure], suggests: [asthma_exacerbation, asthma, allergic_rhinitis]}  # p.201
+  - {findings: [ace_inhibitor], suggests: [drug_induced_cough]}  # p.203
+  - {findings: [toxic_inhalation, smoking, e_cigarette], suggests: [irritant_inhalation]}  # p.203, 206
+  - {findings: [recent_respiratory_infection], suggests: [post_infectious_cough]}  # p.204
+  - {findings: [history_allergy], suggests: [chronic_sinusitis, upper_airway_cough_syndrome]}  # p.204
+  - {findings: [smoking], suggests: [emphysema, lung_tumor]}  # p.212
+  - {findings: [immunocompromised, on_chemotherapy], suggests: [tuberculosis, fungal_pneumonia]}  # p.205
+  - {findings: [corticosteroid_use], suggests: [nocardiosis]}  # p.205
+  - {findings: [diabetes, hiv_infection], suggests: [fungal_pneumonia]}  # p.205
+  - {findings: [hiv_infection], suggests: [tuberculosis]}  # p.205
+  - {findings: [tb_contact], suggests: [tuberculosis, endobronchial_tb]}  # p.212
+  - {findings: [connective_tissue_disease], suggests: [interstitial_lung_disease, pulmonary_vasculitis]}  # p.206, 210
+  - {findings: [alcohol, smoking, overweight, lying_after_meals], suggests: [gerd]}  # p.206
+  - {findings: [recurrent_lung_infections], suggests: [bronchiectasis]}  # p.209
+  - {findings: [choking_history], suggests: [foreign_body_aspiration, lung_abscess]}  # p.209, 210
+  - {findings: [recent_trauma_surgery], suggests: [chest_injury]}  # p.211
+  - {findings: [history_heart_disease], suggests: [heart_failure, mitral_stenosis]}  # p.211
+  - {findings: [antithrombotic_use], suggests: [drug_induced_bleeding]}  # p.211
+  - {findings: [easy_bleeding], suggests: [coagulopathy, platelet_defect]}  # p.211
+
+exam_clues: []

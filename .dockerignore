@@ -1,0 +1,12 @@
+# Allowlist: private CSV, model artifacts and evaluation cases never enter the build context.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!README.md
+!src/
+!src/**
+!kb/
+!kb/**
+**/__pycache__/
+**/*.pyc

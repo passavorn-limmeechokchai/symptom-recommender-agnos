@@ -1,0 +1,255 @@
+# Chapter 3 — Fever (ไข้)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 19–34. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 3
+title: {th: ไข้, en: Fever}
+chief_complaint: fever
+also_entry: []
+status: draft
+
+definitions:
+  fever: "อุณหภูมิ ≥ 37.5 °C"
+  duration:                                # p.24
+    acute: "น้อยกว่า 1–2 สัปดาห์"
+    subacute: "ระหว่าง acute กับ prolonged"
+    prolonged: "มากกว่า 3 สัปดาห์"
+  fever_of_unknown_origin: "ไข้ไม่ทราบสาเหตุ: ไข้ > 38.3 °C นานกว่า 3 สัปดาห์ และตรวจหาสาเหตุแล้วยังไม่พบ"   # p.21
+
+hpi:
+  fever:
+    duration:
+      ask: "เป็นไข้มากี่วันแล้ว"
+      unit: days
+      allow_unknown: true
+      categories:                          # p.24; "1–2 weeks" read as 14 days
+        acute: {below: 14}
+        subacute: {from: 14, to: 21}
+        prolonged: {above: 21}
+      grey_zones:
+        - {from: 7, to: 14, both: [acute, subacute]}
+        - {from: 18, to: 24, both: [subacute, prolonged]}
+    temperature:
+      ask: "วัดไข้ได้กี่องศา"
+      unit: celsius
+      allow_unknown: true                  # unknown -> fever not confirmed (p.23)
+      categories:
+        low_grade: {from: 37.5, to: 38.4}
+        moderate: {from: 38.5, to: 39.4}
+        high: {from: 39.5}
+  vomiting:
+    character:  # p.26
+      ask: "อาเจียนพุ่งไหม"
+      options: [projectile, normal]
+
+steps:
+  - {id: confirm_fever}  # p.23
+  - {id: gate}  # p.23
+  - {id: duration}  # p.23
+  - {id: infection_vs_noninfection}  # p.24
+  - {id: systemic_vs_localized}  # p.24
+  - {id: exposures}  # p.30
+
+gates:
+  sepsis_or_febrile_neutropenia:  # p.24
+    when: always
+    ask: [confusion, drowsiness, severe_dyspnea, near_syncope, cold_extremities, low_blood_pressure,
+          decreased_urine, on_chemotherapy]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {present: [headache]}  # p.26
+    ask: [neck_stiffness, projectile_vomiting, drowsiness, confusion]
+    rules_out: [meningitis, encephalitis]
+
+tree_selection:
+  - {when: always, use: [fever]}
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {fever.duration: acute}, boost: fever.infection}  # p.22
+  - {when: {fever.duration: [subacute, prolonged]}, boost: fever.non_infection}  # p.22
+  - {when: {no_symptoms_of: fever.infection.localized}, boost: fever.infection.systemic}  # p.25
+
+trees:
+  fever:                                   # ภาพ 3-1, ตาราง 3-2
+    infection:
+      systemic:
+        virus: [dengue, chikungunya, acute_hiv, infectious_mononucleosis]
+        bacteria: [enteric_fever, melioidosis, primary_bacteremia, scrub_typhus, murine_typhus, leptospirosis]
+        parasite: [malaria]
+      localized:
+        central_nervous_system: [meningitis, encephalitis]
+        upper_respiratory: [pharyngitis, sinusitis, otitis_media]
+        lower_respiratory: [bronchitis, pneumonia, lung_abscess]
+        cardiovascular: [infective_endocarditis]
+        gastrointestinal: [gastroenteritis]
+        hepatobiliary: [hepatitis, liver_abscess, cholecystitis, cholangitis]
+        genitourinary: [acute_pyelonephritis, pelvic_inflammatory_disease]
+        musculoskeletal: [septic_arthritis, spondylodiscitis]
+        skin_soft_tissue: [skin_soft_tissue_infection]
+      other:                               # from the exposure table (p.28–29)
+        [opportunistic_infection, nosocomial_infection, zoonotic_infection,
+         sexually_transmitted_infection, tuberculosis, epidemic_infection]
+    non_infection:
+      inflammation: [autoimmune_disease, autoinflammatory_disease, other_inflammation, trauma_surgery]
+      malignancy: [hematologic_malignancy, solid_malignancy]
+      others: [drug_fever, central_fever, endocrine_fever, hematologic_disease, transfusion_reaction,
+               vaccine_reaction, thrombosis, hematoma, other_noninfectious]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  meningitis:  # p.26
+    symptoms: [headache, neck_stiffness, projectile_vomiting]
+    signs: [meningeal_irritation]
+  encephalitis:  # p.26
+    symptoms: [headache, drowsiness, confusion]
+    signs: [alteration_of_consciousness, neurological_deficit]
+  pharyngitis:  # p.26
+    symptoms: [nasal_congestion, rhinorrhea, sore_throat]
+    signs: [injected_pharynx, pharyngeal_exudate]
+  sinusitis:  # p.26
+    symptoms: [nasal_congestion, purulent_rhinorrhea, headache]
+    signs: [paranasal_sinus_tenderness]
+  otitis_media:  # p.26
+    symptoms: [ear_pain, ear_fullness, ear_discharge]
+    signs: [injected_or_bulging_tympanic_membrane, tympanic_membrane_perforation]
+  bronchitis:  # p.26
+    symptoms: [cough, dyspnea]
+    signs: [rhonchi_or_wheezing]
+  pneumonia:  # p.26
+    symptoms: [cough, sputum, dyspnea]
+    signs: [crepitation, consolidation]
+  lung_abscess:  # p.26
+    symptoms: [cough, copious_sputum]
+    signs: [localized_decreased_breath_sounds]
+  infective_endocarditis:  # p.27
+    symptoms: [exertional_fatigue]
+    signs: [murmur, roth_spot, osler_node, janeway_lesion, splinter_hemorrhage, heart_failure_signs]
+  gastroenteritis:  # p.27
+    symptoms: [diarrhea, abdominal_pain, nausea]
+    signs: [hyperactive_bowel_sounds]
+  hepatitis:  # p.27
+    symptoms: [ruq_pain, jaundice, nausea, vomiting, dark_urine]
+    signs: [jaundice, liver_tenderness, hepatomegaly]
+  liver_abscess:  # p.27
+    symptoms: [ruq_pain]
+    signs: [liver_tenderness, hepatomegaly]
+  cholecystitis:  # p.27
+    symptoms: [ruq_pain]
+    signs: [murphy_sign]
+  cholangitis:  # p.27
+    symptoms: [ruq_pain, jaundice]
+    signs: [jaundice, ruq_tenderness]
+  acute_pyelonephritis:  # p.27
+    symptoms: [flank_pain, nausea, vomiting]
+    signs: [costovertebral_angle_tenderness]
+  pelvic_inflammatory_disease:  # p.27
+    symptoms: [lower_abdominal_pain, vaginal_discharge]
+    signs: [lower_abdominal_tenderness, cervical_motion_tenderness, bimanual_tenderness]
+  skin_soft_tissue_infection:  # p.27
+    symptoms: [skin_inflammation]
+    signs: [skin_and_subcutaneous_inflammation, hemorrhagic_blebs]
+  septic_arthritis:  # p.27
+    symptoms: [joint_inflammation]
+    signs: [joint_inflammation]
+  spondylodiscitis:  # p.27
+    symptoms: [back_pain, back_pain_radiating_leg]
+    signs: [spinal_point_tenderness]
+  chikungunya:  # p.32
+    symptoms: [polyarthralgia]
+  enteric_fever:  # p.33
+    symptoms: [diarrhea]
+    signs: [rose_spot, hepatomegaly]
+
+branch_findings:
+  fever.infection.systemic:  # p.25
+    symptoms: [fatigue, myalgia, polyarthralgia, anorexia, generalized_rash, lymph_node_swelling]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [immunocompromised], suggests: [opportunistic_infection]}  # p.28
+  - {findings: [recurrent_infections], suggests: [opportunistic_infection]}  # p.28
+  - {findings: [recent_trauma_surgery], suggests: [trauma_surgery, skin_soft_tissue_infection, central_fever]}  # p.28
+  - {findings: [recent_hospitalization], suggests: [nosocomial_infection, gastroenteritis]}  # p.28
+  - {findings: [forest_overnight], suggests: [malaria]}  # p.28
+  - {findings: [flood_wading], suggests: [leptospirosis]}  # p.28
+  - {findings: [scrub_exposure], suggests: [scrub_typhus]}  # p.28
+  - {findings: [soil_exposure, northeast_resident, diabetes], suggests: [melioidosis]}  # p.28
+  - {findings: [animal_contact], suggests: [zoonotic_infection, leptospirosis, murine_typhus]}  # p.28
+  - {findings: [dog_bite], suggests: [zoonotic_infection]}  # p.28
+  - {findings: [unprotected_sex], suggests: [acute_hiv, sexually_transmitted_infection]}  # p.28
+  - {findings: [unsafe_food], suggests: [gastroenteritis, hepatitis, zoonotic_infection]}  # p.28
+  - {findings: [sick_contacts], suggests: [epidemic_infection]}  # p.28
+  - {findings: [tb_contact], suggests: [tuberculosis]}  # p.29
+  - {findings: [new_medication], suggests: [drug_fever]}  # p.29
+  - {findings: [recent_vaccine_or_transfusion], suggests: [transfusion_reaction, vaccine_reaction]}  # p.29
+
+exam_clues:
+  - {sign: roth_spot, suggests: [infective endocarditis]}  # p.29
+  - {sign: stellate_maculopathy, suggests: [cat-scratch disease]}  # p.29
+  - {sign: conjunctival_suffusion, suggests: [leptospirosis]}  # p.29
+  - {sign: dental_caries, suggests: [infective endocarditis, dental root abscess, sinusitis]}  # p.29
+  - {sign: koplik_spot, suggests: [measles]}  # p.29
+  - {sign: oral_lesion, suggests: [histoplasmosis, rhinocerebral mucormycosis, Behcet disease]}  # p.29
+  - {sign: oral_painless_ulcer, suggests: [SLE]}  # p.29
+  - {sign: malar_or_discoid_rash, suggests: [SLE]}  # p.29
+  - {sign: sinus_tenderness, suggests: [sinusitis]}  # p.29
+  - {sign: enlarged_thyroid_or_bruit, suggests: [hyperthyroidism]}  # p.29
+  - {sign: thyroid_tenderness, suggests: [thyroiditis]}  # p.29
+  - sign: localized_cervical_lymphadenopathy  # p.29
+    askable_as: lymph_node_swelling
+    suggests: [head and neck infection, intra-abdominal malignancy, Kawasaki disease, Kikuchi disease,
+               rubella, tuberculous lymphadenitis, cat-scratch disease]
+  - sign: generalized_lymphadenopathy  # p.30
+    askable_as: lymph_node_swelling
+    suggests: [lymphoma, infectious mononucleosis, acute HIV infection, cat-scratch disease, secondary syphilis,
+               toxoplasmosis, drug allergy, SLE, rheumatoid arthritis]
+  - sign: hepatomegaly  # p.30
+    suggests: [liver abscess, leptospirosis, rickettsial infection, enteric fever, brucellosis,
+               disseminated mycobacterial or fungal infection]
+  - {sign: splenomegaly, suggests: [splenic abscess]}  # p.30
+  - {sign: hepatosplenomegaly, suggests: [infectious mononucleosis, chronic malaria, lymphoma]}  # p.30
+  - {sign: prostate_enlargement, suggests: [prostatitis or prostate abscess]}  # p.30
+  - sign: generalized_skin_rash  # p.30
+    askable_as: generalized_rash
+    suggests: [viral exanthem, dengue, chikungunya, secondary syphilis, scarlet fever, rickettsial infection,
+               leptospirosis, mycoplasma infection, DIC, drug allergy, malignancy, SLE, vasculitis,
+               adult-onset Still disease, Kawasaki disease]
+  - {sign: rose_spot, suggests: [enteric fever]}  # p.30
+  - {sign: eschar, suggests: [scrub typhus]}  # p.30
+  - {sign: osler_node_janeway_lesion_splinter_hemorrhage, suggests: [infective endocarditis]}  # p.30

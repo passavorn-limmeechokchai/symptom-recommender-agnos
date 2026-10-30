@@ -1,0 +1,207 @@
+# Chapter 8 — Headache (ปวดศีรษะ)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 79–86. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 8
+title: {th: ปวดศีรษะ, en: Headache}
+chief_complaint: headache
+also_entry: []
+status: draft
+
+definitions:  # p.80
+  primary_headache: "ปวดศีรษะเป็นอาการหลัก โดยไม่มีพยาธิสภาพที่ก่อให้เกิดอาการ"
+  secondary_headache: "ปวดศีรษะที่มีสาเหตุจากพยาธิสภาพในสมอง กะโหลกศีรษะ หรืออวัยวะข้างเคียง"
+  thunderclap_headache: "ปวดรุนแรงฉับพลัน ความรุนแรงถึงจุดสูงสุดภายใน 1 นาที"
+  orthostatic_headache: "ปวดเมื่ออยู่ในท่านั่งหรือยืน และหายเมื่อนอนราบ"
+
+hpi:
+  headache:
+    onset:  # p.80, 83
+      ask: "ปวดขึ้นมาทันทีแล้วรุนแรงที่สุดภายใน 1 นาทีไหม"
+      options: [thunderclap, gradual]
+    duration:  # p.81
+      ask: "ปวดศีรษะแบบนี้มานานเท่าไหร่แล้ว"
+      unit: months
+      allow_unknown: true
+      categories:
+        recent: {below: 3}
+        intermediate: {from: 3, to: 6}
+        longstanding: {above: 6}
+    pattern:  # p.81
+      ask: "ปวดเป็นๆ หายๆ แบบเดิมทุกครั้ง หรือปวดตลอดและแย่ลงเรื่อยๆ"
+      options: [episodic_stereotyped, persistent_progressive, new_or_changed]
+    character:  # p.81
+      ask: "ปวดแบบไหน"
+      options: [throbbing, band_like, stabbing_electric]
+    location:  # p.81
+      ask: "ปวดตรงไหน"
+      multiple: true
+      allow_unknown: true
+      options: [one_side, both_sides, around_eye, frontal, occipital, vertex]
+    laterality_pattern:  # p.81, 84
+      ask: "ถ้าปวดข้างเดียว ปวดข้างเดิมทุกครั้งหรือสลับข้าง"
+      options: [fixed_side, alternating]
+    aggravating:  # p.82
+      ask: "อะไรทำให้ปวดมากขึ้น"
+      multiple: true
+      options: [upright, lying_down, cough_strain, none]
+    timing:  # p.80, 86
+      ask: "ปวดจนตื่นกลางดึกหรือปวดมากช่วงตื่นนอนไหม"
+      options: [wakes_from_sleep, none]
+    severity:  # p.84
+      ask: "ปวดมากแค่ไหน ถ้าให้คะแนน 0–10"
+      unit: score
+      categories:
+        mild_moderate: {to: 6}
+        severe: {from: 7}
+
+steps:
+  - {id: thunderclap}  # p.83
+  - {id: comfort_vs_red_flags}  # p.83
+  - {id: primary_type}  # p.84
+  - {id: secondary_by_neuro_sign}  # p.85
+
+gates:
+  thunderclap:  # p.83
+    when: always
+    ask: [thunderclap_headache]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # ภาพ 8-1 red flag signs (SNOOP)
+    ask: [fever, weight_loss, confusion, drowsiness, hemiparesis, new_or_changed_headache,
+          headache_worse_cough_strain, orthostatic_headache, fixed_side_headache, history_cancer, hiv_infection]
+    red_flag_when: {age_above: 50}
+    rules_out: [subarachnoid_hemorrhage, meningitis, intracranial_hemorrhage, brain_abscess, brain_tumor,
+                cerebral_venous_sinus_thrombosis]
+  - when: {present: [eye_pain]}  # p.82
+    ask: [blurred_vision, red_eye]
+    rules_out: [angle_closure_glaucoma]
+  - when: {age_above: 50}  # p.82
+    ask: [blurred_vision, jaw_claudication, scalp_tenderness]
+    rules_out: [temporal_arteritis]
+
+tree_selection:
+  - {when: {headache.onset: thunderclap}, use: [thunderclap]}  # p.83
+  - {when: always, use: [primary, secondary]}
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {headache.duration: longstanding, headache.pattern: episodic_stereotyped}, boost: primary}  # p.81, 83
+  - {when: {headache.duration: recent}, boost: secondary}  # p.81
+  - {when: {headache.pattern: persistent_progressive}, boost: secondary}  # p.81
+
+trees:  # ภาพ 8-1
+  thunderclap: [subarachnoid_hemorrhage, intracranial_hemorrhage, cerebral_venous_sinus_thrombosis, pituitary_apoplexy]
+  primary: [tension_type_headache, migraine, cluster_headache, other_primary_headache]
+  secondary:
+    meningeal_sign: [subarachnoid_hemorrhage, meningitis]
+    increased_icp: [brain_abscess, brain_tumor, intracranial_hemorrhage, cerebral_venous_sinus_thrombosis,
+                    idiopathic_intracranial_hypertension]
+    focal_deficit: [intracranial_hemorrhage, subdural_hematoma, brain_abscess, brain_tumor, pituitary_apoplexy,
+                    vascular_dissection]
+    normal_neuro:
+      intracranial: [subdural_hematoma, silent_area_lesion]
+      extracranial: [eye_strain, angle_closure_glaucoma, sinusitis, temporal_arteritis, trigeminal_neuralgia]
+    other: [low_csf_pressure_headache, hypertensive_headache]  # p.82, 85
+
+scores: {}
+
+confirm: {}
+
+findings:
+  tension_type_headache:  # p.84
+    symptoms: [band_like_headache, neck_pain]
+  migraine:  # p.81, 84–85
+    symptoms: [throbbing_headache, one_sided_headache, nausea, vomiting, photophobia, visual_aura]
+  cluster_headache:  # p.81, 85
+    symptoms: [stabbing_headache, periorbital_headache, fixed_side_headache, red_eye, tearing, rhinorrhea]
+  subarachnoid_hemorrhage:  # p.85
+    symptoms: [thunderclap_headache, neck_stiffness]
+  meningitis:  # p.85
+    symptoms: [fever, neck_stiffness]
+  brain_abscess:  # p.85
+    symptoms: [fever]
+  angle_closure_glaucoma:  # p.82
+    symptoms: [eye_pain, blurred_vision, red_eye]
+  temporal_arteritis:  # p.82, 83
+    symptoms: [blurred_vision, jaw_claudication, scalp_tenderness, fever, joint_pain, weight_loss]
+  sinusitis:  # p.85
+    symptoms: [nasal_congestion, purulent_rhinorrhea]
+  eye_strain:  # p.85
+    symptoms: [eye_pain]
+  trigeminal_neuralgia:  # p.81
+    symptoms: [stabbing_headache]
+  low_csf_pressure_headache:  # p.82, 85
+    symptoms: [orthostatic_headache]
+  idiopathic_intracranial_hypertension:  # p.82
+    symptoms: [headache_worse_lying]
+  pituitary_apoplexy:  # p.83
+    symptoms: [thunderclap_headache, blurred_vision]
+
+branch_findings:
+  thunderclap:  # p.83
+    symptoms: [thunderclap_headache]
+  primary:  # ภาพ 8-1 comfort signs
+    symptoms: [episodic_stereotyped_headache, longstanding_headache, family_history_migraine,
+               menstrual_headache, alternating_side_headache]
+  secondary:  # ภาพ 8-1 red flag signs
+    symptoms: [new_or_changed_headache, persistent_progressive_headache]
+  secondary.meningeal_sign:  # p.85
+    symptoms: [neck_stiffness, fever, photophobia]
+  secondary.increased_icp:  # p.80
+    symptoms: [headache_worse_lying, headache_wakes_from_sleep, headache_worse_cough_strain, vomiting]
+  secondary.focal_deficit:  # p.85
+    symptoms: [hemiparesis, diplopia, dysarthria]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [history_cancer, hiv_infection, immunocompromised], suggests: [brain_tumor, brain_abscess, meningitis]}  # p.82
+  - {findings: [oral_contraceptive_use, pregnancy], suggests: [cerebral_venous_sinus_thrombosis]}  # p.86
+  - {findings: [migraine_history, family_history_migraine], suggests: [migraine]}  # ภาพ 8-1
+  - {findings: [obesity], suggests: [idiopathic_intracranial_hypertension]}  # p.82
+  - {findings: [head_trauma, antithrombotic_use], suggests: [subdural_hematoma, intracranial_hemorrhage]}  # p.85
+  - {findings: [history_hypertension], suggests: [hypertensive_headache, intracranial_hemorrhage]}  # p.82
+  - {findings: [stress], suggests: [tension_type_headache]}  # p.84
+
+exam_clues:
+  - {sign: bp_over_180_120, suggests: [hypertensive headache, intracerebral hemorrhage, raised ICP]}  # p.82
+  - {sign: papilledema, suggests: [raised intracranial pressure]}  # p.83
+  - {sign: bitemporal_hemianopia, suggests: [pituitary macroadenoma, pituitary apoplexy]}  # p.83
+  - {sign: meningeal_sign, suggests: [meningitis, subarachnoid hemorrhage, carcinomatous meningitis]}  # p.83
+  - {sign: shallow_anterior_chamber_cloudy_cornea, suggests: [acute angle-closure glaucoma]}  # p.82
+  - {sign: tender_temporal_artery, suggests: [temporal arteritis]}  # p.82
+  - {sign: cranial_nerve_palsy_same_side, suggests: [skull base lesion]}  # p.83
+  - {sign: pericranial_muscle_tenderness, suggests: [tension-type headache]}  # p.84
+  - {sign: horner_syndrome, suggests: [cluster headache]}  # p.85

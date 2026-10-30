@@ -1,0 +1,137 @@
+# Urinary flank pain (ปวดเอวจากทางเดินปัสสาวะ)
+# Source: uro.pdf, pages 6–8, 10–14. `# uro.N` = PDF page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: g7
+title: {th: ปวดเอวจากทางเดินปัสสาวะ, en: Urinary flank pain}
+chief_complaint: flank_pain
+also_entry: [colicky_flank_pain, flank_to_groin_pain, intractable_renal_colic]
+status: draft
+
+definitions:
+  renal_pain: "การอักเสบมักปวดต่อเนื่อง ส่วนการอุดตันมักปวดบิดเป็นพักๆ"  # uro.7
+  ureteric_radiation: "ปวดอาจร้าวลงท้องน้อย ขาหนีบ หรืออวัยวะเพศตามระดับของท่อไต"  # uro.7, 11
+  emergency_obstruction: "อุดตันร่วมติดเชื้อ ปวดคุมไม่ได้ ไตเสื่อมเฉียบพลัน หรืออุดตันในไตข้างเดียวที่ทำงาน ต้องประเมินเร่งด่วน"  # uro.6, 11
+
+hpi:
+  flank_pain:
+    character:  # uro.7
+      ask: "ปวดบิดเป็นพักๆ หรือปวดต่อเนื่อง"
+      options: [colicky, steady]
+      allow_unknown: true
+    radiation:  # uro.7, 11
+      ask: "ปวดร้าวไปขาหนีบหรืออวัยวะเพศ ท้องน้อย หรือไม่ร้าว"
+      options: [groin_genital, lower_abdomen, none]
+      allow_unknown: true
+    severity:  # uro.6, 11
+      ask: "ควบคุมอาการปวดได้ หรือยังปวดรุนแรงคุมไม่ได้"
+      options: [controlled, uncontrolled]
+      allow_unknown: true
+
+steps:
+  - {id: inflammation_or_obstruction_pain_pattern}  # uro.7
+  - {id: evaluate_infection_renal_function_and_high_risk_obstruction}  # uro.6, 11
+  - {id: pain_radiation_and_urinary_findings}  # uro.7–8, 11
+  - {id: imaging_and_microscopy_for_cause}  # uro.9, 11
+
+gates:
+  uncontrolled_colic:  # uro.6, 11
+    when: always
+    ask: [intractable_renal_colic]
+    if_any_yes: urgent
+  colic_with_high_risk_features:  # uro.6, 11
+    when: {present: [colicky_flank_pain]}
+    ask: [fever, solitary_kidney, kidney_transplant, acute_kidney_injury_history]
+    if_any_yes: urgent
+  infected_known_obstruction:  # uro.6, 11
+    when: {present: [known_urinary_obstruction]}
+    ask: [fever]
+    if_any_yes: urgent
+  renal_bleeding_with_instability:  # uro.13
+    when: {present: [hematuria]}
+    ask: [low_blood_pressure]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # uro.8, 11
+    ask: [hematuria, fever, urinary_stone_history]
+    rules_out: [renal_stone, acute_pyelonephritis, renal_cell_carcinoma]
+
+tree_selection:
+  - {when: {flank_pain.character: colicky}, use: [obstruction]}  # uro.7
+  - {when: {flank_pain.character: steady}, use: [infection, tumor]}  # uro.7, 13–14
+  - {when: {flank_pain.character: unknown}, use: [obstruction, infection, tumor]}  # uro.7
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {present: [flank_to_groin_pain]}, boost: obstruction}  # uro.7, 11
+  - {when: {age_between: [1, 4]}, boost: tumor.childhood}  # uro.14
+
+trees:
+  obstruction: [renal_stone, obstructive_uropathy]  # uro.6–7, 11
+  infection: [acute_pyelonephritis]  # uro.7–8
+  tumor:
+    renal: [renal_cell_carcinoma, renal_angiomyolipoma]  # uro.13–14
+    childhood: [wilms_tumor]  # uro.14
+
+scores: {}
+
+confirm: {}
+
+findings:
+  renal_stone:  # uro.11
+    symptoms: [colicky_flank_pain, flank_to_groin_pain, hematuria, nausea, vomiting]
+    signs: [cva_tenderness]
+  acute_pyelonephritis:  # uro.7–8; symptoms reused from ch.3 p.27 and ch.23 p.252
+    symptoms: [high_fever, chills, nausea, vomiting]
+    signs: [cva_tenderness]
+  renal_cell_carcinoma:  # uro.14
+    symptoms: [hematuria, abdominal_mass, fever, weight_loss, fatigue]
+  renal_angiomyolipoma:  # uro.13
+    symptoms: [hematuria, abdominal_mass, low_blood_pressure]
+  wilms_tumor:  # uro.14
+    symptoms: [hematuria, abdominal_mass]
+
+branch_findings: {}
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [low_fluid_intake, high_salt_diet, urinary_stone_history], suggests: [renal_stone]}  # uro.10–11
+  - {findings: [known_urinary_obstruction], suggests: [obstructive_uropathy]}  # uro.6
+  - {findings: [smoking], suggests: [renal_cell_carcinoma]}  # uro.14
+
+exam_clues:
+  - {sign: cva_tenderness, suggests: [renal_stone, acute_pyelonephritis]}  # uro.8, 11
+  - {sign: palpable_abdominal_mass, suggests: [renal_cell_carcinoma, renal_angiomyolipoma, wilms_tumor], askable_as: abdominal_mass}  # uro.8, 13–14
+  - {sign: hydronephrosis, suggests: [obstructive_uropathy]}  # uro.6

@@ -1,0 +1,3392 @@
+# Symptom dictionary: everything a patient can answer about.
+#
+# How to read this file. One entry per symptom, history item or home measurement, under ── lines
+# naming a body system or the chapter that added it. Written from the sources only: it holds no
+# Agnos vocabulary. Agnos names and answers are mapped to these ids at runtime by the normalizer,
+# and that mapping is evaluated.
+#
+#   <id>:              the id that chapter files use
+#     th, en           display names (source wording or standard medical terms)
+#     kind             symptom | history (risk factor or exposure) | measurement (e.g. home blood pressure)
+#     parent           the more general symptom this one makes specific
+#     refines          the HPI answer that makes it specific, {question: answer}, matching the parent's
+#                      `hpi` question in a chapter file (ruq_pain = abdominal_pain + location ruq)
+#     aliases          other ways to say it; a comment gives the source (# p.N, # g.N, # eye.N, # ent.N,
+#                      # uro.N, # reviewer); no comment = standard Thai written without looking at the data
+#     sex              female | male -> never recommended to the other sex
+#     red_flag         true -> asked before any scoring
+#     urgent           true -> the patient should be seen now whenever it is present, whatever the
+#                      chief complaint (no chapter needed)
+
+# ── General ───────────────────────────────────────────────────────────────
+fever:
+  th: ไข้
+  en: fever
+  kind: symptom
+  aliases:
+    - ตัวร้อน               # reviewer
+
+low_grade_fever:
+  th: ไข้ต่ำๆ
+  en: low-grade fever
+  kind: symptom
+  parent: fever
+  refines: {temperature: low_grade}
+
+high_fever:
+  th: ไข้สูง
+  en: high fever
+  kind: symptom
+  parent: fever
+  refines: {temperature: high}
+
+weight_loss:
+  th: น้ำหนักลด
+  en: weight loss
+  kind: symptom
+
+night_sweats:
+  th: เหงื่อออกมากตอนกลางคืน
+  en: night sweats
+  kind: symptom
+
+edema:
+  th: บวม
+  en: edema
+  kind: symptom
+
+leg_swelling:
+  th: ขาบวม
+  en: leg swelling
+  kind: symptom
+  parent: edema
+  refines: {location: legs}
+
+leg_pain:
+  th: เจ็บขา
+  en: leg pain
+  kind: symptom
+
+easy_bleeding:
+  th: เลือดออกง่าย
+  en: easy bleeding
+  kind: symptom
+
+pallor:
+  th: ซีด
+  en: pallor
+  kind: symptom
+
+restlessness:
+  th: กระสับกระส่าย
+  en: restlessness
+  kind: symptom
+  red_flag: true
+
+cold_extremities:
+  th: มือเท้าซีดเย็น
+  en: cold pale hands and feet
+  kind: symptom
+  aliases: [ตัวเย็น, เหงื่อแตกตัวเย็น]
+  red_flag: true
+
+low_blood_pressure:
+  th: วัดความดันได้ต่ำ (ตัวบนน้อยกว่า 90)
+  en: low blood pressure (systolic < 90)
+  kind: measurement
+  aliases:
+    - ความดันเลือดต่ำ       # p.181
+    - ความดันต่ำ
+    - ความดันตก
+  red_flag: true
+
+chills:
+  th: หนาวสั่น
+  en: chills
+  kind: symptom
+
+fatigue:
+  th: อ่อนเพลีย
+  en: fatigue
+  kind: symptom
+
+myalgia:
+  th: ปวดเมื่อยตามตัว
+  en: myalgia
+  kind: symptom
+  aliases: [ปวดเมื่อย, ปวดตามตัว]
+
+anorexia:
+  th: เบื่ออาหาร
+  en: loss of appetite
+  kind: symptom
+
+lymph_node_swelling:
+  th: ต่อมน้ำเหลืองโต
+  en: swollen lymph nodes
+  kind: symptom
+  aliases: [คลำได้ก้อนที่คอ, ต่อมน้ำเหลืองบวม]
+
+# ── Neuro ─────────────────────────────────────────────────────────────────
+headache:
+  th: ปวดศีรษะ
+  en: headache
+  kind: symptom
+  aliases:
+    - ปวดหัว                # reviewer
+
+neck_stiffness:
+  th: คอแข็ง
+  en: neck stiffness
+  kind: symptom
+  red_flag: true
+
+drowsiness:
+  th: ซึม
+  en: drowsiness
+  kind: symptom
+  red_flag: true
+
+confusion:
+  th: สับสน
+  en: confusion
+  kind: symptom
+  red_flag: true
+
+near_syncope:
+  th: หน้ามืดจะเป็นลม
+  en: near syncope
+  kind: symptom
+  aliases:
+    - หน้ามืด               # p.248
+    - เป็นลม                # p.145
+    - วูบ                   # reviewer
+    - fainted             # reviewer
+    - faint               # reviewer
+
+# ── Upper respiratory / ENT ───────────────────────────────────────────────
+nasal_congestion:
+  th: คัดจมูก
+  en: nasal congestion
+  kind: symptom
+  aliases:
+    - stuffy nose         # reviewer
+    - blocked nose        # reviewer
+
+rhinorrhea:
+  th: น้ำมูกไหล
+  en: runny nose
+  kind: symptom
+  aliases: [มีน้ำมูก]
+
+purulent_rhinorrhea:
+  th: น้ำมูกเขียวเหลือง
+  en: purulent nasal discharge
+  kind: symptom
+  parent: rhinorrhea
+  refines: {color: green_yellow}
+
+sore_throat:
+  th: เจ็บคอ
+  en: sore throat
+  kind: symptom
+  aliases:
+    - ระคายคอ               # g.15
+
+ear_pain:
+  th: ปวดหู
+  en: ear pain
+  kind: symptom
+
+ear_fullness:
+  th: หูอื้อ
+  en: ear fullness
+  kind: symptom
+
+ear_discharge:
+  th: หนองไหลออกจากหู
+  en: ear discharge
+  kind: symptom
+  aliases: [หูน้ำหนวก]
+  aliases:
+    - ear drainage        # reviewer
+
+postnasal_drip:
+  th: น้ำมูกไหลลงคอ
+  en: postnasal drip
+  kind: symptom
+
+sneezing:
+  th: จาม
+  en: sneezing
+  kind: symptom
+
+nasal_itch:
+  th: คันจมูก
+  en: itchy nose
+  kind: symptom
+
+itchy_eyes:
+  th: คันตา
+  en: itchy eyes
+  kind: symptom
+
+throat_clearing:
+  th: กระแอมบ่อย
+  en: frequent throat clearing
+  kind: symptom
+
+hoarseness:
+  th: เสียงแหบ
+  en: hoarseness
+  kind: symptom
+
+halitosis:
+  th: หายใจมีกลิ่นเหม็น
+  en: bad breath
+  kind: symptom
+
+cheek_pain:
+  th: ปวดแก้ม
+  en: cheek pain
+  kind: symptom
+
+epistaxis:
+  th: เลือดกำเดาไหล
+  en: nosebleed
+  kind: symptom
+
+# ── Lower respiratory ─────────────────────────────────────────────────────
+cough:
+  th: ไอ
+  en: cough
+  kind: symptom
+
+dry_cough:
+  th: ไอแห้งๆ
+  en: dry cough
+  kind: symptom
+  parent: cough
+  refines: {character: dry}
+
+sputum:
+  th: มีเสมหะ
+  en: sputum
+  kind: symptom
+  aliases:
+    - เสมหะ                 # reviewer
+
+white_sputum:
+  th: เสมหะสีขาวใส
+  en: white sputum
+  kind: symptom
+  parent: sputum
+  refines: {color: white_clear}
+
+purulent_sputum:
+  th: เสมหะสีเขียวเหลือง
+  en: purulent sputum
+  kind: symptom
+  parent: sputum
+  refines: {color: green_yellow}
+  aliases:
+    - เสมหะเป็นหนอง         # p.205
+    - เสมหะเขียว
+    - เสมหะเหลือง
+
+foul_sputum:
+  th: เสมหะมีกลิ่นเหม็น
+  en: foul-smelling sputum
+  kind: symptom
+  parent: sputum
+  refines: {odor: foul}
+
+hemoptysis:
+  th: ไอเป็นเลือด
+  en: hemoptysis
+  kind: symptom
+  aliases: [ไอมีเลือดปน, เสมหะปนเลือด]
+  red_flag: true
+
+massive_hemoptysis:
+  th: ไอเป็นเลือดปริมาณมาก
+  en: massive hemoptysis
+  kind: symptom
+  parent: hemoptysis
+  refines: {amount: massive}
+  red_flag: true
+
+copious_sputum:
+  th: มีเสมหะมาก
+  en: copious sputum
+  kind: symptom
+  parent: sputum
+  refines: {amount: large}
+
+dyspnea:
+  th: หอบเหนื่อย
+  en: shortness of breath
+  kind: symptom
+  aliases:
+    - หายใจลำบาก            # p.189
+    - เหนื่อย               # reviewer
+
+severe_dyspnea:
+  th: หอบเหนื่อยมาก
+  en: severe shortness of breath
+  kind: symptom
+  parent: dyspnea
+  refines: {severity: severe}
+  red_flag: true
+
+exertional_fatigue:
+  th: เหนื่อยง่าย
+  en: fatigue with exertion
+  kind: symptom
+  parent: dyspnea
+  refines: {aggravating: exertion}
+
+sudden_dyspnea:
+  th: เหนื่อยหอบขึ้นมาทันที
+  en: sudden shortness of breath
+  kind: symptom
+  parent: dyspnea
+  refines: {onset: sudden}
+
+progressive_dyspnea:
+  th: เหนื่อยมากขึ้นเรื่อยๆ
+  en: progressive shortness of breath
+  kind: symptom
+  parent: dyspnea
+  refines: {progression: worsening}
+
+orthopnea:
+  th: นอนราบไม่ได้
+  en: orthopnea
+  kind: symptom
+  parent: dyspnea
+  refines: {aggravating: lying_flat}
+
+paroxysmal_nocturnal_dyspnea:
+  th: ตื่นขึ้นมาหอบหรือไอกลางดึก
+  en: paroxysmal nocturnal dyspnea
+  kind: symptom
+  parent: dyspnea
+  refines: {aggravating: night}
+
+chest_pain:
+  th: เจ็บหน้าอก
+  en: chest pain
+  kind: symptom
+  aliases:
+    - แน่นหน้าอก            # p.256
+
+pleuritic_chest_pain:
+  th: เจ็บหน้าอกเวลาหายใจเข้าลึกๆ
+  en: pleuritic chest pain
+  kind: symptom
+  parent: chest_pain
+  refines: {aggravating: deep_breath}
+
+# ── Gastrointestinal / hepatobiliary ──────────────────────────────────────
+abdominal_pain:
+  th: ปวดท้อง
+  en: abdominal pain
+  kind: symptom
+
+ruq_pain:
+  th: ปวดท้องด้านขวาบน
+  en: right upper quadrant pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: ruq}
+  aliases:
+    - ปวดใต้ชายโครงขวา      # p.247
+
+epigastric_pain:
+  th: ปวดลิ้นปี่
+  en: epigastric pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: epigastrium}
+  aliases:
+    - จุกลิ้นปี่            # p.251
+    - ปวดใต้ลิ้นปี่
+
+luq_pain:
+  th: ปวดท้องด้านซ้ายบน
+  en: left upper quadrant pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: luq}
+  aliases: [ปวดใต้ชายโครงซ้าย]
+
+rlq_pain:
+  th: ปวดท้องน้อยด้านขวา
+  en: right lower quadrant pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: rlq}
+
+periumbilical_pain:
+  th: ปวดรอบสะดือ
+  en: periumbilical pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: periumbilical}
+
+llq_pain:
+  th: ปวดท้องน้อยด้านซ้าย
+  en: left lower quadrant pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: llq}
+
+lower_abdominal_pain:
+  th: ปวดท้องน้อย
+  en: lower abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: suprapubic}
+  aliases: [ปวดหัวหน่าว]
+
+diffuse_abdominal_pain:
+  th: ปวดทั่วท้อง
+  en: diffuse abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {location: diffuse}
+
+sudden_abdominal_pain:
+  th: ปวดท้องขึ้นมาทันทีทันใด
+  en: sudden-onset abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {onset: sudden}
+
+gradual_abdominal_pain:
+  th: ปวดท้องค่อยๆ เป็น เป็นๆ หายๆ
+  en: gradual-onset abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {onset: gradual}
+
+colicky_abdominal_pain:
+  th: ปวดบิดเป็นพักๆ หายปวดแล้วหายสนิท
+  en: colicky abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {character: colicky}
+  aliases:
+    - ปวดบิด                # p.251
+
+biliary_type_pain:
+  th: จุกแน่นลิ้นปี่ ปวดมากขึ้นเรื่อยๆ นาน 30 นาทีถึงหลายชั่วโมง
+  en: biliary-type pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {character: biliary}
+
+burning_abdominal_pain:
+  th: ปวดท้องแบบแสบร้อน
+  en: burning abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {character: burning}
+  aliases:
+    - แสบท้อง               # reviewer
+
+severe_constant_abdominal_pain:
+  th: ปวดท้องรุนแรงตลอดเวลา
+  en: severe constant abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {character: constant_severe}
+
+dermatomal_burning_pain:
+  th: ปวดแสบร้อนเป็นแนวตามผิวหนัง
+  en: burning pain along a dermatome
+  kind: symptom
+  parent: abdominal_pain
+  refines: {character: dermatomal_burning}
+
+severe_abdominal_pain:
+  th: ปวดท้องรุนแรง
+  en: severe abdominal pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {severity: severe}
+
+pain_radiating_right_shoulder:
+  th: ปวดร้าวไปไหล่ขวา
+  en: pain radiating to the right shoulder
+  kind: symptom
+  parent: abdominal_pain
+  refines: {radiation: right_shoulder}
+
+pain_radiating_back:
+  th: ปวดร้าวทะลุหลัง
+  en: pain radiating to the back
+  kind: symptom
+  parent: abdominal_pain
+  refines: {radiation: back}
+
+pain_radiating_arm:
+  th: ปวดร้าวไปแขน
+  en: pain radiating to the arm
+  kind: symptom
+  parent: abdominal_pain
+  refines: {radiation: arm}
+
+migrating_pain_rlq:
+  th: ปวดรอบสะดือแล้วย้ายมาท้องน้อยด้านขวา
+  en: pain migrating from the umbilicus to the right lower quadrant
+  kind: symptom
+  parent: abdominal_pain
+  refines: {migration: periumbilical_to_rlq}
+
+pain_worse_hungry:
+  th: ปวดมากขึ้นเวลาหิวหรือก่อนมื้ออาหาร
+  en: pain worse when hungry
+  kind: symptom
+  parent: abdominal_pain
+  refines: {aggravating: hunger}
+
+pain_after_meals:
+  th: ปวดมากขึ้นหลังกินอาหาร
+  en: pain worse after meals
+  kind: symptom
+  parent: abdominal_pain
+  refines: {aggravating: meals}
+
+pain_after_fatty_food:
+  th: ปวดหลังกินอาหารมัน
+  en: pain after fatty food
+  kind: symptom
+  parent: abdominal_pain
+  refines: {aggravating: fatty_food}
+
+pain_after_spicy_food:
+  th: ปวดหลังกินอาหารรสจัดหรือเผ็ด
+  en: pain after spicy food
+  kind: symptom
+  parent: abdominal_pain
+  refines: {aggravating: spicy_food}
+
+pain_worse_moving:
+  th: ปวดมากขึ้นเวลาขยับตัว ต้องนอนนิ่งๆ
+  en: pain worse with movement
+  kind: symptom
+  parent: abdominal_pain
+  refines: {aggravating: movement}
+
+pain_relieved_leaning_forward:
+  th: ปวดดีขึ้นเมื่อก้มตัวไปข้างหน้า
+  en: pain relieved by leaning forward
+  kind: symptom
+  parent: abdominal_pain
+  refines: {relieving: leaning_forward}
+
+pain_relieved_by_food:
+  th: ปวดดีขึ้นหลังกินอาหารหรือยาลดกรด
+  en: pain relieved by food or antacids
+  kind: symptom
+  parent: abdominal_pain
+  refines: {relieving: food_or_antacid}
+
+pain_with_menses:
+  th: ปวดท้องช่วงมีประจำเดือน
+  en: pain with menstruation
+  kind: symptom
+  parent: abdominal_pain
+  refines: {menstrual_relation: with_menses}
+  sex: female
+
+mid_cycle_pain:
+  th: ปวดท้องช่วงกลางรอบเดือน
+  en: mid-cycle pain
+  kind: symptom
+  parent: abdominal_pain
+  refines: {menstrual_relation: mid_cycle}
+  sex: female
+
+pain_after_missed_period:
+  th: ปวดท้องหลังขาดประจำเดือน
+  en: pain after a missed period
+  kind: symptom
+  parent: abdominal_pain
+  refines: {menstrual_relation: after_missed_period}
+  sex: female
+  red_flag: true
+
+abdominal_distension:
+  th: ท้องอืด ท้องโต
+  en: abdominal distension
+  kind: symptom
+  aliases:
+    - ท้องอืด               # p.252
+    - ท้องโต                # p.252
+
+no_stool_no_flatus:
+  th: ไม่ถ่าย ไม่ผายลม
+  en: no stool or flatus
+  kind: symptom
+
+voluminous_diarrhea:
+  th: ถ่ายเหลวครั้งละมากๆ
+  en: large-volume diarrhea
+  kind: symptom
+  parent: diarrhea
+  refines: {amount: large}
+
+small_frequent_stools:
+  th: ถ่ายเหลวกะปริบกะปรอย
+  en: small frequent stools
+  kind: symptom
+  parent: diarrhea
+  refines: {amount: small_frequent}
+
+bloody_mucoid_stool:
+  th: ถ่ายเป็นมูกเลือด
+  en: mucus and blood in stool
+  kind: symptom
+  parent: diarrhea
+  refines: {blood_mucus: present}
+
+bloody_stool:
+  th: ถ่ายเป็นเลือด
+  en: blood in stool
+  kind: symptom
+
+melena:
+  th: ถ่ายดำ
+  en: black tarry stool
+  kind: symptom
+  parent: bloody_stool
+  refines: {color: black}
+  aliases:
+    - อุจจาระสีดำ           # p.255
+
+hematochezia:
+  th: ถ่ายเป็นเลือดสด
+  en: fresh blood in stool
+  kind: symptom
+  parent: bloody_stool
+  refines: {color: fresh_red}
+
+pale_stool:
+  th: อุจจาระสีซีด
+  en: pale stool
+  kind: symptom
+
+diarrhea:
+  th: ท้องเสีย
+  en: diarrhea
+  kind: symptom
+  aliases:
+    - ถ่ายเหลว              # p.252
+
+nausea:
+  th: คลื่นไส้
+  en: nausea
+  kind: symptom
+
+vomiting:
+  th: อาเจียน
+  en: vomiting
+  kind: symptom
+
+vomiting_large_food:
+  th: อาเจียนเป็นอาหารปริมาณมาก
+  en: vomiting large amounts of food
+  kind: symptom
+  parent: vomiting
+  refines: {content: large_food}
+
+projectile_vomiting:
+  th: อาเจียนพุ่ง
+  en: projectile vomiting
+  kind: symptom
+  parent: vomiting
+  refines: {character: projectile}
+  red_flag: true
+
+hematemesis:
+  th: อาเจียนเป็นเลือด          # p.208
+  en: vomiting blood
+  kind: symptom
+  red_flag: true
+
+heartburn:
+  th: แสบร้อนกลางอก
+  en: heartburn
+  kind: symptom
+  aliases: [แสบอก]
+
+sour_regurgitation:
+  th: เรอเปรี้ยว
+  en: sour regurgitation
+  kind: symptom
+
+dysphagia:
+  th: กลืนลำบาก
+  en: difficulty swallowing
+  kind: symptom
+  aliases:
+    - กลืนติด               # reviewer
+
+odynophagia:
+  th: กลืนเจ็บ
+  en: painful swallowing
+  kind: symptom
+
+jaundice:
+  th: ตัวเหลืองตาเหลือง
+  en: jaundice
+  kind: symptom
+  aliases:
+    - ตัวเหลือง             # p.217
+    - ตาเหลือง              # p.217
+
+# ── Genitourinary ─────────────────────────────────────────────────────────
+dark_urine:
+  th: ปัสสาวะสีเข้ม
+  en: dark urine
+  kind: symptom
+
+decreased_urine:
+  th: ปัสสาวะออกน้อย
+  en: decreased urine output
+  kind: symptom
+
+dysuria:
+  th: ปัสสาวะแสบขัด
+  en: painful urination
+  kind: symptom
+
+cloudy_urine:
+  th: ปัสสาวะขุ่น
+  en: cloudy urine
+  kind: symptom
+
+hematuria:
+  th: ปัสสาวะเป็นเลือด
+  en: blood in urine
+  kind: symptom
+
+urine_sediment:
+  th: ปัสสาวะมีตะกอน
+  en: sediment in urine
+  kind: symptom
+
+flank_pain:
+  th: ปวดเอว
+  en: flank pain
+  kind: symptom
+  aliases: [ปวดหลังส่วนบน]
+
+vaginal_discharge:
+  th: ตกขาวผิดปกติ
+  en: abnormal vaginal discharge
+  kind: symptom
+  aliases: [ตกขาว]
+  sex: female
+
+# ── Musculoskeletal / skin ────────────────────────────────────────────────
+joint_pain:
+  th: ปวดข้อ
+  en: joint pain
+  kind: symptom
+
+polyarthralgia:
+  th: ปวดหลายข้อ
+  en: pain in several joints
+  kind: symptom
+  parent: joint_pain
+  refines: {joint_count: multiple}
+
+joint_inflammation:
+  th: ข้อปวด บวม แดง ร้อน
+  en: hot swollen joint
+  kind: symptom
+  parent: joint_pain
+  refines: {swelling_redness: present}
+
+knee_pain:
+  th: ปวดข้อเข่า
+  en: knee pain
+  kind: symptom
+  parent: joint_pain
+  refines: {location: knee}
+
+ankle_pain:
+  th: ปวดข้อเท้า
+  en: ankle pain
+  kind: symptom
+  parent: joint_pain
+  refines: {location: ankle}
+
+hip_pain:
+  th: ปวดข้อสะโพก
+  en: hip pain
+  kind: symptom
+  parent: joint_pain
+  refines: {location: hip}
+
+wrist_pain:
+  th: ปวดข้อมือ
+  en: wrist pain
+  kind: symptom
+  parent: joint_pain
+  refines: {location: wrist}
+
+elbow_pain:
+  th: ปวดข้อศอก
+  en: elbow pain
+  kind: symptom
+  parent: joint_pain
+  refines: {location: elbow}
+
+shoulder_pain:
+  th: ปวดข้อไหล่
+  en: shoulder pain
+  kind: symptom
+  parent: joint_pain
+  refines: {location: shoulder}
+
+finger_base_joint_pain:
+  th: ปวดโคนนิ้วมือ  # reviewer
+  en: pain at the base of the fingers (MCP)
+  kind: symptom
+  parent: joint_pain
+  refines: {location: finger_base}
+
+finger_middle_joint_pain:
+  th: ปวดข้อกลางนิ้วมือ
+  en: pain at the middle finger joints (PIP)
+  kind: symptom
+  parent: joint_pain
+  refines: {location: finger_middle}
+
+finger_tip_joint_pain:
+  th: ปวดข้อปลายนิ้วมือ
+  en: pain at the finger-tip joints (DIP)
+  kind: symptom
+  parent: joint_pain
+  refines: {location: finger_tip}
+
+toe_joint_pain:
+  th: ปวดข้อนิ้วเท้า
+  en: toe joint pain
+  kind: symptom
+  parent: joint_pain
+  refines: {location: toe}
+
+symmetric_joint_pain:
+  th: ปวดข้อทั้งสองข้างเหมือนกัน
+  en: symmetric joint pain
+  kind: symptom
+  parent: joint_pain
+  refines: {symmetry: symmetric}
+
+asymmetric_joint_pain:
+  th: ปวดข้อไม่เท่ากันสองข้าง
+  en: asymmetric joint pain
+  kind: symptom
+  parent: joint_pain
+  refines: {symmetry: asymmetric}
+
+migratory_joint_pain:
+  th: ปวดข้อย้ายที่ไปเรื่อยๆ
+  en: migratory joint pain
+  kind: symptom
+  parent: joint_pain
+  refines: {pattern: migratory}
+
+additive_joint_pain:
+  th: ปวดข้อเพิ่มขึ้นทีละข้อ ข้อเดิมยังปวดอยู่
+  en: additive joint pain
+  kind: symptom
+  parent: joint_pain
+  refines: {pattern: additive}
+
+intermittent_joint_attacks:
+  th: ปวดข้อเป็นๆ หายๆ เป็นทันทีแล้วหายสนิท
+  en: intermittent joint attacks
+  kind: symptom
+  parent: joint_pain
+  refines: {pattern: intermittent}
+
+morning_stiffness_long:
+  th: ข้อฝืดตอนเช้านานกว่า 1 ชั่วโมง
+  en: morning stiffness over 1 hour
+  kind: symptom
+  parent: joint_pain
+  refines: {morning_stiffness: over_1_hour}
+
+morning_stiffness_short:
+  th: ข้อฝืดตอนเช้าไม่ถึง 15 นาที
+  en: morning stiffness under 15 minutes
+  kind: symptom
+  parent: joint_pain
+  refines: {morning_stiffness: under_15_minutes}
+
+enlarging_hands_face:
+  th: มือเท้าโตขึ้นหรือหน้าเปลี่ยนไป
+  en: enlarging hands, feet or face
+  kind: symptom
+
+oral_ulcer:
+  th: แผลในปาก
+  en: mouth ulcers
+  kind: symptom
+
+genital_ulcer:
+  th: แผลที่อวัยวะเพศ
+  en: genital ulcer
+  kind: symptom
+
+urethral_discharge:
+  th: มีหนองออกจากท่อปัสสาวะ
+  en: urethral discharge
+  kind: symptom
+
+hair_loss:
+  th: ผมร่วง
+  en: hair loss
+  kind: symptom
+
+red_eye:
+  th: ตาแดง
+  en: red eye
+  kind: symptom
+
+eye_pain:
+  th: ปวดตา
+  en: eye pain
+  kind: symptom
+
+back_pain:
+  th: ปวดหลัง
+  en: back pain
+  kind: symptom
+
+back_pain_radiating_leg:
+  th: ปวดหลังร้าวลงขา
+  en: back pain radiating to the leg
+  kind: symptom
+  parent: back_pain
+  refines: {radiation: leg}
+
+skin_inflammation:
+  th: ผิวหนังปวด บวม แดง ร้อน
+  en: painful red swollen skin
+  kind: symptom
+
+rash:
+  th: ผื่น
+  en: rash
+  kind: symptom
+
+generalized_rash:
+  th: ผื่นทั่วตัว
+  en: generalized rash
+  kind: symptom
+  parent: rash
+  refines: {location: generalized}
+
+localized_rash:
+  th: ผื่นเฉพาะที่
+  en: localized rash
+  kind: symptom
+  parent: rash
+  refines: {location: localized}
+
+rash_flexural:
+  th: ผื่นที่ข้อพับแขนขา
+  en: rash on flexural areas
+  kind: symptom
+  parent: rash
+  refines: {location: flexural}
+
+rash_extensor:
+  th: ผื่นที่ด้านนอกแขนขา เช่น เข่า ศอก หน้าแข้ง
+  en: rash on extensor surfaces
+  kind: symptom
+  parent: rash
+  refines: {location: extensor}
+
+rash_acral:
+  th: ผื่นที่มือ เท้า ข้อมือ ข้อเท้า
+  en: rash on hands and feet
+  kind: symptom
+  parent: rash
+  refines: {location: acral}
+
+rash_sun_exposed:
+  th: ผื่นที่บริเวณโดนแดด เช่น ใบหน้า คอ หลังมือ
+  en: rash on sun-exposed skin
+  kind: symptom
+  parent: rash
+  refines: {location: sun_exposed}
+
+rash_seborrheic_area:
+  th: ผื่นที่หนังศีรษะ หน้าผาก คิ้ว ร่องแก้ม หลังหู
+  en: rash on scalp, eyebrows, nasolabial folds or behind the ears
+  kind: symptom
+  parent: rash
+  refines: {location: seborrheic}
+
+rash_skin_folds:
+  th: ผื่นที่รอยพับผิวหนัง เช่น รักแร้ ขาหนีบ ใต้เต้านม
+  en: rash in skin folds
+  kind: symptom
+  parent: rash
+  refines: {location: skin_folds}
+
+macular_rash:
+  th: ผื่นแดงราบ
+  en: flat red rash
+  kind: symptom
+  parent: rash
+  refines: {morphology: macular}
+
+papular_rash:
+  th: ผื่นเป็นตุ่มนูน
+  en: raised bumps
+  kind: symptom
+  parent: rash
+  refines: {morphology: papular}
+
+scaly_rash:
+  th: ผื่นนูนมีขุยหรือสะเก็ด
+  en: scaly raised rash
+  kind: symptom
+  parent: rash
+  refines: {morphology: scaly}
+  aliases: [ผื่นเป็นขุย]
+
+follicular_papules:
+  th: ตุ่มที่รูขุมขน
+  en: bumps at hair follicles
+  kind: symptom
+  parent: rash
+  refines: {morphology: follicular}
+
+pustules:
+  th: ตุ่มหนอง
+  en: pustules
+  kind: symptom
+  parent: rash
+  refines: {morphology: pustular}
+
+blisters:
+  th: ตุ่มน้ำ
+  en: blisters
+  kind: symptom
+  parent: rash
+  refines: {morphology: blistering}
+  aliases:
+    - ตุ่มน้ำใส             # p.397
+    - พุพอง                 # p.406
+
+eczematous_rash:
+  th: ผื่นแดงคัน บวม อาจมีน้ำเหลืองซึมหรือตกสะเก็ด
+  en: itchy red rash that may weep or crust
+  kind: symptom
+  parent: rash
+  refines: {morphology: eczematous}
+
+erythroderma_skin:
+  th: ผิวแดงเกือบทั้งตัว
+  en: red skin over almost the whole body
+  kind: symptom
+  parent: rash
+  refines: {morphology: erythroderma}
+  red_flag: true
+
+purpuric_rash:
+  th: จุดเลือดออก กดแล้วสีไม่จาง
+  en: purpura that does not blanch
+  kind: symptom
+  parent: rash
+  refines: {morphology: purpuric}
+  aliases:
+    - จุดเลือดออก           # p.409
+
+wheals:
+  th: ผื่นนูนเป็นปื้น
+  en: wheals
+  kind: symptom
+  parent: rash
+  refines: {morphology: wheal}
+  aliases: [ลมพิษ]
+
+grouped_rash:
+  th: ผื่นเกาะกลุ่มกัน
+  en: grouped lesions
+  kind: symptom
+  parent: rash
+  refines: {configuration: grouped}
+
+dermatomal_rash:
+  th: ผื่นเรียงเป็นแนวยาวข้างเดียวของลำตัว
+  en: rash in a band on one side
+  kind: symptom
+  parent: rash
+  refines: {configuration: dermatomal}
+
+target_lesions:
+  th: ผื่นเป็นวงซ้อนกันเหมือนเป้า
+  en: target lesions
+  kind: symptom
+  parent: rash
+  refines: {configuration: target}
+
+annular_rash:
+  th: ผื่นเป็นวงกลม
+  en: ring-shaped rash
+  kind: symptom
+  parent: rash
+  refines: {configuration: annular}
+
+coin_shaped_rash:
+  th: ผื่นกลมเหมือนเหรียญ
+  en: coin-shaped rash
+  kind: symptom
+  parent: rash
+  refines: {configuration: discoid}
+
+itch:
+  th: คัน
+  en: itch
+  kind: symptom
+
+skin_burning:
+  th: แสบผิว
+  en: burning skin
+  kind: symptom
+
+skin_detachment:
+  th: ผิวหนังหลุดลอก
+  en: skin peeling off
+  kind: symptom
+  red_flag: true
+
+mucosal_lesions:
+  th: มีแผลในปาก ริมฝีปาก หรือตาแดงเจ็บร่วมกับผื่น
+  en: mouth, lip or eye involvement with the rash
+  kind: symptom
+  red_flag: true
+
+face_lip_swelling:
+  th: หน้าหรือริมฝีปากบวม
+  en: face or lip swelling
+  kind: symptom
+  red_flag: true
+
+# ── History / exposures (exposure table p.28–29 and sepsis gate) ──────────
+on_chemotherapy:
+  th: กำลังได้รับยาเคมีบำบัด
+  en: currently on chemotherapy
+  kind: history
+
+immunocompromised:
+  th: มีโรคหรือใช้ยาที่กดภูมิคุ้มกัน หรือเคยปลูกถ่ายอวัยวะ/ไขกระดูก
+  en: immunocompromised
+  kind: history
+
+recurrent_infections:
+  th: เจ็บป่วยด้วยโรคติดเชื้อบ่อย
+  en: frequent infections
+  kind: history
+
+recent_trauma_surgery:
+  th: เพิ่งได้รับอุบัติเหตุหรือผ่าตัด
+  en: recent trauma or surgery
+  kind: history
+
+recent_hospitalization:
+  th: เพิ่งนอนโรงพยาบาลหรือได้ยาฆ่าเชื้อ
+  en: recent hospital stay or antibiotics
+  kind: history
+
+forest_overnight:
+  th: เดินทางเข้าป่าและค้างคืนในป่า
+  en: overnight stay in forest
+  kind: history
+
+flood_wading:
+  th: ย่ำน้ำ ลุยน้ำท่วม
+  en: wading in flood water
+  kind: history
+
+scrub_exposure:
+  th: เข้าป่าโปร่ง ป่าละเมาะ พุ่มไม้
+  en: scrubland exposure
+  kind: history
+
+soil_exposure:
+  th: อาชีพหรือกิจกรรมสัมผัสดิน
+  en: soil contact
+  kind: history
+
+northeast_resident:
+  th: อยู่หรือเคยอยู่ภาคตะวันออกเฉียงเหนือ
+  en: lives or lived in northeast Thailand
+  kind: history
+
+diabetes:
+  th: เป็นเบาหวาน
+  en: diabetes
+  kind: history
+  aliases:
+    - diabetic            # reviewer
+
+animal_contact:
+  th: เลี้ยงสัตว์ ทำงานกับสัตว์ หรือขายเนื้อสัตว์
+  en: animal contact
+  kind: history
+
+dog_bite:
+  th: ถูกสุนัขกัด
+  en: dog bite
+  kind: history
+
+unprotected_sex:
+  th: มีเพศสัมพันธ์โดยไม่ป้องกัน
+  en: unprotected sex
+  kind: history
+
+unsafe_food:
+  th: กินอาหารไม่สุกหรือไม่สะอาด
+  en: undercooked or unclean food
+  kind: history
+
+sick_contacts:
+  th: คนรอบข้างป่วยด้วยอาการคล้ายกัน
+  en: sick contacts
+  kind: history
+  aliases: [สัมผัสผู้ป่วย, คนรอบข้างเจ็บป่วย]
+
+tb_contact:
+  th: สัมผัสผู้ป่วยวัณโรคหรือคนไอเรื้อรัง
+  en: tuberculosis contact
+  kind: history
+
+new_medication:
+  th: เพิ่งได้ยาใหม่หรือปรับยา
+  en: new or changed medication
+  kind: history
+
+recent_vaccine_or_transfusion:
+  th: เพิ่งได้รับวัคซีนหรือรับเลือด
+  en: recent vaccine or blood transfusion
+  kind: history
+
+# ── History (cough chapter p.199–213) ─────────────────────────────────────
+history_asthma:
+  th: เป็นโรคหอบหืด
+  en: known asthma
+  kind: history
+
+history_copd:
+  th: เป็นโรคปอดอุดกั้นเรื้อรัง
+  en: known COPD
+  kind: history
+
+history_allergy:
+  th: เป็นโรคภูมิแพ้
+  en: known allergy
+  kind: history
+
+history_heart_disease:
+  th: เป็นโรคหัวใจ
+  en: known heart disease
+  kind: history
+  aliases:
+    - cardiac disease     # reviewer
+    - heart disease       # reviewer
+
+history_gi_liver_disease:
+  th: เป็นโรคกระเพาะหรือโรคตับ
+  en: known stomach or liver disease
+  kind: history
+  aliases:
+    - โรคกระเพาะ          # reviewer
+    - gastritis           # reviewer
+
+connective_tissue_disease:
+  th: เป็นโรค SLE หรือโรคเนื้อเยื่อเกี่ยวพัน
+  en: connective tissue disease
+  kind: history
+
+hiv_infection:
+  th: ติดเชื้อเอชไอวี
+  en: HIV infection
+  kind: history
+
+trigger_exposure:
+  th: อาการกำเริบหลังสัมผัสสิ่งกระตุ้น
+  en: symptoms triggered by an exposure
+  kind: history
+
+recent_respiratory_infection:
+  th: เพิ่งเป็นหวัดหรือติดเชื้อทางเดินหายใจมาก่อน
+  en: recent respiratory infection
+  kind: history
+
+recurrent_lung_infections:
+  th: ปอดติดเชื้อซ้ำหลายครั้ง
+  en: recurrent lung infections
+  kind: history
+
+choking_history:
+  th: มีประวัติสำลัก
+  en: history of choking or aspiration
+  kind: history
+
+smoking:
+  th: สูบบุหรี่
+  en: smoking
+  kind: history
+
+heavy_smoking:
+  th: สูบบุหรี่มากกว่า 20 pack-year
+  en: heavy smoking (> 20 pack-years)
+  kind: history
+  parent: smoking
+  refines: {amount: over_20_pack_years}
+
+e_cigarette:
+  th: สูบบุหรี่ไฟฟ้า
+  en: e-cigarette use
+  kind: history
+  parent: smoking
+  refines: {type: e_cigarette}
+
+toxic_inhalation:
+  th: สูดดมสารพิษหรือฝุ่นควัน
+  en: toxic fume or dust inhalation
+  kind: history
+
+alcohol:
+  th: ดื่มแอลกอฮอล์
+  en: alcohol use
+  kind: history
+
+overweight:
+  th: น้ำหนักเกิน
+  en: overweight
+  kind: history
+
+lying_after_meals:
+  th: นอนหลังกินอาหารทันที
+  en: lying down right after meals
+  kind: history
+
+ace_inhibitor:
+  th: ใช้ยาลดความดันกลุ่ม ACEI
+  en: taking an ACE inhibitor
+  kind: history
+
+corticosteroid_use:
+  th: ใช้ยาสเตียรอยด์
+  en: corticosteroid use
+  kind: history
+
+antithrombotic_use:
+  th: ใช้ยาต้านเกล็ดเลือด ยาต้านการแข็งตัวของเลือด หรือยาละลายลิ่มเลือด
+  en: taking antiplatelets, anticoagulants or thrombolytics
+  kind: history
+
+# ── History (abdominal pain chapter p.247–259) ────────────────────────────
+abdominal_surgery:
+  th: เคยผ่าตัดช่องท้อง
+  en: previous abdominal surgery
+  kind: history
+
+viral_hepatitis_history:
+  th: เคยติดเชื้อไวรัสตับอักเสบบีหรือซี
+  en: hepatitis B or C infection
+  kind: history
+
+past_jaundice:
+  th: เคยตัวเหลืองตาเหลือง
+  en: previous jaundice
+  kind: history
+
+thalassemia:
+  th: เป็นธาลัสซีเมีย
+  en: thalassemia
+  kind: history
+
+family_history_gi_cancer:
+  th: คนในครอบครัวเป็นมะเร็งลำไส้ใหญ่ กระเพาะอาหาร หรือตับอ่อน
+  en: family history of colon, gastric or pancreatic cancer
+  kind: history
+
+nsaid_use:
+  th: ใช้ยาแก้ปวดกลุ่ม NSAIDs
+  en: NSAID use
+  kind: history
+
+gi_irritant_drug:
+  th: ใช้ยาเม็ดเหล็ก วิตามินซี หรือกัญชา
+  en: iron, vitamin C or cannabinoid use
+  kind: history
+
+recent_shingles:
+  th: เพิ่งเป็นงูสวัด
+  en: recent shingles
+  kind: history
+
+lead_exposure:
+  th: สัมผัสสารตะกั่ว
+  en: lead exposure
+  kind: history
+
+# ── History (rash chapter p.397–410) ──────────────────────────────────────
+contact_chemical:
+  th: สัมผัสสารเคมีหรือสารระคายผิว
+  en: contact with chemicals or irritants
+  kind: history
+
+sun_exposure:
+  th: ถูกแดดจัด
+  en: strong sun exposure
+  kind: history
+
+# ── History (joint pain chapter p.353–362) ────────────────────────────────
+iv_drug_use:
+  th: ใช้สารเสพติดฉีดเข้าเส้น
+  en: injection drug use
+  kind: history
+
+wound_near_joint:
+  th: มีบาดแผลใกล้ข้อที่ปวด
+  en: wound near the painful joint
+  kind: history
+
+recent_infection:
+  th: เพิ่งมีการติดเชื้อที่อื่นมาก่อน
+  en: recent infection elsewhere
+  kind: history
+
+previous_similar_attack:
+  th: เคยมีข้ออักเสบเฉียบพลันแบบเดียวกันมาก่อน
+  en: previous similar joint attack
+  kind: history
+
+sti_history:
+  th: เคยเป็นโรคติดต่อทางเพศสัมพันธ์
+  en: history of sexually transmitted infection
+  kind: history
+
+history_cancer:
+  th: เป็นมะเร็งหรือเคยเป็นมะเร็ง
+  en: current or past cancer
+  kind: history
+
+# ── Diarrhea (chapter 25 p.273–287) ───────────────────────────────────────
+watery_diarrhea:
+  th: ถ่ายเป็นน้ำ
+  en: watery diarrhea
+  kind: symptom
+  parent: diarrhea
+  refines: {character: watery}
+
+fatty_stool:
+  th: อุจจาระเป็นมันลอย
+  en: fatty stool
+  kind: symptom
+  parent: diarrhea
+  refines: {character: fatty}
+
+nocturnal_diarrhea:
+  th: ต้องตื่นมาถ่ายตอนกลางคืน
+  en: nocturnal diarrhea
+  kind: symptom
+  parent: diarrhea
+  refines: {timing: nocturnal}
+
+diarrhea_after_dairy:
+  th: ถ่ายเหลวมากขึ้นหลังดื่มนมหรือกินอาหารบางชนิด
+  en: diarrhea after dairy or certain foods
+  kind: symptom
+  parent: diarrhea
+  refines: {aggravating: dairy}
+
+diarrhea_with_stress_or_spicy_food:
+  th: ถ่ายเหลวมากขึ้นเวลาเครียดหรือกินเผ็ด
+  en: diarrhea worse with stress or spicy food
+  kind: symptom
+  parent: diarrhea
+  refines: {aggravating: stress_or_spicy}
+
+diarrhea_stops_fasting:
+  th: งดอาหารแล้วหยุดถ่าย
+  en: diarrhea stops with fasting
+  kind: symptom
+  parent: diarrhea
+  refines: {relieving: fasting}
+
+relief_after_defecation:
+  th: ถ่ายแล้วอาการดีขึ้น
+  en: relief after defecation
+  kind: symptom
+  parent: diarrhea
+  refines: {relieving: defecation}
+
+tenesmus:
+  th: ปวดเบ่งหรือหน่วงทวารหนัก ถ่ายไม่สุด
+  en: tenesmus
+  kind: symptom
+  aliases:
+    - ปวดเบ่ง               # p.277
+
+fecal_urgency:
+  th: รู้สึกกลั้นอุจจาระไม่อยู่ ต้องรีบเข้าห้องน้ำ
+  en: fecal urgency
+  kind: symptom
+
+fecal_incontinence:
+  th: กลั้นอุจจาระไม่ได้
+  en: fecal incontinence
+  kind: symptom
+
+constipation:
+  th: ท้องผูก
+  en: constipation
+  kind: symptom
+
+perianal_abscess:
+  th: ฝีหรือแผลรอบรูทวาร
+  en: perianal abscess or fistula
+  kind: symptom
+
+flushing:
+  th: หน้าแดง ร้อนวูบวาบ
+  en: flushing
+  kind: symptom
+
+palpitation:
+  th: ใจสั่น
+  en: palpitations
+  kind: symptom
+
+recent_antibiotics:
+  th: เพิ่งได้ยาฆ่าเชื้อ
+  en: recent antibiotics
+  kind: history
+
+laxative_use:
+  th: ใช้ยาระบาย
+  en: laxative use
+  kind: history
+
+raw_freshwater_fish:
+  th: กินปลาน้ำจืดสุกๆ ดิบๆ
+  en: undercooked freshwater fish
+  kind: history
+
+radiation_history:
+  th: เคยฉายแสงบริเวณช่องท้อง
+  en: abdominal radiotherapy
+  kind: history
+
+bedridden:
+  th: ติดเตียงหรือเคลื่อนไหวได้น้อย
+  en: bedridden or immobile
+  kind: history
+
+# ── Dizziness (chapter 9 p.89–99) ─────────────────────────────────────────
+dizziness:
+  th: เวียนศีรษะ
+  en: dizziness
+  kind: symptom
+  aliases:
+    - มึนศีรษะ              # p.90
+    - มึนหัว
+    - dizzy               # reviewer
+
+vertigo:
+  th: เวียนศีรษะหมุน
+  en: vertigo
+  kind: symptom
+  parent: dizziness
+  refines: {character: rotational}
+  aliases:
+    - บ้านหมุน              # p.89
+
+lightheadedness:
+  th: หวิว ลอย คล้ายจะเป็นลม
+  en: lightheadedness
+  kind: symptom
+  parent: dizziness
+  refines: {character: lightheaded}
+
+unsteadiness:
+  th: ทรงตัวไม่อยู่ โคลงเคลง
+  en: unsteadiness
+  kind: symptom
+  parent: dizziness
+  refines: {character: unsteady}
+  aliases:
+    - เดินเซ                # p.96
+    - unsteady            # reviewer
+    - loss of balance     # reviewer
+
+sudden_vertigo:
+  th: เวียนศีรษะขึ้นมาทันทีทันใด
+  en: sudden-onset vertigo
+  kind: symptom
+  parent: dizziness
+  refines: {onset: sudden}
+
+positional_vertigo:
+  th: เวียนเวลาเปลี่ยนท่าหรือหันศีรษะ
+  en: vertigo triggered by position change
+  kind: symptom
+  parent: dizziness
+  refines: {trigger: position_change}
+
+severe_vertigo:
+  th: เวียนมากจนต้องนอนนิ่งๆ
+  en: severe vertigo
+  kind: symptom
+  parent: dizziness
+  refines: {severity: severe}
+
+unable_to_stand:
+  th: ลุกยืนหรือเดินไม่ได้ จะล้ม
+  en: unable to stand or walk
+  kind: symptom
+  red_flag: true
+
+hearing_loss:
+  th: การได้ยินลดลง
+  en: hearing loss
+  kind: symptom
+  aliases:
+    - หูดับ                 # p.95
+
+tinnitus:
+  th: เสียงหึ่งๆในหู  # reviewer
+  en: tinnitus
+  kind: symptom
+  aliases:
+    - เสียงดังในหู           # p.95
+    - เสียงในหู             # p.96
+    - เสียงดังรบกวนในหู   # reviewer
+
+diplopia:
+  th: เห็นภาพซ้อน
+  en: double vision
+  kind: symptom
+  red_flag: true
+
+dysarthria:
+  th: พูดไม่ชัด พูดลำบาก
+  en: slurred speech
+  kind: symptom
+  aliases:
+    - ลิ้นแข็ง              # p.89
+  red_flag: true
+
+perioral_numbness:
+  th: ชารอบปาก
+  en: numbness around the mouth
+  kind: symptom
+  red_flag: true
+
+hemiparesis:
+  th: แขนขาอ่อนแรงครึ่งซีก
+  en: weakness of one side of the body
+  kind: symptom
+  aliases:
+    - แขนขาเป็นอัมพาต       # p.96
+  red_flag: true
+
+limb_incoordination:
+  th: แขนขาไม่ประสานกัน หยิบจับไม่แม่น
+  en: limb incoordination
+  kind: symptom
+
+olfactory_hallucination:
+  th: ได้กลิ่นแปลกๆ
+  en: olfactory hallucination
+  kind: symptom
+
+loss_of_consciousness:
+  th: หมดสติ
+  en: loss of consciousness
+  kind: symptom
+  red_flag: true
+
+neck_pain:
+  th: ปวดต้นคอ
+  en: neck pain
+  kind: symptom
+
+ear_vesicles:
+  th: ตุ่มน้ำใสรอบหูหรือที่ใบหน้า
+  en: blisters around the ear or face
+  kind: symptom
+
+history_hypertension:
+  th: เป็นความดันโลหิตสูง
+  en: hypertension
+  kind: history
+  aliases:
+    - ความดันสูง          # reviewer
+    - high blood pressure # reviewer
+
+dyslipidemia:
+  th: ไขมันในเลือดสูง
+  en: dyslipidemia
+  kind: history
+  aliases:
+    - ไขมันสูง            # reviewer
+    - high cholesterol    # reviewer
+    - hypercholesterolemia   # reviewer
+
+stroke_history:
+  th: เคยเป็นโรคหลอดเลือดสมอง
+  en: previous stroke
+  kind: history
+
+head_trauma:
+  th: เคยได้รับอุบัติเหตุกระแทกศีรษะ
+  en: head trauma
+  kind: history
+
+neck_manipulation:
+  th: เพิ่งนวดหรือดัดต้นคออย่างแรง
+  en: recent forceful neck manipulation
+  kind: history
+
+ototoxic_drug:
+  th: ใช้ยาที่เป็นพิษต่อหู เช่น phenytoin หรือยาฆ่าเชื้อกลุ่ม aminoglycosides
+  en: ototoxic drug use
+  kind: history
+
+migraine_history:
+  th: เป็นไมเกรน
+  en: migraine
+  kind: history
+
+chronic_ear_disease:
+  th: เป็นโรคหูน้ำหนวกเรื้อรัง
+  en: chronic ear disease
+  kind: history
+
+antihypertensive_use:
+  th: ใช้ยาลดความดันโลหิต
+  en: antihypertensive use
+  kind: history
+
+# ── Low back pain (chapter 31 p.343–351) ──────────────────────────────────
+back_pain_worse_with_use:
+  th: ปวดหลังมากขึ้นเวลาใช้งาน พักแล้วดีขึ้น
+  en: back pain worse with activity, better with rest
+  kind: symptom
+  parent: back_pain
+  refines: {relation_to_activity: worse_with_use}
+
+night_back_pain:
+  th: ปวดหลังตอนกลางคืนหรือขณะพัก
+  en: back pain at night or at rest
+  kind: symptom
+  parent: back_pain
+  refines: {relation_to_activity: at_rest_or_night}
+  red_flag: true
+
+back_morning_stiffness_long:
+  th: ตื่นเช้าหลังตึงนานกว่า 30 นาที
+  en: morning back stiffness over 30 minutes
+  kind: symptom
+  parent: back_pain
+  refines: {morning_stiffness: over_30_minutes}
+
+sudden_back_pain:
+  th: ปวดหลังขึ้นมาทันที
+  en: sudden-onset back pain
+  kind: symptom
+  parent: back_pain
+  refines: {onset: sudden}
+
+insidious_back_pain:
+  th: ปวดหลังค่อยๆ มากขึ้นเรื่อยๆ
+  en: insidious-onset back pain
+  kind: symptom
+  parent: back_pain
+  refines: {onset: insidious}
+
+treatment_failure_4_6_weeks:
+  th: รักษามา 4–6 สัปดาห์แล้วไม่ดีขึ้น
+  en: no improvement after 4–6 weeks of treatment
+  kind: symptom
+  parent: back_pain
+  refines: {response_to_treatment: not_improved}
+  red_flag: true
+
+saddle_anesthesia:
+  th: ชารอบทวารหนักหรือบริเวณที่นั่ง
+  en: numbness around the anus or buttocks (saddle area)
+  kind: symptom
+  red_flag: true
+
+urinary_or_fecal_difficulty:
+  th: ปัสสาวะหรืออุจจาระลำบาก กลั้นไม่ได้
+  en: difficulty or loss of control passing urine or stool
+  kind: symptom
+  red_flag: true
+
+leg_weakness:
+  th: ขาอ่อนแรง
+  en: leg weakness
+  kind: symptom
+  red_flag: true
+
+leg_numbness:
+  th: ขาชา
+  en: leg numbness
+  kind: symptom
+
+difficulty_urinating:
+  th: ปัสสาวะลำบาก
+  en: difficulty urinating
+  kind: symptom
+
+pulsatile_abdominal_mass:
+  th: คลำได้ก้อนเต้นตุบๆ ในท้อง
+  en: pulsating lump in the abdomen
+  kind: symptom
+  red_flag: true
+
+osteoporosis:
+  th: เป็นโรคกระดูกพรุน
+  en: osteoporosis
+  kind: history
+
+significant_trauma:
+  th: เพิ่งได้รับอุบัติเหตุรุนแรงที่หลัง
+  en: significant back trauma
+  kind: history
+
+# ── Edema (chapter 27 p.299–311) ──────────────────────────────────────────
+generalized_edema:
+  th: บวมทั้งตัว
+  en: generalized edema
+  kind: symptom
+  parent: edema
+  refines: {distribution: generalized}
+
+unilateral_leg_swelling:
+  th: ขาบวมข้างเดียว
+  en: one leg swollen
+  kind: symptom
+  parent: edema
+  refines: {laterality: unilateral}
+
+bilateral_leg_swelling:
+  th: ขาบวมสองข้าง
+  en: both legs swollen
+  kind: symptom
+  parent: edema
+  refines: {laterality: bilateral}
+
+periorbital_edema:
+  th: หนังตาบวม
+  en: puffy eyelids
+  kind: symptom
+  parent: edema
+  refines: {location: eyelids}
+  aliases:
+    - หนังตาบวม             # p.299
+
+face_swelling:
+  th: หน้าบวม
+  en: facial swelling
+  kind: symptom
+  parent: edema
+  refines: {location: face}
+
+dyspnea_before_edema:
+  th: เหนื่อยก่อนแล้วจึงบวม
+  en: breathlessness before the swelling
+  kind: symptom
+  parent: edema
+  refines: {sequence: dyspnea_first}
+
+edema_before_dyspnea:
+  th: บวมก่อนแล้วจึงเหนื่อย
+  en: swelling before the breathlessness
+  kind: symptom
+  parent: edema
+  refines: {sequence: edema_first}
+
+ascites_before_edema:
+  th: ท้องโตก่อนแล้วขาจึงบวม
+  en: abdominal swelling before leg swelling
+  kind: symptom
+  parent: edema
+  refines: {sequence: abdomen_first}
+
+premenstrual_swelling:
+  th: บวมช่วงก่อนมีประจำเดือน
+  en: swelling before periods
+  kind: symptom
+  parent: edema
+  refines: {timing: premenstrual}
+  sex: female
+
+foamy_urine:
+  th: ปัสสาวะเป็นฟอง
+  en: foamy urine
+  kind: symptom
+
+cola_colored_urine:
+  th: ปัสสาวะสีน้ำล้างเนื้อ
+  en: cola-coloured urine
+  kind: symptom
+
+recurrent_cellulitis:
+  th: เคยเป็นผิวหนังอักเสบติดเชื้อซ้ำๆ ที่ขา
+  en: recurrent cellulitis
+  kind: history
+
+recent_sore_throat_or_skin_infection:
+  th: เพิ่งเจ็บคอหรือมีแผลติดเชื้อที่ผิวหนังภายใน 1–6 สัปดาห์
+  en: sore throat or skin infection in the last 1–6 weeks
+  kind: history
+
+previous_dvt:
+  th: เคยมีลิ่มเลือดอุดตันในหลอดเลือดดำ
+  en: previous venous thrombosis
+  kind: history
+
+pregnancy:
+  th: ตั้งครรภ์
+  en: pregnancy
+  kind: history
+  sex: female
+
+oral_contraceptive_use:
+  th: ใช้ยาคุมกำเนิดหรือฮอร์โมนเอสโตรเจน
+  en: oral contraceptive or estrogen use
+  kind: history
+  sex: female
+
+ccb_use:
+  th: ใช้ยาลดความดันกลุ่ม amlodipine
+  en: calcium-channel blocker (amlodipine) use
+  kind: history
+
+lymph_node_surgery_or_radiation:
+  th: เคยผ่าตัดต่อมน้ำเหลืองหรือฉายแสง
+  en: previous lymph node surgery or radiotherapy
+  kind: history
+
+# ── Headache (chapter 8 p.79–86) ──────────────────────────────────────────
+thunderclap_headache:
+  th: ปวดศีรษะรุนแรงทันทีทันใด สุดๆ ภายใน 1 นาที
+  en: thunderclap headache
+  kind: symptom
+  parent: headache
+  refines: {onset: thunderclap}
+  red_flag: true
+
+longstanding_headache:
+  th: ปวดศีรษะแบบนี้มานานกว่า 6 เดือน
+  en: same headache for over 6 months
+  kind: symptom
+  parent: headache
+  refines: {duration: longstanding}
+
+episodic_stereotyped_headache:
+  th: ปวดศีรษะเป็นๆ หายๆ ลักษณะเหมือนเดิมทุกครั้ง
+  en: episodic headache with the same pattern each time
+  kind: symptom
+  parent: headache
+  refines: {pattern: episodic_stereotyped}
+
+persistent_progressive_headache:
+  th: ปวดศีรษะตลอดไม่หาย และรุนแรงขึ้นเรื่อยๆ
+  en: persistent, worsening headache
+  kind: symptom
+  parent: headache
+  refines: {pattern: persistent_progressive}
+  red_flag: true
+
+new_or_changed_headache:
+  th: เพิ่งปวดศีรษะเป็นครั้งแรก หรือลักษณะการปวดเปลี่ยนไปจากเดิม
+  en: first or changed headache
+  kind: symptom
+  parent: headache
+  refines: {pattern: new_or_changed}
+  red_flag: true
+
+throbbing_headache:
+  th: ปวดตุ้บๆ เหมือนชีพจรเต้น
+  en: throbbing headache
+  kind: symptom
+  parent: headache
+  refines: {character: throbbing}
+
+band_like_headache:
+  th: ปวดตื้อๆ บีบรัดรอบศีรษะ
+  en: band-like headache
+  kind: symptom
+  parent: headache
+  refines: {character: band_like}
+
+stabbing_headache:
+  th: ปวดเหมือนมีดแทงหรือไฟช็อต
+  en: stabbing or electric headache
+  kind: symptom
+  parent: headache
+  refines: {character: stabbing_electric}
+
+one_sided_headache:
+  th: ปวดศีรษะครึ่งซีก
+  en: one-sided headache
+  kind: symptom
+  parent: headache
+  refines: {location: one_side}
+
+periorbital_headache:
+  th: ปวดรอบกระบอกตา
+  en: pain around the eye
+  kind: symptom
+  parent: headache
+  refines: {location: around_eye}
+
+fixed_side_headache:
+  th: ปวดข้างเดิมทุกครั้ง
+  en: always the same side
+  kind: symptom
+  parent: headache
+  refines: {laterality_pattern: fixed_side}
+
+alternating_side_headache:
+  th: ปวดสลับข้างไปมา
+  en: side varies between attacks
+  kind: symptom
+  parent: headache
+  refines: {laterality_pattern: alternating}
+
+orthostatic_headache:
+  th: ปวดเวลานั่งหรือยืน ดีขึ้นเมื่อนอนราบ
+  en: headache when upright, better lying down
+  kind: symptom
+  parent: headache
+  refines: {aggravating: upright}
+
+headache_worse_lying:
+  th: ปวดมากขึ้นเวลานอนราบ
+  en: headache worse lying down
+  kind: symptom
+  parent: headache
+  refines: {aggravating: lying_down}
+
+headache_worse_cough_strain:
+  th: ปวดมากขึ้นเวลาไอ จาม หรือเบ่ง
+  en: headache worse with cough or strain
+  kind: symptom
+  parent: headache
+  refines: {aggravating: cough_strain}
+  red_flag: true
+
+headache_wakes_from_sleep:
+  th: ปวดจนตื่นกลางดึกหรือปวดมากตอนตื่นนอน
+  en: headache wakes from sleep
+  kind: symptom
+  parent: headache
+  refines: {timing: wakes_from_sleep}
+
+menstrual_headache:
+  th: ปวดศีรษะสัมพันธ์กับประจำเดือน
+  en: headache linked to periods
+  kind: symptom
+  sex: female
+
+photophobia:
+  th: แพ้แสงหรือแพ้เสียง
+  en: light or sound sensitivity
+  kind: symptom
+
+visual_aura:
+  th: เห็นแสงวูบวาบหรือเส้นซิกแซกก่อนปวด
+  en: visual aura
+  kind: symptom
+
+blurred_vision:
+  th: ตามัว
+  en: blurred vision
+  kind: symptom
+  aliases:
+    - ตาพร่ามัว           # reviewer
+    - ตาพร่า              # reviewer
+
+tearing:
+  th: น้ำตาไหล
+  en: tearing
+  kind: symptom
+
+jaw_claudication:
+  th: ปวดกรามเวลาเคี้ยว
+  en: jaw pain when chewing
+  kind: symptom
+
+scalp_tenderness:
+  th: เจ็บหนังศีรษะบริเวณขมับ
+  en: tender scalp at the temples
+  kind: symptom
+
+family_history_migraine:
+  th: คนในครอบครัวเป็นไมเกรน
+  en: family history of migraine
+  kind: history
+
+obesity:
+  th: อ้วนมาก
+  en: obesity
+  kind: history
+
+stress:
+  th: มีความเครียด
+  en: stress
+  kind: history
+
+# ── Upper respiratory (guideline g.15–31, 107–109) ────────────────────────
+severe_sore_throat:
+  th: เจ็บคอมาก กลืนลำบาก
+  en: severe sore throat
+  kind: symptom
+  parent: sore_throat
+  refines: {severity: severe}
+
+persistent_rhinorrhea:
+  th: น้ำมูกไม่ดีขึ้นนานกว่า 10 วัน
+  en: runny nose not improving for over 10 days
+  kind: symptom
+  parent: rhinorrhea
+  refines: {duration: over_10_days}
+
+double_sickening:
+  th: อาการหวัดดีขึ้นแล้วกลับแย่ลงอีก
+  en: cold getting worse again after improving
+  kind: symptom
+  parent: rhinorrhea
+  refines: {course: worsening_after_improving}
+
+daytime_cough:
+  th: ไอช่วงกลางวัน
+  en: daytime cough
+  kind: symptom
+  parent: cough
+  refines: {timing: daytime}
+
+tonsillar_exudate:
+  th: ทอนซิลบวมแดงหรือเป็นหนอง
+  en: red swollen tonsils or pus on the tonsils
+  kind: symptom
+
+tender_neck_lymph_node:
+  th: ต่อมน้ำเหลืองที่คอโต กดเจ็บ
+  en: tender swollen neck glands
+  kind: symptom
+
+facial_pain:
+  th: ปวดหรือกดเจ็บบนใบหน้า โหนกแก้ม เหนือคิ้ว ระหว่างหัวตา
+  en: facial pain or tenderness
+  kind: symptom
+
+hyponasal_voice:
+  th: เสียงขึ้นจมูก
+  en: nasal-sounding voice
+  kind: symptom
+
+anosmia:
+  th: ไม่ได้กลิ่น
+  en: loss of smell
+  kind: symptom
+
+toothache:
+  th: ปวดฟันบน
+  en: upper toothache
+  kind: symptom
+
+eye_irritation:
+  th: เคืองตา
+  en: eye irritation
+  kind: symptom
+
+gum_bleeding:
+  th: เหงือกบวมแดง เลือดออกง่าย
+  en: swollen bleeding gums
+  kind: symptom
+
+strep_contact:
+  th: ใกล้ชิดผู้ป่วยคออักเสบจากเชื้อสเตรปโตคอคคัส
+  en: contact with streptococcal throat infection
+  kind: history
+
+daycare_attendance:
+  th: อยู่ในสถานรับเลี้ยงเด็ก
+  en: attends daycare
+  kind: history
+
+smoke_exposure:
+  th: สัมผัสควันบุหรี่หรือมลพิษในอากาศ
+  en: smoke or air pollution exposure
+  kind: history
+
+# ── Eye (eye notes) ───────────────────────────────────────────────────────
+eye_discharge:
+  th: ขี้ตา
+  en: eye discharge
+  kind: symptom
+
+watery_eye_discharge:
+  th: น้ำตาไหลหรือขี้ตาใส
+  en: watery eye discharge
+  kind: symptom
+  parent: eye_discharge
+  refines: {character: watery}
+
+mucoid_eye_discharge:
+  th: ขี้ตาเป็นเมือก
+  en: mucoid eye discharge
+  kind: symptom
+  parent: eye_discharge
+  refines: {character: mucoid}
+
+mucopurulent_eye_discharge:
+  th: ขี้ตาเป็นหนองสีเหลืองเขียว
+  en: mucopurulent eye discharge
+  kind: symptom
+  parent: eye_discharge
+  refines: {character: mucopurulent}
+
+severe_purulent_eye_discharge:
+  th: ขี้ตาเป็นหนองมาก ไหลตลอด
+  en: profuse purulent eye discharge
+  kind: symptom
+  parent: eye_discharge
+  refines: {character: severe_purulent}
+  red_flag: true
+
+sudden_vision_loss:
+  th: ตามัวลงทันที
+  en: sudden loss of vision
+  kind: symptom
+  parent: blurred_vision
+  refines: {onset: sudden}
+  red_flag: true
+
+severe_eye_pain:
+  th: ปวดตามาก
+  en: severe eye pain
+  kind: symptom
+
+eye_pain_on_movement:
+  th: ปวดตาเวลากลอกตา
+  en: eye pain on eye movement
+  kind: symptom
+
+halos:
+  th: เห็นแสงเป็นวงรุ้งรอบดวงไฟ
+  en: halos around lights
+  kind: symptom
+  red_flag: true
+
+floaters:
+  th: เห็นจุดดำลอยไปมา
+  en: floaters
+  kind: symptom
+
+color_vision_loss:
+  th: เห็นสีผิดไปจากเดิม
+  en: colours look faded
+  kind: symptom
+
+eyelid_lump:
+  th: ตุ่มที่เปลือกตา
+  en: lump on the eyelid
+  kind: symptom
+  aliases:
+    - กุ้งยิง
+
+eyelid_inflammation:
+  th: เปลือกตาอักเสบ แดง เป็นขุย
+  en: inflamed flaky eyelids
+  kind: symptom
+  aliases:
+    - เปลือกตาอักเสบ        # eye.2
+
+eyelid_swelling:
+  th: เปลือกตาบวม
+  en: eyelid swelling
+  kind: symptom
+  aliases:
+    - ตาบวม               # reviewer
+
+painful_lump_inner_corner:
+  th: ก้อนบวมเจ็บที่หัวตา
+  en: painful swelling at the inner corner of the eye
+  kind: symptom
+
+preauricular_lymph_node:
+  th: ต่อมน้ำเหลืองหน้าหูโต
+  en: swollen gland in front of the ear
+  kind: symptom
+
+eye_trauma:
+  th: อุบัติเหตุที่ตาหรือมีสิ่งเข้าตา
+  en: eye injury or something in the eye
+  kind: history
+  red_flag: true
+
+contact_lens_use:
+  th: ใส่คอนแทกต์เลนส์
+  en: contact lens use
+  kind: history
+
+hyperopia:
+  th: สายตายาว
+  en: long-sightedness
+  kind: history
+
+eye_rubbing_or_straining:
+  th: ขยี้ตา หรือไอ จาม เบ่งแรงๆ
+  en: eye rubbing, coughing or straining
+  kind: history
+
+# ── Ear (ENT notes, guideline g.46–49) ────────────────────────────────────
+severe_ear_pain:
+  th: ปวดหูมาก
+  en: severe ear pain
+  kind: symptom
+
+ear_itch:
+  th: คันหู
+  en: itchy ear
+  kind: symptom
+
+pain_pressing_tragus:
+  th: กดหน้ารูหูแล้วเจ็บ
+  en: pain when pressing the front of the ear
+  kind: symptom
+
+red_swollen_auricle:
+  th: ใบหูบวมแดงเจ็บ
+  en: red swollen painful outer ear
+  kind: symptom
+
+facial_weakness:
+  th: หน้าเบี้ยว ปากเบี้ยว หลับตาไม่สนิท
+  en: facial weakness
+  kind: symptom
+  red_flag: true
+
+foul_ear_discharge:
+  th: หนองไหลจากหูมีกลิ่นเหม็น
+  en: foul-smelling ear discharge
+  kind: symptom
+  parent: ear_discharge
+  refines: {odor: foul}
+
+recurrent_ear_discharge:
+  th: หนองไหลจากหูเป็นๆ หายๆ
+  en: recurrent ear discharge
+  kind: symptom
+  parent: ear_discharge
+  refines: {course: recurrent}
+
+pulsatile_tinnitus:
+  th: ได้ยินเสียงตุบๆ ในหูตามจังหวะชีพจร
+  en: pulsatile tinnitus
+  kind: symptom
+  parent: tinnitus
+  refines: {character: pulsatile}
+
+sudden_hearing_loss:
+  th: การได้ยินลดลงทันทีภายใน 3 วัน
+  en: sudden hearing loss
+  kind: symptom
+  parent: hearing_loss
+  refines: {onset: sudden}
+  red_flag: true
+
+one_sided_hearing_loss:
+  th: การได้ยินลดลงข้างเดียว
+  en: hearing loss in one ear
+  kind: symptom
+  parent: hearing_loss
+  refines: {laterality: one_ear}
+
+muffled_hearing:
+  th: ได้ยินเสียงเบาลง
+  en: sounds muffled
+  kind: symptom
+  parent: hearing_loss
+  refines: {character: muffled}
+
+hears_but_unclear:
+  th: ได้ยินแต่ฟังไม่รู้เรื่อง
+  en: hears but cannot make out words
+  kind: symptom
+  parent: hearing_loss
+  refines: {character: hears_but_unclear}
+
+ear_pulling:
+  th: เด็กดึงหู ทุบหู ร้องกวน
+  en: child pulls at the ear
+  kind: symptom
+
+delayed_speech:
+  th: เด็กพูดช้า
+  en: delayed speech in a child
+  kind: symptom
+
+water_in_ear:
+  th: หูโดนน้ำบ่อย ว่ายน้ำ
+  en: frequent water in the ear
+  kind: history
+
+ear_cleaning_trauma:
+  th: แคะหูหรือใช้ไม้พันสำลีเช็ดหู
+  en: ear picking or cotton bud use
+  kind: history
+
+ear_trauma:
+  th: อุบัติเหตุที่หูหรือถูกตบหู
+  en: injury to the ear
+  kind: history
+
+flying_or_diving:
+  th: เพิ่งขึ้นเครื่องบินหรือดำน้ำ
+  en: recent flight or diving
+  kind: history
+
+loud_noise_exposure:
+  th: สัมผัสเสียงดังมาก
+  en: loud noise exposure
+  kind: history
+
+# ── Chest pain (chapter 14 p.153–160) ─────────────────────────────────────
+sudden_chest_pain:
+  th: เจ็บหน้าอกขึ้นมาทันทีและรุนแรง   # p.155
+  en: sudden severe chest pain
+  kind: symptom
+  parent: chest_pain
+  refines: {onset: sudden_severe}
+
+pressure_chest_pain:
+  th: เจ็บแน่นหน้าอกเหมือนของหนักทับ   # p.154
+  en: pressing chest pain
+  kind: symptom
+  parent: chest_pain
+  refines: {character: pressure}
+
+tearing_chest_pain:
+  th: เจ็บหน้าอกเหมือนถูกฉีกหรือมีดแทง   # p.156
+  en: tearing chest pain
+  kind: symptom
+  parent: chest_pain
+  refines: {character: tearing}
+
+burning_chest_pain:
+  th: เจ็บแสบร้อนที่หน้าอก   # p.158
+  en: burning chest pain
+  kind: symptom
+  parent: chest_pain
+  refines: {character: burning}
+
+exertional_chest_pain:
+  th: เจ็บหน้าอกเวลาออกแรง   # p.154
+  en: chest pain on exertion
+  kind: symptom
+  parent: chest_pain
+  refines: {aggravating: exertion}
+
+chest_pain_worse_lying:
+  th: เจ็บหน้าอกมากขึ้นเวลานอนราบ   # p.156
+  en: chest pain worse lying down
+  kind: symptom
+  parent: chest_pain
+  refines: {aggravating: lying_flat}
+
+chest_wall_tenderness:
+  th: กดที่หน้าอกแล้วเจ็บ   # p.158
+  en: chest wall tenderness
+  kind: symptom
+  parent: chest_pain
+  refines: {aggravating: touch}
+
+chest_pain_relieved_by_rest:
+  th: เจ็บหน้าอกดีขึ้นเมื่อพัก   # p.156
+  en: chest pain relieved by rest
+  kind: symptom
+  parent: chest_pain
+  refines: {relieving: rest}
+
+chest_pain_relieved_leaning_forward:
+  th: เจ็บหน้าอกดีขึ้นเมื่อนั่งโน้มตัวไปข้างหน้า   # p.156
+  en: chest pain relieved by leaning forward
+  kind: symptom
+  parent: chest_pain
+  refines: {relieving: leaning_forward}
+
+chest_pain_radiating_arm:
+  th: เจ็บหน้าอกร้าวไปกราม คอ หรือแขนซ้าย   # p.156
+  en: chest pain radiating to jaw, neck or left arm
+  kind: symptom
+  parent: chest_pain
+  refines: {radiation: jaw_neck_arm}
+
+chest_pain_radiating_back:
+  th: เจ็บหน้าอกร้าวทะลุหลัง   # p.156
+  en: chest pain radiating to the back
+  kind: symptom
+  parent: chest_pain
+  refines: {radiation: back}
+
+prolonged_chest_pain:
+  th: เจ็บหน้าอกนานเกิน 15 นาที   # p.156
+  en: chest pain lasting over 15 minutes
+  kind: symptom
+  parent: chest_pain
+  refines: {duration: prolonged}
+
+diaphoresis:
+  th: เหงื่อออกมาก   # p.156
+  en: sweating
+  kind: symptom
+  aliases:
+    - เหงื่อแตก              # p.154
+
+kidney_disease:
+  th: เป็นโรคไต   # p.156
+  en: kidney disease
+  kind: history
+
+chest_trauma:
+  th: เพิ่งได้รับบาดเจ็บที่หน้าอก   # p.158
+  en: recent chest injury
+  kind: history
+
+chest_strain:
+  th: ยกของหนัก ออกกำลังหักโหม หรือไออย่างรุนแรง   # p.158
+  en: heavy lifting, strenuous exercise or violent coughing
+  kind: history
+
+# ── Dyspnea (chapter 18 p.189–198) ─────────────────────────────────────────
+trepopnea:
+  th: เหนื่อยเวลานอนตะแคงข้างใดข้างหนึ่ง   # p.190
+  en: dyspnea lying on one side
+  kind: symptom
+  parent: dyspnea
+  refines: {aggravating: lying_on_side}
+
+platypnea:
+  th: เหนื่อยเวลานั่งหรือยืน ดีขึ้นเมื่อนอนราบ   # p.190
+  en: dyspnea when upright
+  kind: symptom
+  parent: dyspnea
+  refines: {aggravating: sitting_up}
+
+dyspnea_bending_forward:
+  th: เหนื่อยเวลาก้มตัวไปข้างหน้า   # p.195
+  en: dyspnea on bending forward
+  kind: symptom
+  parent: dyspnea
+  refines: {aggravating: bending_forward}
+
+wheezing:
+  th: หายใจมีเสียงหวีด   # p.193
+  en: wheezing
+  kind: symptom
+
+weight_gain:
+  th: น้ำหนักขึ้น   # p.191
+  en: weight gain
+  kind: symptom
+
+kussmaul_breathing:
+  th: หายใจหอบแรงและลึก   # p.195
+  en: deep, labored breathing
+  kind: symptom
+
+irritability:
+  th: หงุดหงิด ฉุนเฉียวง่าย   # p.195
+  en: irritability
+  kind: symptom
+
+dry_skin:
+  th: ผิวแห้ง   # p.195
+  en: dry skin
+  kind: symptom
+
+depressed_mood:
+  th: ซึมเศร้า   # p.195
+  en: low mood
+  kind: symptom
+
+forgetfulness:
+  th: ขี้ลืม   # p.195
+  en: forgetfulness
+  kind: symptom
+
+family_history_heart_disease:
+  th: คนในครอบครัวเป็นโรคหัวใจและหลอดเลือด   # p.192
+  en: family history of heart disease
+  kind: history
+
+# ── Dysphagia (chapter 21 p.229–238) ───────────────────────────────────────
+cannot_swallow_saliva:
+  th: กลืนน้ำลายไม่ได้ น้ำลายไหลออกปาก   # p.231
+  en: cannot swallow saliva
+  kind: symptom
+
+choking_on_swallowing:
+  th: สำลักหรือไอขณะกลืน   # p.231
+  en: choking or coughing when swallowing
+  kind: symptom
+
+nasal_regurgitation:
+  th: อาหารหรือน้ำย้อนขึ้นจมูก   # p.231
+  en: food coming back through the nose
+  kind: symptom
+
+drooling:
+  th: น้ำลายหรืออาหารไหลออกจากปาก   # p.231
+  en: drooling
+  kind: symptom
+
+food_regurgitation:
+  th: ขย้อนอาหารที่กลืนลงไปแล้วออกมา   # p.230
+  en: regurgitation of swallowed food
+  kind: symptom
+
+food_stuck_after_big_bite:
+  th: กลืนติดหลังกินคำใหญ่หรือเคี้ยวไม่ละเอียด เช่น เนื้อสัตว์ ขนมปัง   # p.234
+  en: food sticks after large or poorly chewed bites
+  kind: symptom
+
+pain_with_hot_or_cold_drinks:
+  th: ดื่มของร้อนหรือเย็นแล้วเจ็บหรือจุกหน้าอก   # p.235
+  en: chest pain with hot or cold drinks
+  kind: symptom
+
+resting_tremor:
+  th: มือสั่นขณะอยู่เฉยๆ   # p.234
+  en: resting tremor
+  kind: symptom
+
+slow_movement:
+  th: เคลื่อนไหวช้าลง   # p.234
+  en: slow movement
+  kind: symptom
+
+neck_lump:
+  th: ก้อนที่ลำคอด้านหน้าหรือต่อมไทรอยด์โต   # p.232
+  en: lump in the front of the neck
+  kind: symptom
+
+pill_esophagitis_drug:
+  th: ใช้ยา bisphosphonate ยาเม็ดเหล็ก วิตามินซี tetracycline หรือ doxycycline   # p.232
+  en: takes pills that injure the esophagus
+  kind: history
+
+caustic_ingestion:
+  th: เคยกลืนสารกัดกร่อน   # p.235
+  en: swallowed a corrosive substance
+  kind: history
+
+head_neck_surgery_or_radiation:
+  th: เคยผ่าตัดหรือฉายแสงบริเวณคอ หลอดอาหาร หรือทรวงอก   # p.232
+  en: surgery or radiation to the neck, esophagus or chest
+  kind: history
+
+# ── GI bleeding (chapter 24 p.261–272) ─────────────────────────────────────
+massive_hematemesis:
+  th: อาเจียนเป็นเลือดปริมาณมาก   # p.265
+  en: massive hematemesis
+  kind: symptom
+  parent: hematemesis
+  refines: {amount: massive}
+  red_flag: true
+
+coffee_ground_vomitus:
+  th: อาเจียนเป็นสีน้ำตาลดำเหมือนกากกาแฟ   # p.263
+  en: coffee-ground vomitus
+  kind: symptom
+  parent: hematemesis
+  refines: {character: coffee_ground}
+
+blood_on_stool_surface:
+  th: เลือดหยดหรือเคลือบอยู่บนอุจจาระหลังถ่าย   # p.269
+  en: blood dripping or coating the stool
+  kind: symptom
+  parent: bloody_stool
+  refines: {pattern: coating_or_dripping}
+
+vomiting_before_hematemesis:
+  th: อาเจียนหลายครั้งก่อนจะอาเจียนเป็นเลือด   # p.265
+  en: repeated vomiting before hematemesis
+  kind: symptom
+
+persistent_bleeding:
+  th: เลือดออกไม่หยุดหรือออกซ้ำ   # p.267
+  en: ongoing or recurrent bleeding
+  kind: symptom
+
+narrow_stool:
+  th: อุจจาระลำเล็กลง   # p.268
+  en: narrow stools
+  kind: symptom
+
+bowel_habit_change:
+  th: ท้องผูกสลับท้องเสีย   # p.268
+  en: change in bowel habit
+  kind: symptom
+
+anal_discomfort:
+  th: ไม่สบายหรือหน่วงที่รูทวาร   # p.269
+  en: anal discomfort
+  kind: symptom
+
+painful_defecation:
+  th: เจ็บมากที่ทวารเวลาเบ่งถ่าย   # p.269
+  en: pain on defecation
+  kind: symptom
+
+herbal_medicine:
+  th: ใช้ยาชุด ยาสมุนไพร หรือยาลูกกลอน   # p.263
+  en: takes traditional or herbal remedies
+  kind: history
+
+h_pylori_history:
+  th: เคยติดเชื้อ H. pylori   # p.265
+  en: previous Helicobacter pylori infection
+  kind: history
+
+recent_polypectomy:
+  th: เพิ่งตัดติ่งเนื้อในลำไส้ใหญ่ภายใน 2 สัปดาห์   # p.269
+  en: polyp removed within 2 weeks
+  kind: history
+
+# ── Constipation (chapter 26 p.289–298) ────────────────────────────────────
+infrequent_stools:
+  th: ถ่ายอุจจาระน้อยกว่า 3 ครั้งต่อสัปดาห์   # p.292
+  en: fewer than 3 stools a week
+  kind: symptom
+  parent: constipation
+  refines: {frequency: infrequent}
+
+hard_stools:
+  th: อุจจาระแข็งเป็นก้อน   # p.290
+  en: hard, lumpy stools
+  kind: symptom
+
+straining:
+  th: ต้องเบ่งถ่ายนานหรือแรง   # p.290
+  en: straining at stool
+  kind: symptom
+
+anorectal_blockage:
+  th: รู้สึกถ่ายไม่ออกเหมือนมีอะไรอุดอยู่   # p.292
+  en: feeling of blockage when passing stool
+  kind: symptom
+
+digital_evacuation:
+  th: ต้องใช้นิ้วช่วยล้วงให้ถ่ายออก   # p.290
+  en: uses a finger to help pass stool
+  kind: symptom
+
+pain_related_to_defecation:
+  th: ปวดท้องที่สัมพันธ์กับการขับถ่าย   # p.293
+  en: abdominal pain related to defecation
+  kind: symptom
+
+constipating_drug:
+  th: ใช้ยาที่ทำให้ท้องผูก เช่น ยาแก้ปวดกลุ่มมอร์ฟีน ยาลดกรดที่มีอะลูมิเนียม ยาเม็ดเหล็ก แคลเซียม ยาต้านเศร้า ยากันชัก   # p.293
+  en: takes a drug that causes constipation
+  kind: history
+
+# ── Jaundice (chapter 20 p.217–228) ───────────────────────────────────────
+involuntary_movement:
+  th: มือสั่นหรือเคลื่อนไหวผิดปกติที่ควบคุมไม่ได้   # p.222
+  en: tremor or movements that cannot be controlled
+  kind: symptom
+
+wild_mushroom:
+  th: กินเห็ดป่า   # p.221
+  en: ate wild mushrooms
+  kind: history
+
+autoimmune_disease_history:
+  th: เป็นโรคภูมิคุ้มกันผิดปกติ เช่น รูมาตอยด์ ไทรอยด์เป็นพิษ ไทรอยด์อักเสบเรื้อรัง   # p.222
+  en: known autoimmune disease
+  kind: history
+
+family_history_liver_disease:
+  th: คนในครอบครัวเป็นโรคตับหรือไวรัสตับอักเสบ   # p.221, 222
+  en: family history of liver disease or viral hepatitis
+  kind: history
+
+previous_biliary_surgery:
+  th: เคยผ่าตัดหรือส่องกล้องรักษาท่อน้ำดีหรือถุงน้ำดี   # ตาราง 20-1; p.223
+  en: previous biliary surgery or procedure
+  kind: history
+
+# ── Weight change (chapter 5 p.45–57) ─────────────────────────────────────
+heat_intolerance:
+  th: ขี้ร้อนกว่าปกติ   # p.54
+  en: heat intolerance
+  kind: symptom
+
+cold_intolerance:
+  th: ขี้หนาวกว่าปกติ   # p.50
+  en: cold intolerance
+  kind: symptom
+
+polyuria:
+  th: ปัสสาวะปริมาณมากกว่าปกติ   # p.54
+  en: excessive urine volume
+  kind: symptom
+
+polydipsia:
+  th: หิวน้ำและดื่มน้ำบ่อย   # p.54
+  en: excessive thirst
+  kind: symptom
+
+polyphagia:
+  th: กินอาหารปริมาณมากกว่าปกติ   # p.48; ภาพ 5-1
+  en: increased food intake
+  kind: symptom
+
+early_satiety:
+  th: กินอาหารได้นิดเดียวก็อิ่ม   # p.54
+  en: early satiety
+  kind: symptom
+
+menstrual_change:
+  th: รอบเดือนหรือปริมาณประจำเดือนเปลี่ยนไป   # p.45, 50, 54
+  en: change in menstrual cycle or flow
+  kind: symptom
+  sex: female
+
+purple_striae:
+  th: มีรอยแตกลายสีม่วงที่ผิวหนัง   # p.50
+  en: purple skin striae
+  kind: symptom
+
+proximal_muscle_weakness:
+  th: กล้ามเนื้อต้นแขนหรือต้นขาอ่อนแรง   # p.50
+  en: proximal muscle weakness
+  kind: symptom
+
+hirsutism:
+  th: มีขนดกขึ้นแบบผู้ชาย   # p.50
+  en: hirsutism
+  kind: symptom
+  sex: female
+
+acne:
+  th: มีสิว   # p.50
+  en: acne
+  kind: symptom
+
+binge_eating:
+  th: กินมากจนหยุดตัวเองไม่ได้แล้วรู้สึกผิด   # p.51
+  en: episodes of uncontrolled overeating with guilt
+  kind: symptom
+
+manic_episodes:
+  th: มีช่วงอารมณ์ครื้นเครงผิดปกติสลับกับช่วงซึมเศร้า   # p.51
+  en: episodes of mania or hypomania alternating with depression
+  kind: symptom
+
+hypoglycemia_episodes:
+  th: มีภาวะน้ำตาลในเลือดต่ำเป็นๆ หายๆ   # p.50
+  en: recurrent hypoglycemia
+  kind: symptom
+
+chewing_problem:
+  th: เคี้ยวอาหารลำบากจากปัญหาฟันหรือช่องปาก   # p.53
+  en: difficulty chewing because of dental or oral problems
+  kind: symptom
+
+mouth_pain:
+  th: เจ็บในช่องปาก   # p.54; ตาราง 5-1
+  en: mouth pain
+  kind: symptom
+
+purging:
+  th: ทำให้อาเจียนหรือใช้ยาถ่ายหรือยาลดน้ำหนักเพื่อคุมน้ำหนัก   # p.53
+  en: self-induced vomiting or laxative or diet-pill use for weight control
+  kind: symptom
+
+insomnia:
+  th: นอนไม่หลับ   # p.51
+  en: insomnia
+  kind: symptom
+
+joint_swelling:
+  th: ข้อบวม   # p.55; ตาราง 5-1
+  en: joint swelling
+  kind: symptom
+
+dieting_or_exercise:
+  th: ตั้งใจลดน้ำหนักด้วยการคุมอาหารหรือออกกำลังกาย   # p.53
+  en: intentional dieting or exercise for weight loss
+  kind: history
+
+weight_gain_drug:
+  th: ใช้ยาที่ทำให้น้ำหนักขึ้น เช่น ยาจิตเวช ยากันชัก ยารักษาเบาหวาน หรือสเตียรอยด์   # p.50–51
+  en: takes medication associated with weight gain
+  kind: history
+
+smoking_cessation:
+  th: เพิ่งเลิกสูบบุหรี่   # p.49
+  en: recently stopped smoking
+  kind: history
+
+sedentary_lifestyle:
+  th: ใช้ชีวิตนั่งอยู่กับที่และไม่ค่อยเคลื่อนไหว   # p.49
+  en: sedentary lifestyle
+  kind: history
+
+sleep_deprivation:
+  th: นอนหลับไม่เพียงพอเป็นประจำ   # p.49
+  en: habitual sleep deprivation
+  kind: history
+
+high_fat_diet:
+  th: กินอาหารไขมันสูงหรือให้พลังงานสูงเป็นประจำ   # p.49
+  en: habitual high-fat or high-energy diet
+  kind: history
+
+high_salt_diet:
+  th: กินเค็มหรือกินอาหารโซเดียมสูง   # p.47–48
+  en: high salt intake
+  kind: history
+
+childhood_obesity:
+  th: มีภาวะอ้วนมาตั้งแต่เด็ก   # p.51
+  en: obesity since childhood
+  kind: history
+
+brain_disease_history:
+  th: เคยเป็นเนื้องอกหรือติดเชื้อในสมอง   # p.52
+  en: previous brain tumor or infection
+  kind: history
+
+muscle_training:
+  th: ฝึกเพาะกายหรือฝึกกีฬาเพื่อเพิ่มกล้ามเนื้อ   # p.52
+  en: bodybuilding or athletic muscle training
+  kind: history
+
+polypharmacy:
+  th: ใช้ยาหลายชนิดร่วมกัน   # p.55
+  en: takes several medications together
+  kind: history
+
+malabsorption_drug:
+  th: ใช้ยา orlistat หรือ acarbose   # p.55
+  en: takes orlistat or acarbose
+  kind: history
+
+substance_use:
+  th: ใช้สารเสพติด   # p.55
+  en: substance use
+  kind: history
+
+# ── Abnormal vaginal bleeding (chapter 38 p.419–428) ──────────────────────
+vaginal_bleeding:
+  th: เลือดออกผิดปกติทางช่องคลอด   # p.420
+  en: abnormal vaginal bleeding
+  kind: symptom
+  sex: female
+  aliases:
+    - เลือดออกทางช่องคลอด   # p.420
+
+acute_heavy_vaginal_bleeding:
+  th: ขณะนี้มีเลือดออกทางช่องคลอดมากอย่างเฉียบพลัน   # p.420, 424
+  en: current acute heavy vaginal bleeding
+  kind: symptom
+  parent: vaginal_bleeding
+  refines: {current_status: acute_heavy}
+  sex: female
+  red_flag: true
+
+heavy_menstrual_bleeding:
+  th: ประจำเดือนมามากกว่าปกติ   # p.420
+  en: heavy menstrual bleeding
+  kind: symptom
+  parent: vaginal_bleeding
+  refines: {pattern: menstrual, amount: heavy}
+  sex: female
+
+intermenstrual_bleeding:
+  th: เลือดออกกะปริบกะปรอยระหว่างรอบเดือน   # p.420
+  en: intermenstrual bleeding
+  kind: symptom
+  parent: vaginal_bleeding
+  refines: {pattern: intermenstrual}
+  sex: female
+
+prolonged_vaginal_bleeding:
+  th: เลือดออกทางช่องคลอดนานเกิน 8 วันต่อครั้ง   # p.420, 422
+  en: vaginal bleeding lasting more than 8 days per episode
+  kind: symptom
+  parent: vaginal_bleeding
+  refines: {episode_duration: over_8_days}
+  sex: female
+
+irregular_menstrual_bleeding:
+  th: ประจำเดือนมาไม่สม่ำเสมอ   # p.421, 426
+  en: irregular menstrual bleeding
+  kind: symptom
+  parent: vaginal_bleeding
+  refines: {regularity: irregular}
+  sex: female
+
+missed_period:
+  th: ประจำเดือนขาด   # p.422
+  en: missed menstrual period
+  kind: symptom
+  sex: female
+
+urinary_frequency:
+  th: ปัสสาวะบ่อย   # p.421
+  en: urinary frequency
+  kind: symptom
+
+lower_abdominal_mass:
+  th: คลำได้ก้อนบริเวณท้องน้อย   # p.421, 423
+  en: palpable lower abdominal mass
+  kind: symptom
+
+thyroid_disease_history:
+  th: เป็นโรคของต่อมไทรอยด์   # p.422
+  en: known thyroid disease
+  kind: history
+
+pcos_history:
+  th: เคยได้รับการวินิจฉัยว่าเป็น PCOS   # p.422
+  en: diagnosed polycystic ovary syndrome
+  kind: history
+  sex: female
+
+family_history_lynch_syndrome:
+  th: คนในครอบครัวเป็น Lynch syndrome   # p.422
+  en: family history of Lynch syndrome
+  kind: history
+
+gynecologic_hormone_use:
+  th: ใช้ฮอร์โมนเพื่อรักษาทางนรีเวชหรือคุมกำเนิด   # p.422, 425
+  en: hormonal gynecologic treatment or contraception
+  kind: history
+  sex: female
+
+antidepressant_use:
+  th: ใช้ยารักษาโรคซึมเศร้า   # p.422
+  en: antidepressant use
+  kind: history
+
+vaginal_injury_history:
+  th: ช่องคลอดได้รับบาดเจ็บจากอุบัติเหตุหรือหลังมีเพศสัมพันธ์   # p.423
+  en: vaginal injury after an accident or intercourse
+  kind: history
+  sex: female
+
+postpartum_hemorrhage_history:
+  th: เคยมีเลือดออกมากหลังคลอด   # p.426
+  en: previous postpartum hemorrhage
+  kind: history
+  sex: female
+
+# ── Urinary symptoms (uro.pdf) ─────────────────────────────────────────
+urinary_urgency:
+  th: ปวดปัสสาวะกะทันหันจนรอไม่ได้   # uro.2
+  en: urinary urgency
+  kind: symptom
+
+nocturia:
+  th: ต้องตื่นจากหลับมาปัสสาวะกลางคืน   # uro.2
+  en: nocturia
+  kind: symptom
+
+weak_urinary_stream:
+  th: ปัสสาวะไหลเบาหรือไม่พุ่ง   # uro.2
+  en: weak urinary stream
+  kind: symptom
+
+urinary_hesitancy:
+  th: ต้องรอนานกว่าปัสสาวะจะเริ่มไหล   # uro.2
+  en: urinary hesitancy
+  kind: symptom
+
+intermittent_urinary_stream:
+  th: ปัสสาวะไหลแล้วหยุดเป็นช่วงๆ   # uro.2
+  en: intermittent urinary stream
+  kind: symptom
+
+incomplete_bladder_emptying:
+  th: รู้สึกถ่ายปัสสาวะไม่สุด   # uro.2
+  en: feeling of incomplete bladder emptying
+  kind: symptom
+
+terminal_dribbling:
+  th: ช่วงท้ายปัสสาวะไหลเป็นหยด   # uro.2
+  en: terminal dribbling
+  kind: symptom
+
+post_void_dribbling:
+  th: ปัสสาวะหยดเลอะหลังถ่ายเสร็จแล้ว   # uro.2
+  en: post-void dribbling
+  kind: symptom
+
+split_urinary_stream:
+  th: ลำปัสสาวะแตกเป็นหลายสาย   # uro.2
+  en: split or spraying urinary stream
+  kind: symptom
+
+urinary_incontinence:
+  th: กลั้นปัสสาวะไม่ได้   # uro.2–3
+  en: urinary incontinence
+  kind: symptom
+  aliases:
+    - ปัสสาวะเล็ด   # uro.3
+
+stress_urinary_leak:
+  th: ปัสสาวะเล็ดเวลาไอ จาม หรือออกแรง   # uro.3
+  en: urine leakage with cough or exertion
+  kind: symptom
+  parent: urinary_incontinence
+  refines: {pattern: stress}
+  aliases:
+    - ไอแล้วปัสสาวะเล็ด   # uro.3
+    - จามแล้วปัสสาวะเล็ด   # uro.3
+
+urge_urinary_leak:
+  th: ปวดปัสสาวะมากแล้วเล็ดก่อนถึงห้องน้ำ   # uro.3
+  en: urine leakage after a compelling urge
+  kind: symptom
+  parent: urinary_incontinence
+  refines: {pattern: urge}
+
+overflow_urinary_leak:
+  th: ปัสสาวะล้นหรือซึมออกเมื่อถ่ายไม่หมด   # uro.3
+  en: overflow urinary leakage
+  kind: symptom
+  parent: urinary_incontinence
+  refines: {pattern: overflow}
+
+unable_to_urinate:
+  th: ปัสสาวะไม่ออก   # uro.3–4
+  en: unable to pass urine
+  kind: symptom
+  parent: difficulty_urinating
+  refines: {output: none}
+  aliases:
+    - ฉี่ไม่ออก   # uro.3
+
+urinary_retention:
+  th: มีปัสสาวะค้างในกระเพาะปัสสาวะ   # uro.3–4
+  en: urinary retention
+  kind: symptom
+  parent: difficulty_urinating
+  refines: {bladder: full}
+
+acute_urinary_retention:
+  th: ปัสสาวะไม่ออกขึ้นมาทันทีและปวดท้องน้อยตึง   # uro.3–4
+  en: acute painful urinary retention
+  kind: symptom
+  parent: difficulty_urinating
+  refines: {bladder: full, course: acute_painful}
+  red_flag: true
+
+chronic_urinary_retention:
+  th: ถ่ายปัสสาวะไม่หมดมานานแต่ไม่ปวด   # uro.3
+  en: chronic painless urinary retention
+  kind: symptom
+  parent: difficulty_urinating
+  refines: {bladder: full, course: chronic_painless}
+
+acute_on_chronic_retention:
+  th: ปัสสาวะออกยากมานานแล้วปวดตึงถ่ายไม่ออกมากขึ้นทันที   # uro.3
+  en: acute on chronic urinary retention
+  kind: symptom
+  parent: difficulty_urinating
+  refines: {bladder: full, course: acute_on_chronic}
+  red_flag: true
+
+anuria:
+  th: ไม่มีปัสสาวะออกเลย   # uro.4
+  en: anuria
+  kind: symptom
+
+colicky_flank_pain:
+  th: ปวดเอวบิดเป็นพักๆ   # uro.7, 11
+  en: colicky flank pain
+  kind: symptom
+  parent: flank_pain
+  refines: {character: colicky}
+
+flank_to_groin_pain:
+  th: ปวดเอวร้าวไปขาหนีบหรืออวัยวะเพศ   # uro.7, 11
+  en: flank pain radiating to groin or genitalia
+  kind: symptom
+  parent: flank_pain
+  refines: {radiation: groin_genital}
+
+intractable_renal_colic:
+  th: ปวดเอวบิดรุนแรงจนคุมอาการไม่ได้   # uro.6, 11
+  en: uncontrolled renal colic
+  kind: symptom
+  parent: flank_pain
+  refines: {character: colicky, severity: uncontrolled}
+  red_flag: true
+
+urine_blood_clots:
+  th: มีลิ่มเลือดในปัสสาวะ   # uro.8–9
+  en: blood clots in urine
+  kind: symptom
+  parent: hematuria
+  refines: {visible_clots: present}
+
+abdominal_mass:
+  th: คลำได้ก้อนในท้อง   # uro.8, 13–14
+  en: palpable abdominal mass
+  kind: symptom
+
+diuretic_use:
+  th: ใช้ยาขับปัสสาวะ   # uro.2
+  en: diuretic use
+  kind: history
+
+high_fluid_intake:
+  th: ดื่มน้ำหรือของเหลวปริมาณมาก   # uro.2
+  en: high fluid intake
+  kind: history
+
+evening_fluid_alcohol:
+  th: ดื่มน้ำหรือแอลกอฮอล์มากก่อนนอน   # uro.2
+  en: large evening fluid or alcohol intake
+  kind: history
+
+previous_prostate_surgery:
+  th: เคยผ่าตัดต่อมลูกหมาก   # uro.3
+  en: previous prostate surgery
+  kind: history
+  sex: male
+
+multiple_vaginal_deliveries:
+  th: เคยคลอดทางช่องคลอดหลายครั้ง   # uro.3
+  en: multiple vaginal deliveries
+  kind: history
+  sex: female
+
+retention_drug_use:
+  th: ใช้ยาต้านมัสคารินิก ยาต้านโรคจิต หรือยากระตุ้นแอลฟา   # uro.3
+  en: medication associated with urinary retention
+  kind: history
+
+decongestant_use:
+  th: ใช้ยาลดคัดจมูก   # uro.3
+  en: nasal decongestant use
+  kind: history
+
+parkinsons_history:
+  th: เป็นโรคพาร์กินสัน   # uro.3
+  en: known Parkinson disease
+  kind: history
+
+spinal_injury_history:
+  th: เคยมีไขสันหลังหรือเส้นประสาทควบคุมปัสสาวะบาดเจ็บ   # uro.3, 6
+  en: spinal or bladder nerve injury
+  kind: history
+
+solitary_kidney:
+  th: มีไตที่ทำงานอยู่เพียงข้างเดียว   # uro.6, 11
+  en: solitary functioning kidney
+  kind: history
+
+kidney_transplant:
+  th: เคยปลูกถ่ายไต   # uro.11
+  en: kidney transplant
+  kind: history
+
+known_urinary_obstruction:
+  th: แพทย์เคยแจ้งว่าทางเดินปัสสาวะอุดตัน   # uro.6, 11
+  en: known urinary tract obstruction
+  kind: history
+
+acute_kidney_injury_history:
+  th: แพทย์แจ้งว่าไตทำงานแย่ลงเฉียบพลัน   # uro.6, 11
+  en: known acute renal insufficiency
+  kind: history
+
+urinary_stone_history:
+  th: เคยเป็นนิ่วในทางเดินปัสสาวะ   # uro.11
+  en: previous urinary stone
+  kind: history
+
+low_fluid_intake:
+  th: ดื่มน้ำน้อยเป็นประจำ   # uro.10
+  en: habitual low fluid intake
+  kind: history
+
+urothelial_chemical_exposure:
+  th: สัมผัสเบนซีน aromatic amines หรือสารเคมีในงานอุตสาหกรรม   # uro.8, 15
+  en: urothelial carcinogen exposure
+  kind: history
+
+analgesic_overuse:
+  th: ใช้ยาแก้ปวดมากเกินหรือใช้ต่อเนื่องเป็นเวลานาน   # uro.8
+  en: analgesic overuse
+  kind: history
+
+urine_coloring_food_drug:
+  th: กินบีทรูต เบอร์รี หรือใช้ยา rifampin หรือ phenytoin   # uro.8
+  en: food or medication that colors urine
+  kind: history
+
+family_history_prostate_cancer:
+  th: คนในครอบครัวเป็นมะเร็งต่อมลูกหมาก   # uro.18
+  en: family history of prostate cancer
+  kind: history
+  sex: male
+
+urinary_straining:
+  th: ต้องเบ่งเพื่อให้ปัสสาวะออก   # uro.2, 16
+  en: straining to urinate
+  kind: symptom
+
+# ── Added by the reviewing physician ──────────────────────────────────────
+limb_weakness:
+  th: แขนขาอ่อนแรง          # reviewer
+  en: limb weakness
+  kind: symptom
+
+suicidal_ideation:
+  th: คิดอยากฆ่าตัวตายหรือทำร้ายตนเอง   # reviewer
+  en: thoughts of suicide or self-harm
+  kind: symptom
+  aliases:
+    - คิดอยากฆ่าตัวตาย        # reviewer
+    - อยากฆ่าตัวตาย          # reviewer
+    - อยากตาย                # reviewer
+    - ทำร้ายตนเอง            # reviewer
+    - ทำร้ายตัวเอง            # reviewer
+    - suicidal               # reviewer
+    - self-harm              # reviewer
+  red_flag: true
+  urgent: true

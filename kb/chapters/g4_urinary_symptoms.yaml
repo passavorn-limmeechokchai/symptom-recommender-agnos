@@ -1,0 +1,208 @@
+# Urinary symptoms — LUTS and incontinence (อาการถ่ายปัสสาวะผิดปกติ)
+# Source: uro.pdf, pages 2–3, 7, 12, 15–18. `# uro.N` = PDF page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: g4
+title: {th: อาการถ่ายปัสสาวะผิดปกติและกลั้นไม่อยู่, en: Lower urinary tract symptoms and incontinence}
+chief_complaint: dysuria
+also_entry: [urinary_frequency, urinary_urgency, nocturia, weak_urinary_stream, urinary_hesitancy, intermittent_urinary_stream, incomplete_bladder_emptying, terminal_dribbling, post_void_dribbling, split_urinary_stream, urinary_straining, urinary_incontinence, stress_urinary_leak, urge_urinary_leak, overflow_urinary_leak, polyuria]
+status: draft
+
+definitions:
+  storage_symptoms: "เก็บปัสสาวะได้ผิดปกติ เช่น ถ่ายบ่อย ปวดเร่ง ตื่นมาถ่ายกลางคืน"  # uro.2
+  voiding_symptoms: "ถ่ายปัสสาวะออกได้ผิดปกติ เช่น ไหลเบา รอนาน ต้องเบ่ง หรือขาดช่วง"  # uro.2
+  nocturia: "ตื่นจากหลับเพื่อปัสสาวะ ไม่นับปัสสาวะแรกหลังตื่นเช้า"  # uro.2
+  global_polyuria: "ปริมาณปัสสาวะตลอด 24 ชั่วโมงมากกว่า 40 มล./กก./วัน ตามเกณฑ์ในแหล่งนี้"  # uro.2
+  frequency: "จำนวนครั้งที่ถ่ายปัสสาวะเพิ่มขึ้น ต้องแยกจากปริมาณรวมทั้งวันมากขึ้น"  # uro.2; text >6, mnemonic >8
+  incontinence: "ปัสสาวะเล็ดหรือรั่วโดยควบคุมไม่ได้ แยก stress, urge, mixed และ overflow"  # uro.3
+  ipss: "คะแนนอาการ 7 ด้าน รวม 0–35: 0–7 เล็กน้อย 8–19 ปานกลาง และ 20–35 รุนแรง"  # uro.16
+
+hpi:
+  dysuria:
+    location:  # uro.7
+      ask: "เจ็บแสบที่ท่อปัสสาวะ ปวดท้องน้อย หรือปวดบริเวณเอว"
+      options: [urethral, suprapubic, flank]
+      multiple: true
+      allow_unknown: true
+  urinary_frequency:
+    volume:  # uro.2
+      ask: "ถ่ายบ่อยครั้งละน้อย หรือปริมาณปัสสาวะรวมทั้งวันมากขึ้นด้วย"
+      options: [small_each_time, large_total]
+      allow_unknown: true
+  nocturia:
+    distribution:  # uro.2
+      ask: "ปริมาณปัสสาวะมากเฉพาะกลางคืน หรือมากทั้งกลางวันและกลางคืน"
+      options: [night_only, day_and_night]
+      allow_unknown: true
+  urinary_incontinence:
+    pattern:  # uro.3
+      ask: "เล็ดเวลาไอหรือออกแรง ปวดเร่งแล้วไปไม่ทัน มีทั้งสองแบบ หรือซึมล้นร่วมกับถ่ายไม่หมด"
+      options: [stress, urge, mixed, overflow]
+      allow_unknown: true
+
+steps:
+  - {id: storage_voiding_or_post_micturition}  # uro.2
+  - {id: frequency_or_excess_urine_volume}  # uro.2
+  - {id: identify_incontinence_pattern_and_transient_causes}  # uro.3
+  - {id: assess_obstruction_infection_drugs_and_neurologic_history}  # uro.2–3
+  - {id: prostate_assessment_when_applicable}  # uro.16–18
+
+gates:
+  acute_retention:  # uro.3–4
+    when: always
+    ask: [acute_urinary_retention, acute_on_chronic_retention]
+    if_any_yes: urgent
+
+  colic_with_high_risk_features:  # uro.6, 11
+    when: {present: [colicky_flank_pain]}
+    ask: [fever, solitary_kidney, kidney_transplant, acute_kidney_injury_history]
+    if_any_yes: urgent
+  uncontrolled_colic:  # uro.6, 11
+    when: always
+    ask: [intractable_renal_colic]
+    if_any_yes: urgent
+  infected_known_obstruction:  # uro.6, 11
+    when: {present: [known_urinary_obstruction]}
+    ask: [fever]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # uro.6, 8, 16–17
+    ask: [hematuria, fever, flank_pain]
+    rules_out: [bladder_cancer, renal_stone, acute_pyelonephritis]
+
+tree_selection:
+  - {when: {present: [dysuria]}, use: [painful]}  # uro.7–8
+  - {when: {present: [urinary_frequency]}, use: [storage]}  # uro.2
+  - {when: {present: [urinary_urgency]}, use: [storage]}  # uro.2
+  - {when: {present: [nocturia]}, use: [storage, nocturnal, production]}  # uro.2
+  - {when: {present: [polyuria]}, use: [production]}  # uro.2
+  - {when: {present: [urinary_frequency], urinary_frequency.volume: large_total}, use: [production]}  # uro.2
+  - {when: {present: [weak_urinary_stream]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [urinary_hesitancy]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [intermittent_urinary_stream]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [incomplete_bladder_emptying]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [terminal_dribbling]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [post_void_dribbling]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [split_urinary_stream]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [urinary_straining]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [difficulty_urinating]}, use: [voiding]}  # uro.2–3
+  - {when: {present: [urinary_incontinence], urinary_incontinence.pattern: stress}, use: [stress]}  # uro.3
+  - {when: {present: [urinary_incontinence], urinary_incontinence.pattern: urge}, use: [urge, transient]}  # uro.3
+  - {when: {present: [urinary_incontinence], urinary_incontinence.pattern: mixed}, use: [stress, urge, transient]}  # uro.3
+  - {when: {present: [urinary_incontinence], urinary_incontinence.pattern: overflow}, use: [overflow, transient]}  # uro.3
+  - {when: {present: [urinary_incontinence], urinary_incontinence.pattern: unknown}, use: [stress, urge, overflow, transient]}  # uro.3
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {sex: male, age_above: 50}, boost: voiding.prostate}  # uro.16, 18
+  - {when: {urinary_frequency.volume: large_total}, boost: production}  # uro.2
+  - {when: {nocturia.distribution: night_only}, boost: nocturnal}  # uro.2
+  - {when: {nocturia.distribution: day_and_night}, boost: production}  # uro.2
+
+trees:
+  painful: [cystitis, urethritis, prostatitis, bladder_stone, urethral_stone]  # uro.3, 7–8, 12
+  storage: [cystitis, overactive_bladder, bladder_cancer, bladder_stone, renal_stone, benign_prostatic_hyperplasia]  # uro.2–3, 7, 15–16
+  voiding:  # uro.2–3, 12, 16, 18
+    prostate: [benign_prostatic_hyperplasia, prostate_cancer, prostatitis]
+    outlet: [urethral_stricture, bladder_stone, urethral_stone]
+    bladder: [neurogenic_bladder, detrusor_underactivity]
+  production: [diabetes_mellitus, diabetes_insipidus, diuretic_related_polyuria, fluid_intake_polyuria]  # uro.2
+  nocturnal: [nocturnal_polyuria, sleep_disorder]  # uro.2
+  stress: [stress_urinary_incontinence]  # uro.3
+  urge: [overactive_bladder, cystitis, neurogenic_bladder]  # uro.3
+  overflow: [detrusor_underactivity, neurogenic_bladder]  # uro.3
+  transient: [cystitis, atrophic_vaginitis, drug_related_incontinence, depression, fecal_impaction, mobility_related_incontinence]  # uro.3
+
+scores: {}
+
+confirm: {}
+
+findings:
+  cystitis:  # uro.2–3, 7–8
+    symptoms: [dysuria, urinary_frequency, urinary_urgency, lower_abdominal_pain, hematuria]
+  urethritis:  # uro.3, 7–8
+    symptoms: [dysuria, hematuria, difficulty_urinating]
+  benign_prostatic_hyperplasia:  # uro.2, 16
+    symptoms: [urinary_frequency, urinary_urgency, nocturia, weak_urinary_stream, intermittent_urinary_stream, urinary_straining, incomplete_bladder_emptying]
+    signs: [smooth_enlarged_prostate]
+  prostate_cancer:  # uro.18
+    symptoms: [hematuria, dysuria, urinary_frequency, back_pain, hip_pain]
+    signs: [hard_nodular_prostate]
+  bladder_cancer:  # uro.15
+    symptoms: [hematuria, dysuria, urinary_frequency, urinary_urgency]
+  bladder_stone:  # uro.12
+    symptoms: [lower_abdominal_pain, intermittent_urinary_stream, hematuria, unable_to_urinate]
+  urethral_stone:  # uro.12
+    symptoms: [weak_urinary_stream, dysuria, hematuria]
+  renal_stone:  # uro.7, 11
+    symptoms: [flank_pain, urinary_frequency, urinary_urgency, hematuria]
+  overactive_bladder:  # uro.2–3
+    symptoms: [urinary_urgency, urge_urinary_leak, urinary_frequency]
+  stress_urinary_incontinence:  # uro.3
+    symptoms: [stress_urinary_leak]
+  detrusor_underactivity:  # uro.3
+    symptoms: [incomplete_bladder_emptying, overflow_urinary_leak]
+  neurogenic_bladder:  # uro.2–3
+    symptoms: [urinary_incontinence, incomplete_bladder_emptying]
+  diabetes_mellitus:  # uro.2; thirst: ch.5 p.54
+    symptoms: [polyuria, polydipsia]
+  diabetes_insipidus:  # uro.2
+    symptoms: [polyuria]
+  diuretic_related_polyuria:  # uro.2
+    symptoms: [polyuria]
+  fluid_intake_polyuria:  # uro.2
+    symptoms: [polyuria]
+  nocturnal_polyuria:  # uro.2
+    symptoms: [nocturia]
+  sleep_disorder:  # uro.2
+    symptoms: [nocturia]
+
+branch_findings: {}
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [diuretic_use], suggests: [diuretic_related_polyuria]}  # uro.2
+  - {findings: [high_fluid_intake], suggests: [fluid_intake_polyuria]}  # uro.2
+  - {findings: [evening_fluid_alcohol], suggests: [nocturnal_polyuria]}  # uro.2
+  - {findings: [multiple_vaginal_deliveries, previous_prostate_surgery], suggests: [stress_urinary_incontinence]}  # uro.3
+  - {findings: [stroke_history, parkinsons_history], suggests: [neurogenic_bladder]}  # uro.3
+  - {findings: [antidepressant_use, decongestant_use], suggests: [drug_related_incontinence]}  # uro.3
+  - {findings: [bedridden], suggests: [mobility_related_incontinence]}  # uro.3
+  - {findings: [smoking, urothelial_chemical_exposure], suggests: [bladder_cancer]}  # uro.8, 15
+  - {findings: [family_history_prostate_cancer], suggests: [prostate_cancer]}  # uro.18
+
+exam_clues:
+  - {sign: smooth_enlarged_prostate, suggests: [benign_prostatic_hyperplasia]}  # uro.16
+  - {sign: hard_nodular_prostate, suggests: [prostate_cancer]}  # uro.18

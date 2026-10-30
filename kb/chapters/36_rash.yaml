@@ -1,0 +1,244 @@
+# Chapter 36 — Rash (ผื่น)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 397–410. `# p.N` = book page.
+# The book reads rash by examination (morphology, colour, configuration, distribution).
+# Here each pattern is asked in words a patient can answer; Nikolsky sign and biopsy stay with the physician.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 36
+title: {th: ผื่น, en: Rash}
+chief_complaint: rash
+also_entry: [itch]
+status: draft
+
+definitions:                               # p.398
+  rash: "ความผิดปกติของผิวหนังที่มีการเปลี่ยนแปลงทั้งลักษณะ สี รูปร่าง ขนาด และ/หรือลักษณะพื้นผิว"
+  primary_lesion: "รอยโรคที่เกิดตั้งแต่แรกเริ่มและยังไม่เปลี่ยนแปลง: ขนาด ลักษณะทางกายภาพ ส่วนประกอบ"
+  secondary_lesion: "การเปลี่ยนแปลงของผื่นในชั้นหนังกำพร้าที่เกิดตามหลัง เช่น จากการแกะเกา การติดเชื้อ การรักษา"
+  erythroderma: "ผิวแดงมากกว่าร้อยละ 90 ของพื้นที่ผิว"       # p.409
+
+hpi:
+  rash:
+    morphology:                            # ตาราง 36-1, ภาพ 36-3
+      ask: "ผื่นมีลักษณะแบบไหน"
+      multiple: true
+      allow_unknown: true
+      options: [macular, papular, scaly, follicular, pustular, blistering, eczematous, erythroderma, purpuric, wheal]
+    configuration:                         # p.401
+      ask: "ผื่นเรียงตัวเป็นรูปแบบไหน"
+      allow_unknown: true
+      options: [grouped, dermatomal, target, annular, discoid, none]
+    location:                              # p.401–402
+      ask: "ผื่นขึ้นที่ไหน"
+      multiple: true
+      allow_unknown: true
+      options: [generalized, localized, flexural, extensor, acral, sun_exposed, seborrheic, skin_folds]
+    duration:                              # p.407; the book gives no cut-off in days
+      ask: "ผื่นเพิ่งขึ้นไม่กี่วัน หรือเป็นมานานหลายสัปดาห์"
+      allow_unknown: true
+      options: [acute, subacute_chronic]
+
+steps:
+  - {id: gate}  # p.409
+  - {id: reaction_pattern}      # morphology -> pattern; p.406
+  - {id: pathologic_group}      # infection / inflammation / tumor / other; p.406
+  - {id: fever_and_distribution}  # p.408
+
+gates:
+  severe_skin_reaction:  # p.409, 410
+    when: always
+    ask: [skin_detachment, mucosal_lesions]
+    if_any_yes: urgent
+  anaphylaxis:  # reviewer
+    when: {present: [wheals]}
+    ask: [face_lip_swelling, dyspnea, near_syncope]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {present: [blisters]}  # p.408, 409
+    ask: [fever, mucosal_lesions, skin_detachment, new_medication]
+    rules_out: [sjs_ten, necrotizing_fasciitis, ssss]
+  - when: {present: [erythroderma_skin]}  # p.409
+    ask: [skin_detachment, fever, new_medication]
+    rules_out: [sjs_ten, ssss, toxic_shock_syndrome, dress]
+  - when: {present: [purpuric_rash]}  # p.401
+    ask: [fever]
+    rules_out: [meningococcemia]
+
+tree_selection:
+  - {when: {rash.morphology: scaly}, use: [papulosquamous]}
+  - {when: {rash.morphology: follicular}, use: [folliculopapular, pustular]}
+  - {when: {rash.morphology: pustular}, use: [pustular]}
+  - {when: {rash.morphology: eczematous}, use: [eczematous]}
+  - {when: {rash.morphology: macular}, use: [maculopapular]}
+  - {when: {rash.morphology: papular}, use: [maculopapular, papulosquamous, eczematous]}
+  - {when: {rash.morphology: blistering}, use: [blistering]}
+  - {when: {rash.morphology: erythroderma}, use: [erythroderma]}
+  - {when: {rash.morphology: purpuric}, use: [petechiae_purpura]}
+  - {when: {rash.morphology: wheal}, use: [wheal]}
+  - {when: {rash.morphology: unknown}, use: [papulosquamous, folliculopapular, eczematous, pustular, maculopapular,
+                                        blistering, erythroderma, petechiae_purpura, wheal]}
+  - {when: always, use: [photodistributed]}
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {present: [fever]}, boost: blistering.localized.fever}  # p.408
+  - {when: {absent: [fever]}, boost: blistering.localized.no_fever}  # p.408
+  - {when: {present: [fever]}, boost: erythroderma.fever}  # p.409
+  - {when: {absent: [fever]}, boost: erythroderma.no_fever}  # p.409
+  - {when: {rash.duration: acute}, boost: maculopapular.infection.acute}  # p.406
+  - {when: {rash.duration: subacute_chronic}, boost: maculopapular.infection.subacute_chronic}  # p.407
+
+trees:                                     # ภาพ 36-3
+  papulosquamous: [psoriasis, pityriasis_rosea, lichen_planus, tinea_infection, seborrheic_dermatitis]
+  folliculopapular: [acne_vulgaris, rosacea, folliculitis, perioral_dermatitis]
+  eczematous:
+    endogenous: [atopic_dermatitis, nummular_eczema, dyshidrosis, xerotic_eczema, stasis_dermatitis,
+                 seborrheic_dermatitis]
+    exogenous: [contact_dermatitis]
+  pustular:
+    follicular: [folliculitis, disseminated_gonococcal_infection, candidiasis, acne_vulgaris, rosacea]
+    non_follicular: [pustular_psoriasis, agep]
+  erythroderma:
+    nikolsky_positive: [sjs_ten, ssss, acute_gvhd]
+    fever: [toxic_shock_syndrome, dress, scarlet_fever, kawasaki_disease]
+    no_fever: [anaphylaxis, alcohol_flush, drug_eruption]
+  blistering:
+    localized:
+      fever: [necrotizing_fasciitis, hand_foot_mouth_disease, eczema_herpeticum, herpes_simplex_zoster]
+      no_fever: [burn, contact_dermatitis, bullous_impetigo, insect_bite_reaction]
+    generalized:
+      infection: [disseminated_herpes, varicella, ssss]
+      autoimmune: [bullous_pemphigoid, pemphigus_vulgaris]
+      drugs: [sjs_ten]
+      other: [erythema_multiforme]
+  maculopapular:
+    infection:
+      acute: [viral_exanthem, dengue, chikungunya, zika, infectious_mononucleosis, acute_hiv,
+              scarlet_fever, meningococcemia, ssss]
+      subacute_chronic: [leprosy, secondary_syphilis, scrub_typhus, murine_typhus, disseminated_candidiasis,
+                         toxoplasmosis]
+    inflammation: [sle, dermatomyositis, adult_onset_still_disease, kawasaki_disease]
+    malignancy: [angioimmunoblastic_t_cell_lymphoma, leukemia_cutis]
+    drugs: [drug_eruption, dress]
+    others: [acute_gvhd]
+  petechiae_purpura: [small_vessel_vasculitis, meningococcemia]     # p.400–401; details in ch.34 (not encoded)
+  wheal: [urticaria, urticarial_vasculitis]                         # ตาราง 36-1, not drawn in ภาพ 36-3
+  photodistributed: [sunburn, photoallergic_dermatitis]             # p.402, not drawn in ภาพ 36-3
+
+scores: {}
+
+confirm: {}
+
+findings:
+  psoriasis:  # p.402
+    symptoms: [rash_extensor]
+  tinea_infection:  # p.401
+    symptoms: [annular_rash]
+  seborrheic_dermatitis:  # p.402
+    symptoms: [rash_seborrheic_area]
+  atopic_dermatitis:  # p.401
+    symptoms: [rash_flexural]
+  nummular_eczema:  # p.401
+    symptoms: [coin_shaped_rash]
+  contact_dermatitis:  # p.406
+    symptoms: [itch, skin_burning]
+  candidiasis:  # p.401, 402
+    symptoms: [rash_skin_folds, rash_flexural]
+  herpes_simplex_zoster:  # p.401
+    symptoms: [grouped_rash, dermatomal_rash]
+  sjs_ten:  # p.409, 410
+    symptoms: [fever, mucosal_lesions, skin_detachment]
+  erythema_multiforme:  # p.401, 409
+    symptoms: [target_lesions]
+  secondary_syphilis:  # p.402
+    symptoms: [rash_acral]
+  meningococcemia:  # p.401
+    symptoms: [fever, purpuric_rash]
+  sle:  # p.402
+    symptoms: [rash_sun_exposed]
+  dress:  # p.409
+    symptoms: [fever]
+
+branch_findings:
+  papulosquamous:  # p.406
+    symptoms: [scaly_rash]
+  folliculopapular:  # p.406
+    symptoms: [follicular_papules]
+  eczematous:  # p.406
+    symptoms: [eczematous_rash, itch]
+  pustular:  # p.408
+    symptoms: [pustules]
+  erythroderma:  # p.409
+    symptoms: [erythroderma_skin]
+  erythroderma.nikolsky_positive:  # p.409
+    symptoms: [skin_detachment]
+  erythroderma.fever:  # p.409
+    symptoms: [fever]
+  blistering:  # p.408
+    symptoms: [blisters]
+  blistering.localized:  # p.408
+    symptoms: [localized_rash]
+  blistering.localized.fever:  # p.408
+    symptoms: [fever]
+  blistering.generalized:  # p.408
+    symptoms: [generalized_rash]
+  maculopapular:  # p.406
+    symptoms: [macular_rash, papular_rash]
+  maculopapular.infection.acute:  # p.407
+    symptoms: [fever]
+  petechiae_purpura:  # p.400
+    symptoms: [purpuric_rash]
+  wheal:  # p.403
+    symptoms: [wheals]
+  photodistributed:  # p.402
+    symptoms: [rash_sun_exposed]
+
+reviewer_findings:
+  anaphylaxis: {symptoms: [wheals, face_lip_swelling, dyspnea]}
+
+history_clues:
+  - {findings: [new_medication], suggests: [drug_eruption, dress, sjs_ten, agep, photoallergic_dermatitis]}  # p.402, 408, 409
+  - {findings: [new_medication, recent_vaccine_or_transfusion], suggests: [erythema_multiforme]}  # p.409
+  - {findings: [contact_chemical], suggests: [contact_dermatitis]}  # p.399, 406
+  - {findings: [sun_exposure], suggests: [sunburn, sle, photoallergic_dermatitis]}  # p.399, 402
+  - {findings: [history_asthma, history_allergy], suggests: [atopic_dermatitis]}  # p.399
+
+exam_clues:
+  - {sign: nikolsky_sign_positive, suggests: [SJS/TEN, SSSS, acute GVHD, pemphigus]}  # p.398, 409
+  - {sign: tense_bulla, suggests: [bullous pemphigoid]}  # p.408
+  - {sign: flaccid_bulla_with_erosion, suggests: [pemphigus vulgaris]}  # p.408
+  - {sign: body_surface_detached, suggests: ["SJS (<10%)", "SJS/TEN overlap (10–30%)", "TEN (>30%)"]}  # p.409
+  - {sign: koebner_phenomenon, suggests: [psoriasis, wart]}  # p.401
+  - {sign: sporotrichoid_pattern, suggests: [nontuberculous mycobacterial infection]}  # p.401
+  - {sign: stellate_purpura, askable_as: purpuric_rash, suggests: [purpura fulminans in meningococcemia]}  # p.401
+  - {sign: confluent_rash, suggests: [measles]}  # p.401

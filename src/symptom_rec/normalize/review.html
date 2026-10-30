@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ตรวจข้อความอาการ · Local review</title>
+<style>
+  * { box-sizing:border-box } body { margin:0; background:#f3f5f7; color:#192b37;
+    font:16px/1.6 system-ui,sans-serif } main { max-width:1000px; margin:32px auto; padding:0 20px }
+  h1 { font-size:26px; margin-bottom:4px } h2 { font-size:19px; margin-top:0 }
+  .muted { color:#52616d } .panel { background:white; padding:24px; border:1px solid #dce2e6;
+    border-radius:12px; margin:20px 0 } .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center }
+  .columns { display:grid; grid-template-columns:1fr 1fr; gap:24px } label { display:block; margin:12px 0 }
+  input,select,textarea,button { font:inherit; padding:9px 12px; border:1px solid #b6c3cc;
+    border-radius:6px; max-width:100% } input,textarea { width:100% } textarea { min-height:80px }
+  button { cursor:pointer; background:#edf3f5; color:#193f51 } button.primary { background:#176779; color:white }
+  button:disabled { opacity:.5; cursor:wait } #variants li { margin:8px 0; white-space:pre-wrap;
+    overflow-wrap:anywhere; font-size:21px } #status { min-height:28px; white-space:pre-wrap }
+  #catalog { max-height:300px; overflow-y:auto; padding:2px } #catalog button { display:block;
+    text-align:left; width:100%; margin:6px 0; font-size:14px } .error { color:#a72727 }
+  @media(max-width:700px) { .columns { grid-template-columns:1fr } .panel { padding:16px } }
+</style>
+<main>
+  <h1>ตรวจข้อความอาการ</h1>
+  <p class="muted">ข้อมูลอยู่ในเครื่องนี้ บันทึกเมื่อกดปุ่มเท่านั้น ไม่มีคำตอบจากโมเดลให้ดู</p>
+  <div class="row">
+    <label>ชุดข้อมูล <select id="subset"><option value="development">Development</option>
+      <option value="validation">Validation</option></select></label>
+    <span id="progress"></span>
+  </div>
+  <p id="scope" class="muted"></p>
+  <section class="panel">
+    <div class="row"><button id="previous">← ก่อนหน้า</button><span id="position"></span>
+      <button id="next">ถัดไป →</button><button id="pending">ข้อที่ยังไม่ตรวจ</button></div>
+    <ul id="variants"></ul><p id="frequency" class="muted"></p>
+    <div class="columns">
+      <div>
+        <label>การตัดสิน <select id="decision"><option value="">เลือกการตัดสิน</option>
+          <option value="map">map · ระบุอาการและสถานะได้</option>
+          <option value="clarify">clarify · ต้องถามเพิ่ม</option>
+          <option value="out_of_kb">out_of_kb · อาการอยู่นอกคลัง</option>
+          <option value="not_symptom">not_symptom · ไม่ใช่อาการ/ประวัติ</option></select></label>
+        <label>Labels <textarea id="labels" placeholder="cough:present;fever:absent"></textarea></label>
+        <p class="muted">ใส่ได้หลายอาการ คั่นด้วย ; ใช้ present, absent, unsure หรือ historical
+          ถ้าเป็น out_of_kb / not_symptom ให้เว้น labels</p>
+        <label>ชื่อผู้ตรวจ <input id="reviewer" autocomplete="off"></label>
+        <label>หมายเหตุ <textarea id="note"></textarea></label>
+      </div>
+      <div>
+        <h2>ค้นหาในคลังอาการ</h2>
+        <input id="search" placeholder="ค้นชื่อไทย อังกฤษ หรือ symptom id" autocomplete="off">
+        <label>สถานะที่จะเพิ่ม <select id="state"><option value="present">present · มีอาการปัจจุบัน</option>
+          <option value="absent">absent · ปฏิเสธอาการ</option><option value="unsure">unsure · ไม่แน่ใจ</option>
+          <option value="historical">historical · เคยมี/หายแล้ว</option></select></label>
+        <div id="catalog"></div>
+      </div>
+    </div>
+    <div class="row"><button id="save" class="primary">บันทึกและไปข้อถัดไป</button>
+      <button id="reload">โหลดจากไฟล์อีกครั้ง</button></div>
+    <p id="status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  let sheet, catalog = [], index = 0, dirty = false, busy = false, currentSubset = 'development';
+  async function api(path, options) {
+    const response = await fetch(path, options);
+    const body = await response.json();
+    if (!response.ok) throw new Error(typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail));
+    return body;
+  }
+  function status(text, error=false) { $('status').textContent=text; $('status').className=error?'error':''; }
+  function canLeave() { return !busy && (!dirty || confirm('มีข้อมูลที่ยังไม่บันทึก ต้องการออกจากข้อนี้หรือไม่?')); }
+  function render() {
+    dirty = false;
+    const task = sheet.tasks[index];
+    $('progress').textContent = `ตรวจแล้ว ${sheet.reviewed}/${sheet.tasks.length} · เหลือ ${sheet.pending}`;
+    $('scope').textContent = currentSubset === 'validation'
+      ? 'Validation: ตรวจโดยไม่ดูผลโมเดล เก็บไว้ประเมินหลังหยุดปรับกฎ/โมเดล ห้ามใช้คำตอบชุดนี้เลือกค่า'
+      : 'Development: ตรวจความหมายและสถานะจากข้อความ หากหลายรูปเขียนมีความหมายต่างกัน ให้เลือก clarify และบันทึกหมายเหตุ';
+    $('position').textContent = `${index+1}/${sheet.tasks.length}`;
+    $('variants').replaceChildren();
+    for (const text of JSON.parse(task.texts)) {
+      const li=document.createElement('li'); li.textContent=text; $('variants').append(li);
+    }
+    $('frequency').textContent = `พบ ${task.occurrences} ครั้ง · id ${task.id}`;
+    for (const id of ['decision','labels','note']) $(id).value = task[id];
+    $('reviewer').value = task.reviewer || $('reviewer').value;
+    status(task.decision ? 'ข้อนี้เคยบันทึกแล้ว สามารถตรวจแก้และบันทึกใหม่ได้' : 'ยังไม่ตรวจ');
+  }
+  async function load() {
+    sheet = await api(`/api/tasks/${currentSubset}`);
+    index = Math.min(index, sheet.tasks.length-1); render();
+  }
+  function navigate(step) { if(canLeave()) { index=(index+step+sheet.tasks.length)%sheet.tasks.length; render(); } }
+  $('previous').onclick = () => navigate(-1); $('next').onclick = () => navigate(1);
+  $('pending').onclick = () => {
+    if(!canLeave()) return;
+    const next=sheet.tasks.findIndex(t=>!t.decision); if(next>=0) {index=next;render();} else status('ตรวจครบแล้ว');
+  };
+  $('subset').onchange = async () => {
+    if(!canLeave()) { $('subset').value=currentSubset; return; }
+    currentSubset=$('subset').value; index=0;
+    try { await load(); } catch(e) { status(e.message,true); }
+  };
+  $('reload').onclick = async () => { if(canLeave()) { try {await load();} catch(e) {status(e.message,true);} } };
+  for (const id of ['decision','labels','reviewer','note']) $(id).oninput = () => {dirty=true;};
+  function showCatalog() {
+    const needle=$('search').value.trim().toLowerCase(); $('catalog').replaceChildren();
+    if(!needle) return;
+    const matches=catalog.filter(s=>[s.id,s.th,s.en].some(v=>v.toLowerCase().includes(needle))).slice(0,30);
+    for(const symptom of matches) {
+      const button=document.createElement('button'); button.type='button';
+      button.textContent=`${symptom.th} · ${symptom.en} (${symptom.id})`;
+      button.onclick=()=>{
+        const labels=$('labels').value.split(';').map(v=>v.trim()).filter(Boolean);
+        const label=`${symptom.id}:${$('state').value}`;
+        if(!labels.includes(label)) labels.push(label);
+        $('labels').value=labels.join(';'); dirty=true;
+      };
+      $('catalog').append(button);
+    }
+    if(!matches.length) $('catalog').textContent='ไม่พบในคลัง';
+  }
+  $('search').oninput=showCatalog;
+  $('save').onclick=async()=>{
+    if(busy || !sheet) return;
+    busy=true; $('save').disabled=true;
+    const payload={revision:sheet.revision};
+    for(const id of ['decision','labels','reviewer','note']) payload[id]=$(id).value;
+    try {
+      sheet=await api(`/api/tasks/${currentSubset}/${sheet.tasks[index].id}`, {
+        method:'POST', headers:{'Content-Type':'application/json','X-Review-Action':'save'}, body:JSON.stringify(payload)});
+      index=(index+1)%sheet.tasks.length; render(); status('บันทึกแล้ว');
+    } catch(e) {status(e.message,true);} finally {busy=false; $('save').disabled=false;}
+  };
+  window.addEventListener('beforeunload', e=>{if(dirty || busy) {e.preventDefault();e.returnValue='';}});
+  (async()=>{try{catalog=await api('/api/catalog');await load();}catch(e){status(e.message,true);}})();
+</script>
+</html>

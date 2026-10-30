@@ -1,0 +1,247 @@
+# Chapter 25 — Diarrhea (ท้องเสีย)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 273–287. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 25
+title: {th: ท้องเสีย, en: Diarrhea}
+chief_complaint: diarrhea
+also_entry: []
+status: draft
+
+definitions:  # p.274
+  diarrhea: "ถ่ายมากกว่า 3 ครั้งต่อวัน อุจจาระเหลวกว่าปกติหรือเป็นน้ำ หรือถ่ายเป็นเลือดมากกว่า 1 ครั้ง หรือมากกว่า 200 กรัมต่อวัน"
+  duration:
+    acute: "น้อยกว่า 2 สัปดาห์"
+    persistent: "2–4 สัปดาห์"
+    chronic: "มากกว่า 4 สัปดาห์"
+  watery: "อุจจาระเหลวหรือเป็นน้ำ ไม่มีเลือดหรือมูกเลือดปน"
+  bloody: "อุจจาระมีมูกปนเลือด แยกออกจากเนื้ออุจจาระไม่ได้"
+  steatorrhea: "อุจจาระเป็นมันลอย กดชักโครกลงยาก"
+
+hpi:
+  diarrhea:
+    duration:  # p.274, 276
+      ask: "ท้องเสียมากี่วันแล้ว"
+      unit: days
+      allow_unknown: true
+      categories:
+        acute: {below: 14}
+        persistent: {from: 14, to: 28}
+        chronic: {above: 28}
+      grey_zones:
+        - {from: 10, to: 18, both: [acute, persistent]}
+        - {from: 24, to: 35, both: [persistent, chronic]}
+    character:  # p.277
+      ask: "อุจจาระเป็นน้ำ หรือเป็นมันลอย"
+      allow_unknown: true
+      options: [watery, fatty]
+    blood_mucus:  # p.277
+      ask: "มีมูกหรือเลือดปนไหม"
+      allow_unknown: true
+      options: [present, absent]
+    amount:  # p.277
+      ask: "ถ่ายครั้งละมากๆ หรือกะปริบกะปรอย"
+      allow_unknown: true
+      options: [large, small_frequent]
+    onset:  # p.276
+      ask: "ท้องเสียขึ้นมาทันที หรือค่อยๆ เป็น"
+      options: [sudden, gradual]
+    timing:  # p.278
+      ask: "ต้องตื่นมาถ่ายตอนกลางคืนไหม"
+      options: [nocturnal, daytime_only]
+    aggravating:  # p.278
+      ask: "อะไรทำให้ถ่ายมากขึ้น"
+      multiple: true
+      options: [dairy, stress_or_spicy, none]
+    relieving:  # p.284, 285
+      ask: "อะไรทำให้อาการดีขึ้น"
+      multiple: true
+      options: [fasting, defecation, none]
+
+steps:
+  - {id: gate}  # p.273, 280
+  - {id: acute_vs_chronic}  # p.282
+  - {id: stool_character}  # p.283
+  - {id: organic_vs_functional}  # p.284
+  - {id: small_bowel_vs_left_colon}  # p.285
+  - {id: mechanism}  # p.285
+
+gates:
+  dehydration_shock:  # p.273, 280
+    when: always
+    ask: [near_syncope, decreased_urine, cold_extremities, low_blood_pressure, drowsiness]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {diarrhea.duration: acute, present: [abdominal_pain]}  # p.284
+    ask: [periumbilical_pain, rlq_pain]
+    rules_out: [appendicitis]
+  - when: {diarrhea.duration: acute, present: [fever]}  # p.284
+    ask: [jaundice, drowsiness, rash, red_eye, decreased_urine]
+    rules_out: [leptospirosis, malaria]
+  - when: {diarrhea.duration: chronic}  # p.284
+    ask: [nocturnal_diarrhea, weight_loss, anorexia, bloody_mucoid_stool, pallor]
+    red_flag_when: {age_above: 50}
+    rules_out: [colon_cancer, lymphoma, intestinal_tuberculosis]
+
+tree_selection:
+  - {when: always, use: [history_based]}
+  - {when: {diarrhea.duration: acute, diarrhea.blood_mucus: absent}, use: [acute_watery]}  # p.283
+  - {when: {diarrhea.duration: acute, diarrhea.blood_mucus: present}, use: [acute_bloody]}  # p.284
+  - {when: {diarrhea.duration: acute, diarrhea.blood_mucus: unknown}, use: [acute_watery, acute_bloody]}
+  - {when: {diarrhea.duration: chronic}, use: [chronic_functional]}  # p.284
+  - {when: {diarrhea.duration: chronic, diarrhea.character: watery}, use: [chronic_watery]}  # p.285
+  - {when: {diarrhea.duration: chronic, diarrhea.blood_mucus: present}, use: [chronic_bloody]}  # p.285
+  - {when: {diarrhea.duration: chronic, diarrhea.character: fatty}, use: [chronic_steatorrhea]}  # p.286
+  - {when: {diarrhea.duration: chronic, diarrhea.character: unknown}, use: [chronic_watery, chronic_bloody, chronic_steatorrhea]}
+  - {when: {diarrhea.duration: persistent}, use: [acute_watery, acute_bloody, chronic_functional, chronic_watery,
+                                         chronic_bloody, chronic_steatorrhea]}  # p.276
+
+branch_selection: {}
+
+branch_hints: []
+
+trees:  # ภาพ 25-1
+  acute_watery:
+    infection: [gastroenteritis]
+    other: [food_poisoning, drug_induced_diarrhea, appendicitis]
+    systemic_infection: [leptospirosis, malaria]
+  acute_bloody:
+    infection: [enterocolitis]
+    other: [diverticulitis, ischemic_colitis, acute_mesenteric_ischemia, colon_cancer]
+  chronic_functional: [ibs]
+  chronic_watery:
+    osmotic: [carbohydrate_malabsorption, osmotic_laxative_diarrhea]
+    secretory: [strongyloidiasis, capillariasis, protozoal_diarrhea, ibd, sibo, carcinoid_syndrome,
+                hyperthyroidism, diabetic_diarrhea, drug_induced_diarrhea, bile_acid_diarrhea]
+  chronic_bloody:
+    infection: [intestinal_tuberculosis, strongyloidiasis, pseudomembranous_colitis, amebiasis, cmv_colitis]
+    malignancy: [colon_cancer, lymphoma]
+    other: [ibd, ischemic_colitis, radiation_colitis]
+  chronic_steatorrhea:
+    malabsorption: [sibo, short_bowel_syndrome, chronic_mesenteric_ischemia]
+    maldigestion: [chronic_pancreatitis]
+  history_based: [endometriosis, eosinophilic_gastroenteritis, fecal_impaction, anorectal_incontinence]  # p.275, 278, 282
+
+scores: {}
+
+confirm: {}
+
+findings:
+  gastroenteritis:  # p.283
+    symptoms: [voluminous_diarrhea, vomiting]
+  food_poisoning:  # p.283
+    symptoms: [vomiting]
+  appendicitis:  # p.284
+    symptoms: [periumbilical_pain, rlq_pain]
+  diverticulitis:  # p.284
+    symptoms: [llq_pain, fever]
+  ischemic_colitis:  # p.284, 286
+    symptoms: [diffuse_abdominal_pain, severe_abdominal_pain]
+  acute_mesenteric_ischemia:  # p.284
+    symptoms: [diffuse_abdominal_pain, severe_abdominal_pain]
+  colon_cancer:  # p.284, 286
+    symptoms: [constipation, weight_loss, pallor, fever, abdominal_pain]
+  ibs:  # p.278, 284
+    symptoms: [fecal_urgency, relief_after_defecation, diarrhea_with_stress_or_spicy_food, small_frequent_stools]
+  carbohydrate_malabsorption:  # p.278
+    symptoms: [abdominal_distension, diarrhea_after_dairy]
+  carcinoid_syndrome:  # p.281, 285
+    symptoms: [flushing]
+  hyperthyroidism:  # p.285
+    symptoms: [palpitation, weight_loss]
+  sibo:  # p.285
+    symptoms: [abdominal_distension]
+  intestinal_tuberculosis:  # p.286
+    symptoms: [fever, weight_loss]
+  ibd:  # p.278, 281, 286
+    symptoms: [fever, abdominal_pain, oral_ulcer, joint_pain, red_eye, perianal_abscess]
+  lymphoma:  # p.286
+    symptoms: [fever, weight_loss, pallor]
+  endometriosis:  # p.278
+    symptoms: [pain_with_menses]
+  fecal_impaction:  # p.275, 282
+    symptoms: [constipation]
+  anorectal_incontinence:  # p.277, 282
+    symptoms: [fecal_incontinence]
+
+branch_findings:
+  acute_watery:  # p.283
+    symptoms: [watery_diarrhea]
+  acute_watery.systemic_infection:  # p.284
+    symptoms: [fever, jaundice, drowsiness, rash, red_eye]
+  acute_bloody:  # p.284
+    symptoms: [bloody_mucoid_stool]
+  acute_bloody.infection:  # p.284
+    symptoms: [fever, abdominal_pain, tenesmus]
+  chronic_watery:  # p.284
+    symptoms: [watery_diarrhea, nocturnal_diarrhea, weight_loss, anorexia]
+  chronic_watery.osmotic:  # p.285
+    symptoms: [diarrhea_after_dairy, diarrhea_stops_fasting]
+  chronic_watery.secretory:  # p.285
+    symptoms: [voluminous_diarrhea]
+  chronic_bloody:  # p.284, 285
+    symptoms: [bloody_mucoid_stool, hematochezia, nocturnal_diarrhea, weight_loss, pallor]
+  chronic_steatorrhea:  # p.286
+    symptoms: [fatty_stool, weight_loss]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [unsafe_food], suggests: [gastroenteritis, enterocolitis, food_poisoning, amebiasis]}  # p.276, 279
+  - {findings: [raw_freshwater_fish], suggests: [capillariasis]}  # p.280
+  - {findings: [new_medication, on_chemotherapy], suggests: [drug_induced_diarrhea]}  # p.279
+  - {findings: [nsaid_use], suggests: [drug_induced_diarrhea]}  # p.279
+  - {findings: [laxative_use], suggests: [osmotic_laxative_diarrhea]}  # p.285
+  - {findings: [recent_antibiotics, recent_hospitalization], suggests: [pseudomembranous_colitis]}  # p.286
+  - {findings: [immunocompromised, hiv_infection], suggests: [protozoal_diarrhea, cmv_colitis]}  # p.279, 285
+  - {findings: [diabetes], suggests: [diabetic_diarrhea, sibo]}  # p.278
+  - {findings: [abdominal_surgery], suggests: [sibo, bile_acid_diarrhea, short_bowel_syndrome]}  # p.279, 285
+  - {findings: [radiation_history], suggests: [radiation_colitis]}  # p.279
+  - {findings: [family_history_gi_cancer], suggests: [colon_cancer, ibd]}  # p.279
+  - {findings: [alcohol], suggests: [chronic_pancreatitis]}  # p.280
+  - {findings: [tb_contact], suggests: [intestinal_tuberculosis]}  # p.286
+  - {findings: [history_heart_disease], suggests: [ischemic_colitis]}  # p.286
+  - {findings: [history_allergy, history_asthma], suggests: [eosinophilic_gastroenteritis]}  # p.278
+  - {findings: [bedridden], suggests: [fecal_impaction]}  # p.275
+
+exam_clues:
+  - {sign: tachycardia_or_orthostatic_hypotension, suggests: [dehydration, hyperthyroidism, carcinoid syndrome, diabetic diarrhea]}  # p.280
+  - {sign: clubbing, suggests: [inflammatory bowel disease]}  # p.280
+  - {sign: cutaneous_larva_migrans, suggests: [hookworm infection]}  # p.280
+  - {sign: erythema_nodosum, suggests: [inflammatory bowel disease]}  # p.280
+  - {sign: aphthous_ulcer, suggests: [inflammatory bowel disease, Behcet disease, SLE]}  # p.281
+  - {sign: left_supraclavicular_or_periumbilical_node, suggests: [colon cancer, pancreatic cancer, liver cancer, lymphoma]}  # p.281
+  - {sign: perianal_abscess_or_fistula, suggests: [Crohn disease]}  # p.282
+  - {sign: loose_anal_sphincter, suggests: [diabetic diarrhea]}  # p.282
+  - {sign: rectal_mass_or_shelf, suggests: [rectal or intra-abdominal tumor]}  # p.282
+  - {sign: impacted_hard_feces, suggests: [overflow diarrhea]}  # p.282

@@ -1,0 +1,173 @@
+# Chapter 14 — Chest pain (เจ็บหน้าอก)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 153–160. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 20
+title: {th: ตัวเหลืองตาเหลือง, en: Jaundice}
+chief_complaint: jaundice
+also_entry: []
+status: draft
+
+definitions:
+  jaundice: "ผิวหนัง ตาขาว และเยื่อบุเป็นสีเหลืองจาก bilirubin ในเลือดสูง มักเห็นได้เมื่อเกิน 3 mg/dL"  # p.218
+  hepatocellular_jaundice: "ตับอักเสบ เปลี่ยน bilirubin ได้ไม่ปกติ จึงคั่งทั้งสองชนิด"  # p.219
+  cholestatic_jaundice: "ทางเดินน้ำดีอุดตัน น้ำดีลงลำไส้ไม่ได้ อุจจาระจึงซีด"  # p.219
+  abnormal_bilirubin_metabolism: "สร้าง bilirubin มากเกิน เช่น เม็ดเลือดแดงแตก หรือเอนไซม์ผิดปกติแต่กำเนิด มักเหลืองเล็กน้อย"  # p.219
+
+hpi:
+  jaundice:
+    pain:  # ตาราง 20-1; p.223
+      ask: "มีปวดท้องร่วมด้วยไหม ปวดจุกแน่นใต้ลิ้นปี่หรือชายโครงขวานานเป็นชั่วโมง ปวดแบบอื่น หรือไม่ปวดเลย"
+      allow_unknown: true
+      options: [biliary_colic, other_pain, painless]
+
+steps:
+  - {id: hepatocellular_cholestatic_or_bilirubin_metabolism}  # p.219, ภาพ 20-1
+  - {id: history_and_exam_for_each_group}  # ตาราง 20-1 p.221
+  - {id: liver_tests_and_imaging}  # p.224, 225
+
+gates:
+  liver_failure:  # p.222
+    when: always
+    ask: [confusion, drowsiness]
+    if_any_yes: urgent
+  cholangitis:  # p.223
+    when: always
+    ask: [high_fever, chills]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # p.221, 222
+    ask: [new_medication, herbal_medicine, alcohol]
+    rules_out: [drug_induced_liver_injury, alcoholic_hepatitis]
+  - when: {sex: female, age_between: [15, 50]}  # p.222
+    ask: [pregnancy]
+    rules_out: [pregnancy_liver_disease]
+
+tree_selection: []
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {present: [pale_stool]}, boost: cholestatic}  # p.219; ตาราง 20-1
+  - {when: {jaundice.pain: biliary_colic}, boost: cholestatic.extrahepatic.stone}  # p.223
+  - {when: {present: [biliary_type_pain]}, boost: cholestatic.extrahepatic.stone}  # p.223
+  - {when: {jaundice.pain: painless, present: [weight_loss]}, boost: cholestatic.extrahepatic.extrinsic_compression}  # p.223
+  - {when: {present: [cola_colored_urine]}, boost: abnormal_bilirubin_metabolism.hemolysis}  # p.224
+
+trees:  # ภาพ 20-1
+  hepatocellular:
+    infection:
+      viral: [viral_hepatitis]  # p.220
+      systemic: [leptospirosis, scrub_typhus, enteric_fever, dengue]  # p.221
+    drug_toxin: [drug_induced_liver_injury]  # p.221
+    alcohol: [alcoholic_hepatitis, cirrhosis]  # p.222
+    autoimmune: [autoimmune_hepatitis]  # p.222
+    ischemic: [ischemic_hepatitis]  # p.222
+    others: [wilson_disease, pregnancy_liver_disease]  # p.222
+  cholestatic:
+    extrahepatic:
+      stone: [choledocholithiasis, cholangitis]  # p.223
+      extrinsic_compression: [pancreatic_cancer, chronic_pancreatitis]  # p.223
+      bile_duct_disease: [cholangiocarcinoma, sclerosing_cholangitis, aids_cholangiopathy, biliary_stricture]  # p.223
+    intrahepatic: [primary_biliary_cholangitis, drug_induced_liver_injury, hcc]  # p.223
+  abnormal_bilirubin_metabolism:
+    hemolysis: [hemolytic_anemia]  # p.224
+    congenital: [congenital_hyperbilirubinemia]  # p.224
+
+scores: {}
+
+confirm: {}
+
+findings:
+  viral_hepatitis:  # p.217, 220, 221
+    symptoms: [low_grade_fever, fatigue, myalgia, nausea, anorexia, dark_urine]
+    signs: [hepatomegaly, liver_tenderness]
+  alcoholic_hepatitis:  # p.222
+    symptoms: [fever]
+    signs: [hepatomegaly, malnutrition]
+  cirrhosis:  # p.222; ตาราง 20-1
+    symptoms: [abdominal_distension]
+    signs: [stigmata_of_chronic_liver_disease, ascites, splenomegaly]
+  wilson_disease:  # p.222
+    symptoms: [involuntary_movement]
+  pregnancy_liver_disease:  # p.222
+    symptoms: [itch]
+  choledocholithiasis:  # p.223; ตาราง 20-1
+    symptoms: [biliary_type_pain, ruq_pain]
+    signs: [ruq_tenderness]
+  cholangitis:  # p.223
+    symptoms: [biliary_type_pain, ruq_pain, high_fever, chills]
+  pancreatic_cancer:  # p.223; ตาราง 20-1
+    symptoms: [anorexia, weight_loss]
+    signs: [palpable_gallbladder, abdominal_mass]
+  cholangiocarcinoma:  # p.223; ตาราง 20-1
+    symptoms: [anorexia, weight_loss]
+  hcc:  # p.223; ตาราง 20-1
+    symptoms: [anorexia, weight_loss]
+  hemolytic_anemia:  # p.224
+    symptoms: [cola_colored_urine, pallor, fatigue]
+    signs: [splenomegaly]
+
+branch_findings:
+  hepatocellular:  # ตาราง 20-1
+    symptoms: [low_grade_fever, fatigue, myalgia, nausea, anorexia]
+  hepatocellular.infection.systemic:  # p.221
+    symptoms: [fever, lymph_node_swelling, cough, diarrhea, rash]
+  cholestatic:  # p.219; ตาราง 20-1
+    symptoms: [itch, pale_stool]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [history_gi_liver_disease, viral_hepatitis_history], suggests: [viral_hepatitis, cirrhosis]}  # ตาราง 20-1
+  - {findings: [unsafe_food, sick_contacts, family_history_liver_disease], suggests: [viral_hepatitis]}  # p.220, 221, 226
+  - {findings: [unprotected_sex, iv_drug_use, recent_vaccine_or_transfusion], suggests: [viral_hepatitis]}  # p.220
+  - {findings: [flood_wading], suggests: [leptospirosis]}  # p.28
+  - {findings: [scrub_exposure], suggests: [scrub_typhus]}  # p.28
+  - {findings: [new_medication, herbal_medicine, wild_mushroom], suggests: [drug_induced_liver_injury]}  # p.221
+  - {findings: [alcohol], suggests: [alcoholic_hepatitis, cirrhosis]}  # p.222
+  - {findings: [autoimmune_disease_history], suggests: [autoimmune_hepatitis]}  # p.222
+  - {findings: [low_blood_pressure, kidney_disease], suggests: [ischemic_hepatitis]}  # p.222
+  - {findings: [family_history_liver_disease], suggests: [wilson_disease]}  # p.222
+  - {findings: [pregnancy], suggests: [pregnancy_liver_disease]}  # p.222
+  - {findings: [previous_biliary_surgery], suggests: [choledocholithiasis, biliary_stricture]}  # ตาราง 20-1; p.223
+  - {findings: [hiv_infection], suggests: [aids_cholangiopathy]}  # p.223
+  - {findings: [thalassemia, recent_vaccine_or_transfusion], suggests: [hemolytic_anemia]}  # ภาพ 20-1; p.224
+
+exam_clues:
+  - {sign: stigmata_of_chronic_liver_disease, suggests: [cirrhosis]}  # ตาราง 20-1
+  - {sign: ascites, suggests: [cirrhosis], askable_as: abdominal_distension}  # ตาราง 20-1
+  - {sign: hepatomegaly, suggests: [viral_hepatitis, alcoholic_hepatitis]}  # ตาราง 20-1; p.222
+  - {sign: palpable_gallbladder, suggests: [pancreatic_cancer]}  # p.223
+  - {sign: splenomegaly, suggests: [hemolytic_anemia, cirrhosis]}  # p.224; ตาราง 20-1
+  - {sign: asterixis, suggests: [acute liver failure]}  # p.222

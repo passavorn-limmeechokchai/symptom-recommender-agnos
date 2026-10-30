@@ -1,0 +1,184 @@
+# Chapter 31 — Low back pain (ปวดหลังส่วนล่าง)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 343–351. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 31
+title: {th: ปวดหลังส่วนล่าง, en: Low back pain}
+chief_complaint: back_pain
+also_entry: [flank_pain]
+status: draft
+
+definitions:  # p.344
+  low_back_pain: "ปวดหลังบริเวณใต้ขอบล่างของกระดูกชายโครง และเหนือขอบล่างของแก้มก้น"
+  duration:
+    acute: "น้อยกว่า 6 สัปดาห์"
+    subacute: "6–12 สัปดาห์"
+    chronic: "มากกว่า 12 สัปดาห์"
+  mechanical: "ปวดจากความผิดปกติเชิงโครงสร้างของกระดูกสันหลัง"
+  sciatica: "ปวดร้าวลงก้น ต้นขาด้านหลัง น่อง และเท้า ตามแนวเส้นประสาท sciatic มักเป็นข้างเดียว"
+  cauda_equina_syndrome: "รากประสาทใต้ต่อไขสันหลังถูกกดทับ: ปวด อ่อนแรง ชา และ/หรือปัสสาวะอุจจาระลำบาก"
+
+hpi:
+  back_pain:
+    duration:  # p.344
+      ask: "ปวดหลังมานานเท่าไหร่แล้ว"
+      unit: weeks
+      allow_unknown: true
+      categories:
+        acute: {below: 6}
+        subacute: {from: 6, to: 12}
+        chronic: {above: 12}
+      grey_zones:
+        - {from: 4, to: 8, both: [acute, subacute]}
+        - {from: 10, to: 14, both: [subacute, chronic]}
+    relation_to_activity:  # p.346–347
+      ask: "ปวดมากขึ้นเวลาใช้งาน ก้ม ยก แล้วพักแล้วดีขึ้นไหม หรือปวดแม้ตอนพัก"
+      allow_unknown: true
+      options: [worse_with_use, at_rest_or_night]
+    radiation:  # p.344
+      ask: "ปวดร้าวไปที่ไหนไหม"
+      options: [leg, abdomen, groin, none]
+    morning_stiffness:  # p.347
+      ask: "ตื่นนอนตอนเช้าหลังตึงนานแค่ไหน"
+      options: [over_30_minutes, under_30_minutes]
+    onset:  # p.347
+      ask: "ปวดขึ้นมาทันที หรือค่อยๆ ปวดมากขึ้นเรื่อยๆ"
+      options: [sudden, insidious]
+    response_to_treatment:  # p.347
+      ask: "รักษาด้วยยาแก้ปวดหรือพักมา 4–6 สัปดาห์แล้วดีขึ้นไหม"
+      options: [improved, not_improved]
+
+steps:
+  - {id: true_vs_referred}  # p.346
+  - {id: red_flags}  # p.347
+  - {id: mechanical_vs_non_mechanical}  # p.346
+
+gates:
+  spinal_cord_compression:  # p.345, 347, ตาราง 31-1
+    when: always
+    ask: [saddle_anesthesia, urinary_or_fecal_difficulty, leg_weakness]
+    if_any_yes: urgent
+
+must_ask:
+  - when: always  # ภาพ 31-1 red flag signs, p.347
+    ask: [fever, night_back_pain, leg_weakness, leg_numbness, weight_loss, history_cancer, osteoporosis,
+          corticosteroid_use, immunocompromised, hiv_infection, iv_drug_use, significant_trauma]
+    red_flag_when: {age_above: 50}
+    rules_out: [spinal_cord_compression, spondylodiscitis, spinal_metastasis, primary_spinal_cancer,
+                osteoporotic_fracture, traumatic_fracture]
+
+tree_selection:
+  - {when: always, use: [referred, true_lbp]}  # ภาพ 31-1
+  - {when: {back_pain.relation_to_activity: worse_with_use}, use: [true_lbp]}
+  - {when: {back_pain.relation_to_activity: at_rest_or_night}, use: [true_lbp]}
+
+branch_selection: {}
+
+branch_hints:
+  - {when: {back_pain.relation_to_activity: worse_with_use}, boost: true_lbp.mechanical}  # p.346
+  - {when: {back_pain.relation_to_activity: at_rest_or_night}, boost: true_lbp.non_mechanical}  # p.347
+  - {when: {back_pain.duration: acute}, boost: true_lbp.nonspecific}  # p.347
+
+trees:  # ภาพ 31-1
+  referred: [abdominal_aortic_aneurysm, pancreatitis, endometriosis, renal_stone, acute_pyelonephritis,
+             prostatitis, pelvic_inflammatory_disease]
+  true_lbp:
+    mechanical: [spondylosis, spinal_stenosis, osteoporotic_fracture, traumatic_fracture,
+                 herniated_disc, scoliosis, spondylolisthesis]
+    non_mechanical: [primary_spinal_cancer, spinal_metastasis, spondylodiscitis, spondyloarthropathy]
+    nonspecific: [lumbar_strain]
+  emergency: [spinal_cord_compression]  # ภาพ 31-1 "conditions needed immediate investigations"
+
+scores: {}
+
+confirm: {}
+
+findings:
+  abdominal_aortic_aneurysm:  # p.346
+    symptoms: [pulsatile_abdominal_mass]
+  pancreatitis:  # p.346
+    symptoms: [epigastric_pain, pain_relieved_leaning_forward]
+  pelvic_inflammatory_disease:  # p.346
+    symptoms: [lower_abdominal_pain]
+  endometriosis:  # p.346
+    symptoms: [pain_with_menses]
+  prostatitis:  # p.346
+    symptoms: [difficulty_urinating]
+  renal_stone:  # p.346
+    symptoms: [dysuria, colicky_abdominal_pain]
+  acute_pyelonephritis:  # p.346
+    symptoms: [fever, chills]
+  herniated_disc:  # p.346, ตาราง 31-3
+    symptoms: [back_pain_radiating_leg, leg_numbness, leg_weakness]
+    signs: [straight_leg_raising_positive]
+  spinal_stenosis:  # p.346
+    symptoms: [back_pain_radiating_leg]
+  osteoporotic_fracture:  # ตาราง 31-1
+    symptoms: [osteoporosis, sudden_back_pain]
+  traumatic_fracture:  # ตาราง 31-1
+    symptoms: [significant_trauma]
+  spondyloarthropathy:  # p.347
+    symptoms: [back_morning_stiffness_long, insidious_back_pain, night_back_pain]
+    signs: [modified_schober_positive]
+  spondylodiscitis:  # ตาราง 31-1
+    symptoms: [fever, weight_loss, night_back_pain]
+  spinal_metastasis:  # ตาราง 31-1
+    symptoms: [weight_loss, night_back_pain]
+  primary_spinal_cancer:  # ตาราง 31-1
+    symptoms: [weight_loss, night_back_pain]
+  spinal_cord_compression:  # ตาราง 31-1
+    symptoms: [saddle_anesthesia, urinary_or_fecal_difficulty, leg_weakness, leg_numbness]
+  lumbar_strain:  # p.347
+    symptoms: [back_pain_worse_with_use]
+
+branch_findings:
+  true_lbp.mechanical:  # p.346
+    symptoms: [back_pain_worse_with_use]
+  true_lbp.non_mechanical:  # p.346–347
+    symptoms: [night_back_pain]
+
+reviewer_findings: {}
+
+history_clues:  # ตาราง 31-1
+  - {findings: [history_cancer], suggests: [spinal_metastasis, primary_spinal_cancer]}
+  - {findings: [osteoporosis, corticosteroid_use], suggests: [osteoporotic_fracture]}
+  - {findings: [significant_trauma], suggests: [traumatic_fracture]}
+  - {findings: [hiv_infection, immunocompromised, corticosteroid_use, iv_drug_use], suggests: [spondylodiscitis]}
+  - {findings: [tb_contact], suggests: [spondylodiscitis]}  # p.350
+  - {findings: [treatment_failure_4_6_weeks], suggests: [spinal_metastasis, primary_spinal_cancer, spondylodiscitis]}
+
+exam_clues:
+  - {sign: palpable_step_along_spine, suggests: [spondylolisthesis]}  # ตาราง 31-3
+  - {sign: straight_leg_raising_positive, suggests: [herniated nucleus pulposus]}  # ตาราง 31-3
+  - {sign: modified_schober_positive, suggests: [spondyloarthropathy]}  # ตาราง 31-3
+  - {sign: neurological_deficit, suggests: [spinal cord compression, fracture, malignancy, infection]}  # ตาราง 31-1
+  - {sign: pulsatile_abdominal_mass, askable_as: pulsatile_abdominal_mass, suggests: [aortic aneurysm]}  # p.346

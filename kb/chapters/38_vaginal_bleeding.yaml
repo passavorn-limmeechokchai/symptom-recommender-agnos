@@ -1,0 +1,232 @@
+# Chapter 38 — Abnormal vaginal bleeding (เลือดออกผิดปกติทางช่องคลอด)
+# Book: วิธีคิดเพื่อการแก้ปัญหาทางคลินิกอย่างเป็นระบบ (2023), pages 419–428. `# p.N` = book page.
+#
+# How to read this file. Every chapter file has the same sections in this order;
+# an empty section ({} or []) means the source has nothing for it.
+#   chapter … status    which chief complaint opens this file; also_entry = other complaints that open it
+#   definitions         terms and cut-offs as the source defines them
+#   hpi                 questions per symptom (LODCRAFTS): `ask` + `options`, or `unit` + `categories`;
+#                       grey_zones = answers near a cut-off keep both neighbouring categories;
+#                       answer values match `refines` of the child symptoms in kb/symptoms.yaml
+#   steps               the source's order of reasoning
+#   gates               asked first; any "yes" -> urgent, or {prioritize: <branch>}
+#   must_ask            asked as soon as `when` matches; rules_out = what the answers exclude;
+#                       red_flag_when = patient profile that itself counts as a red flag
+#   tree_selection      which DDx trees to use; every matching rule adds its trees
+#   branch_selection    inside a chosen tree, keep only the branches for one HPI answer
+#   branch_hints        `when` matches -> boost that branch in the ranking
+#   trees               DDx trees: branch -> branch -> [disease ids]
+#   scores              clinical scores (items, threshold)
+#   confirm             checks that the complaint is what it seems
+#   findings            disease -> symptoms the patient can report, besides the chief complaint;
+#                       signs = found on examination
+#   branch_findings     tree branch -> symptoms shared by every disease under it
+#   reviewer_findings   added by the reviewing physician, not in the source
+#   history_clues       history or exposure -> diseases it points to; each listed item counts on its own
+#   exam_clues          examination finding -> diseases, for physicians; askable_as = a sign the
+#                       patient can notice, asked as that symptom
+#
+# Conditions (`when`): always, or any of present: [ids] | absent: [ids] | <symptom>.<question>: answer |
+#   sex | age_above | age_below | age_between | no_symptoms_of: <branch>.
+# Ids: symptoms in kb/symptoms.yaml, diseases in kb/diseases.yaml. Comments cite the source page;
+# `# reviewer` marks items added by the reviewing physician.
+
+chapter: 38
+title: {th: เลือดออกผิดปกติทางช่องคลอด, en: Abnormal vaginal bleeding}
+chief_complaint: vaginal_bleeding
+also_entry: [heavy_menstrual_bleeding, intermenstrual_bleeding]
+status: draft
+
+definitions:  # p.420
+  normal_menstruation: "รอบห่าง 24–38 วัน เลือดออกไม่เกิน 8 วันต่อรอบ ปริมาณ 5–80 มล."
+  abnormal_vaginal_bleeding: "เลือดออกผิดจากประจำเดือนปกติ อาจมาจากอวัยวะเพศภายนอก ช่องคลอด ปากมดลูก หรือโพรงมดลูก"
+  abnormal_uterine_bleeding: "เลือดออกผิดปกติที่มีต้นทางในโพรงมดลูก"
+  acute_aub: "เลือดจากโพรงมดลูกออกมากจนต้องประเมินและรักษาทันทีเพื่อลดการเสียเลือด"
+  chronic_aub: "ความถี่ ระยะเวลา หรือปริมาณเลือดผิดปกติต่อเนื่องประมาณ 6 เดือนขึ้นไป"
+  heavy_menstrual_bleeding: "ประจำเดือนมากจนกระทบชีวิตประจำวัน หรือวัดได้มากกว่า 80 มล.ต่อรอบ"
+  intermenstrual_bleeding: "มีเลือดออกระหว่างรอบเดือน อาจเป็นเวลาเดิมของรอบหรือคาดเวลาไม่ได้"
+
+hpi:
+  vaginal_bleeding:
+    current_status:  # p.420, 424
+      ask: "ตอนนี้ไม่มีเลือดออก ยังออกเล็กน้อย หรือออกมากอย่างเฉียบพลัน"
+      options: [none, light_or_usual, acute_heavy]
+      allow_unknown: true
+      sex: female
+    source:  # p.420, 423; ภาพ 38-1
+      ask: "ทราบไหมว่าเลือดมาจากช่องคลอด มากับปัสสาวะ หรือออกทางทวารหนัก ถ้ายังแยกไม่ได้เลือกไม่แน่ใจ"
+      options: [vaginal, urinary, rectal]
+      allow_unknown: true
+      sex: female
+    pregnancy_test:  # p.424–425
+      ask: "ได้ตรวจการตั้งครรภ์สำหรับครั้งนี้หรือยัง ผลเป็นบวกหรือลบ ถ้ายังไม่ได้ตรวจเลือกไม่แน่ใจ"
+      options: [positive, negative]
+      allow_unknown: true
+      sex: female
+    pattern:  # p.420–421
+      ask: "เลือดออกช่วงประจำเดือน ระหว่างรอบเดือน หรือมีทั้งสองแบบ"
+      options: [menstrual, intermenstrual]
+      multiple: true
+      allow_unknown: true
+      sex: female
+    amount:  # p.420, 422
+      ask: "เลือดมากกว่าประจำเดือนเดิมไหม เช่น ผ้าอนามัยเต็มเร็ว ใช้มากขึ้น หรือมีลิ่มเลือด"
+      options: [usual, heavy]
+      allow_unknown: true
+      sex: female
+    regularity:  # p.421, 426
+      ask: "เลือดมาตรงรอบสม่ำเสมอ หรือรอบไม่แน่นอน"
+      options: [regular, irregular]
+      allow_unknown: true
+      sex: female
+    interval:  # p.422
+      ask: "จากวันแรกของรอบหนึ่งถึงวันแรกของรอบถัดไป น้อยกว่า 24 วัน 24–38 วัน มากกว่า 38 วัน หรือขาดประจำเดือน"
+      options: [under_24_days, 24_to_38_days, over_38_days, absent]
+      allow_unknown: true
+      sex: female
+    episode_duration:  # p.420, 422
+      ask: "เลือดออกแต่ละครั้งนานไม่เกิน 8 วัน หรือเกิน 8 วัน"
+      options: [up_to_8_days, over_8_days]
+      allow_unknown: true
+      sex: female
+    course:  # p.420, 425
+      ask: "เริ่มมีเลือดออกผิดปกติมาน้อยกว่า 6 เดือน หรือประมาณ 6 เดือนขึ้นไปแล้ว"
+      options: [under_6_months, 6_months_or_more]
+      allow_unknown: true
+      sex: female
+    contraception:  # p.422; case p.419, 425
+      ask: "ปัจจุบันคุมกำเนิดอย่างไร ไม่ได้คุม ใช้ฮอร์โมน ทำหมัน หรือวิธีอื่น"
+      options: [none, hormonal, tubal_ligation, other]
+      allow_unknown: true
+      sex: female
+
+steps:
+  - {id: assess_current_bleeding_and_anemia}  # p.420–421, 423–425
+  - {id: confirm_genital_not_urinary_or_anorectal_source}  # p.420, 423; ภาพ 38-1
+  - {id: extra_uterine_or_intra_uterine_source}  # p.423–424
+  - {id: pregnancy_test_before_non_gestational_aub}  # p.424–425
+  - {id: palm_structural_or_coein_non_structural}  # p.424–425
+  - {id: pelvic_exam_imaging_and_selected_biopsy}  # p.423–426
+
+gates:
+  acute_heavy_bleeding:  # p.420; ภาพ 38-1
+    when: {sex: female}
+    ask: [acute_heavy_vaginal_bleeding]
+    if_any_yes: urgent
+
+must_ask:
+  - when: {sex: female, vaginal_bleeding.pregnancy_test: unknown}  # p.422, 424–425
+    ask: [pregnancy, missed_period]
+    rules_out: [miscarriage, molar_pregnancy, ectopic_pregnancy]
+  - when: {sex: female}  # p.420; ภาพ 38-1
+    ask: [hematuria, bloody_stool]
+    rules_out: [urinary_bleeding_source, anorectal_bleeding_source]
+  - when: {sex: female}  # p.421–422
+    ask: [near_syncope, easy_bleeding, antithrombotic_use]
+    rules_out: [coagulopathy, drug_induced_bleeding]
+
+tree_selection:
+  - {when: {sex: female}, use: [non_gynecologic, extra_uterine]}  # ภาพ 38-1
+  - {when: {sex: female, vaginal_bleeding.pregnancy_test: positive}, use: [pregnancy_related]}  # p.424
+  - {when: {sex: female, vaginal_bleeding.pregnancy_test: negative}, use: [non_gestational]}  # p.424
+  - {when: {sex: female, vaginal_bleeding.pregnancy_test: unknown}, use: [pregnancy_related, non_gestational]}  # p.424–425
+
+branch_selection:
+  attribute: vaginal_bleeding.source
+  map:  # p.420, 423; ภาพ 38-1
+    vaginal: [extra_uterine, pregnancy_related, non_gestational]
+    urinary: [urinary]
+    rectal: [rectal]
+
+branch_hints:
+  - {when: {vaginal_bleeding.pregnancy_test: positive}, boost: pregnancy_related}  # p.424
+  - {when: {present: [pregnancy]}, boost: pregnancy_related}  # p.424
+  - {when: {vaginal_bleeding.regularity: regular}, boost: non_gestational.structural}  # p.425–426
+  - {when: {present: [heavy_menstrual_bleeding]}, boost: non_gestational.structural}  # p.425–426
+  - {when: {present: [intermenstrual_bleeding]}, boost: non_gestational.structural.polyp}  # p.426
+  - {when: {vaginal_bleeding.regularity: irregular}, boost: non_gestational.non_structural.ovulatory}  # p.426
+  - {when: {present: [pain_with_menses]}, boost: non_gestational.structural.adenomyosis}  # p.425–426
+
+trees:  # ภาพ 38-1
+  non_gynecologic:
+    urinary: [urinary_bleeding_source]
+    rectal: [anorectal_bleeding_source]
+  extra_uterine:  # p.423
+    vulval: [vulval_lesion]
+    vaginal: [vaginal_laceration]
+    cervical: [cervical_polyp, cervical_cancer]
+  pregnancy_related: [miscarriage, molar_pregnancy, ectopic_pregnancy]  # p.424
+  non_gestational:
+    structural:  # PALM; p.424–425
+      polyp: [endometrial_polyp]
+      adenomyosis: [adenomyosis]
+      leiomyoma: [uterine_leiomyoma]
+      malignancy_hyperplasia: [uterine_malignancy_or_hyperplasia]
+    non_structural:  # COEIN; p.425
+      coagulopathy: [coagulopathy]
+      ovulatory: [ovulatory_dysfunction, pcos, hyperthyroidism, hypothyroidism]  # thyroid/PCOS history: p.422–423
+      endometrial: [endometrial_dysfunction, endometritis]
+      iatrogenic: [drug_induced_bleeding]
+      other: [uterine_avm, isthmocele]
+
+scores: {}
+
+confirm: {}
+
+findings:
+  urinary_bleeding_source:  # p.419–420; ภาพ 38-1
+    symptoms: [hematuria]
+  anorectal_bleeding_source:  # p.419–420; ภาพ 38-1
+    symptoms: [bloody_stool]
+  vulval_lesion:  # p.423
+    symptoms: [genital_ulcer]
+  vaginal_laceration:  # p.423
+    signs: [vaginal_tear]
+  cervical_polyp:  # p.423
+    signs: [cervical_polyp_on_pelvic_exam]
+  cervical_cancer:  # p.421, 423
+    symptoms: [anorexia, weight_loss]
+    signs: [cervical_mass]
+  endometrial_polyp:  # p.426
+    symptoms: [intermenstrual_bleeding]
+  adenomyosis:  # p.423, 425–426
+    symptoms: [heavy_menstrual_bleeding, prolonged_vaginal_bleeding, pain_with_menses, lower_abdominal_mass]
+    signs: [enlarged_uterus]
+  uterine_leiomyoma:  # p.421, 423, 425–426
+    symptoms: [heavy_menstrual_bleeding, prolonged_vaginal_bleeding, lower_abdominal_mass, urinary_frequency, difficulty_urinating]
+    signs: [enlarged_uterus, submucosal_myoma_on_ultrasound]
+  uterine_malignancy_or_hyperplasia:  # p.421, 425
+    symptoms: [anorexia, weight_loss]
+  coagulopathy:  # p.422, 426
+    symptoms: [easy_bleeding]
+  ovulatory_dysfunction:  # p.426
+    symptoms: [irregular_menstrual_bleeding]
+  pcos:  # p.422–423; PCOS symptoms: ch.5 p.50
+    symptoms: [irregular_menstrual_bleeding, acne, hirsutism]
+  hyperthyroidism:  # thyroid disease: p.422–423; symptoms: ch.5 p.54
+    symptoms: [heat_intolerance, palpitation, diaphoresis, neck_lump]
+  hypothyroidism:  # thyroid disease: p.422–423; symptoms: ch.5 p.50
+    symptoms: [cold_intolerance, fatigue, constipation, dry_skin, hair_loss, neck_lump]
+
+branch_findings:
+  pregnancy_related:  # p.425
+    symptoms: [missed_period]
+
+reviewer_findings: {}
+
+history_clues:
+  - {findings: [vaginal_injury_history], suggests: [vaginal_laceration]}  # p.423
+  - {findings: [postpartum_hemorrhage_history], suggests: [coagulopathy]}  # p.426
+  - {findings: [antithrombotic_use, oral_contraceptive_use, gynecologic_hormone_use, antidepressant_use, herbal_medicine], suggests: [drug_induced_bleeding]}  # p.422, 425
+  - {findings: [thyroid_disease_history], suggests: [hyperthyroidism, hypothyroidism]}  # p.422–423
+  - {findings: [pcos_history], suggests: [pcos, ovulatory_dysfunction]}  # p.422, 426
+  - {findings: [obesity, family_history_lynch_syndrome], suggests: [uterine_malignancy_or_hyperplasia]}  # p.422–423
+
+exam_clues:
+  - {sign: low_blood_pressure_or_tachycardia_during_acute_bleeding, suggests: [acute blood loss]}  # p.423
+  - {sign: pale_conjunctiva, suggests: [blood loss anemia], askable_as: pallor}  # p.423
+  - {sign: genital_ulcer, suggests: [vulval_lesion], askable_as: genital_ulcer}  # p.423
+  - {sign: cervical_polyp, suggests: [cervical_polyp]}  # p.423
+  - {sign: cervical_mass, suggests: [cervical_cancer]}  # p.423
+  - {sign: enlarged_uterus, suggests: [uterine_leiomyoma, adenomyosis]}  # p.423, 425
+  - {sign: submucosal_myoma_on_ultrasound, suggests: [uterine_leiomyoma]}  # p.426
